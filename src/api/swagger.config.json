@@ -1,0 +1,5 @@
+
+{
+  "docsUrl": "./OpenAPI.json",
+  "axiosInstanceUrl": "@/plugins/myAxios.js"
+}

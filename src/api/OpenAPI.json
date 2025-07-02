@@ -1,0 +1,472 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/user/update": {
+      "post": {
+        "tags": [
+          "用户接口"
+        ],
+        "summary": "用户更新",
+        "operationId": "userUpdate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/register": {
+      "post": {
+        "tags": [
+          "用户接口"
+        ],
+        "summary": "注册请求",
+        "operationId": "userRegister",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/logout": {
+      "post": {
+        "tags": [
+          "用户接口"
+        ],
+        "summary": "用户注销",
+        "operationId": "userLogout",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "tags": [
+          "用户接口"
+        ],
+        "summary": "登录请求",
+        "operationId": "userLogin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/delete": {
+      "post": {
+        "tags": [
+          "用户接口"
+        ],
+        "summary": "删除用户",
+        "operationId": "userDelete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/search": {
+      "get": {
+        "tags": [
+          "用户接口"
+        ],
+        "summary": "查询所有用户",
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/searchOne": {
+      "get": {
+        "tags": [
+          "用户接口"
+        ],
+        "summary": "查询单个用户",
+        "operationId": "updateMassage",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/search/tags": {
+      "get": {
+        "tags": [
+          "用户接口"
+        ],
+        "summary": "根据标签名查询用户",
+        "operationId": "searchUsersByTags",
+        "parameters": [
+          {
+            "name": "tagsList",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/current": {
+      "get": {
+        "tags": [
+          "用户接口"
+        ],
+        "summary": "展示当前用户信息",
+        "operationId": "getCurrentUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "refType": null
+          },
+          "userName": {
+            "type": "string",
+            "refType": null
+          },
+          "userAccount": {
+            "type": "string",
+            "refType": null
+          },
+          "avatarUrl": {
+            "type": "string",
+            "refType": null
+          },
+          "gender": {
+            "type": "integer",
+            "format": "int32",
+            "refType": null
+          },
+          "tags": {
+            "type": "string",
+            "refType": null
+          },
+          "userPassword": {
+            "type": "string",
+            "refType": null
+          },
+          "phone": {
+            "type": "string",
+            "refType": null
+          },
+          "email": {
+            "type": "string",
+            "refType": null
+          },
+          "userStatus": {
+            "type": "integer",
+            "format": "int32",
+            "refType": null
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time",
+            "refType": null
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time",
+            "refType": null
+          },
+          "isdelete": {
+            "type": "integer",
+            "format": "int32",
+            "refType": null
+          },
+          "userRole": {
+            "type": "integer",
+            "format": "int32",
+            "refType": null
+          },
+          "profile": {
+            "type": "string",
+            "refType": null
+          }
+        }
+      },
+      "BaseResponseBoolean": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "UserRegisterRequest": {
+        "type": "object",
+        "properties": {
+          "userAccount": {
+            "type": "string"
+          },
+          "userPassword": {
+            "type": "string"
+          },
+          "checkPassword": {
+            "type": "string"
+          }
+        }
+      },
+      "BaseResponseLong": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLoginRequest": {
+        "type": "object",
+        "properties": {
+          "userAccount": {
+            "type": "string"
+          },
+          "userPassword": {
+            "type": "string"
+          }
+        }
+      },
+      "BaseResponseUser": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/User"
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "BaseResponseListUser": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "x-openapi": {
+    "x-setting": {
+      "customCode": 200,
+      "language": "zh-CN",
+      "enableSwaggerModels": true,
+      "swaggerModelName": "Swagger Models",
+      "enableReloadCacheParameter": false,
+      "enableAfterScript": true,
+      "enableDocumentManage": true,
+      "enableVersion": false,
+      "enableRequestCache": true,
+      "enableFilterMultipartApis": false,
+      "enableFilterMultipartApiMethodType": "POST",
+      "enableHost": false,
+      "enableHostText": "",
+      "enableDynamicParameter": false,
+      "enableDebug": true,
+      "enableFooter": true,
+      "enableFooterCustom": false,
+      "enableSearch": true,
+      "enableOpenApi": true,
+      "enableHomeCustom": false,
+      "enableGroup": true,
+      "enableResponseCode": true
+    },
+    "x-markdownFiles": []
+  }
+}
