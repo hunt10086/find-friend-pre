@@ -1,4 +1,5 @@
 <template>
+  <div>
   <van-form @submit="onSubmit">
     <van-cell-group inset>
       <van-field
@@ -12,11 +13,15 @@
       <van-button round block type="primary" native-type="submit"> 提交 </van-button>
     </div>
   </van-form>
+    </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { postUserUpdate } from '@/api/controller'
+import { showSuccessToast } from 'vant'
+import router from '@/config/router.ts'
 
 const route = useRoute()
 console.log(route.query)
@@ -26,8 +31,24 @@ const editUser = ref({
   editName: route.query.editName,
 })
 
-const onSubmit = (values) => {
-  //TODO 把修改的数据提交给后端
+const onSubmit = async (values) => {
+  const input = {
+    [editUser.value.editKey]: values[editUser.value.editKey],
+  }
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }
+  const res=await postUserUpdate(input,config);
+  if(res.data.code===0){
+    showSuccessToast('修改成功');
+    router.back();
+  }else {
+
+    showSuccessToast('修改失败');
+  }
+
 }
 </script>
 

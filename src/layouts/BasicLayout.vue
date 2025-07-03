@@ -7,8 +7,8 @@
     <van-icon name="search" size="18" />
   </template>
   </van-nav-bar>
-  <div class="content">
-<router-view />
+  <div id="content">
+  <router-view />
   </div>
 
   <van-tabbar route  @change="onChange">
@@ -40,5 +40,7 @@ import { showToast } from 'vant';
 </script>
 
 <style scoped>
-
+#content{
+  padding-bottom: 50px;
+}
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div v-if="user">
-  <van-cell title="用户ID" :value="user.id" />
+  <van-cell title="用户ID" :value="user?.id" />
   <van-cell
     title="用户名"
     is-link
@@ -10,15 +10,14 @@
   />
   <van-cell title="账号" :value="user.userAccount" />
   <van-cell
-    title="头像地址"
+    title="头像"
     is-link
     to="/user/edit"
     :value="user.avatarUrl"
-    @click="toEdit('avatarUrl', '头像', user.avatarUrl)"
+    @click="toEdit('avatarUrl', '头像地址', user.avatarUrl)"
   >
     <img :src="user.avatarUrl" style="height: 50px" />
   </van-cell>
-
   <van-cell
     title="性别"
     is-link
@@ -63,33 +62,23 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { getUserCurrent } from '@/api/controller'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import { showSuccessToast } from 'vant'
 
 const router = useRouter()
-// const user = {
-//   id: 1,
-//   userName: 'fkha',
-//   userAccount: 'fajh',
-//   avatarUrl: 'https://img.keaitupian.cn/uploads/2020/11/30/1581475563425326.jpg',
-//   gender: '男',
-//   phone: '10086',
-//   profile: 'I am a good boy',
-//   email: '2529220@qq.com',
-//   userStatus: 0,
-//   userRole: 1,
-//   tags: 'java',
-//   createTime: new Date(),
-// }
-
-const user = ref();
-const res=await getUserCurrent();
-user.value=res.data.data;
-
-
+const user=ref()
+onMounted(async () => {
+  const res = await getUserCurrent()
+  user.value = res.data.data
+  if (user) {
+    showSuccessToast('获取用户信息成功')
+  } else {
+    showSuccessToast('获取用户信息失败')
+  }
+})
 
 const toEdit = (editKey: string, editName: string, currentValue: string) => {
   router.push({ path: '/user/edit', query: { editKey, editName, currentValue } })
 }
 </script>
-<style scoped>
-</style>
+<style scoped></style>
