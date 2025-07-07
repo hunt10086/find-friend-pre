@@ -3,6 +3,7 @@ export * from "./postUserRegister";
 export * from "./postUserLogout";
 export * from "./postUserLogin";
 export * from "./postUserDelete";
+export * from "./getUserSendCode";
 export * from "./getUserSearch";
 export * from "./getUserSearchOne";
 export * from "./getUserSearchTags";

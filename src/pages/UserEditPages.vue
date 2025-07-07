@@ -22,6 +22,7 @@ import { useRoute } from 'vue-router'
 import { postUserUpdate } from '@/api/controller'
 import { showSuccessToast } from 'vant'
 import router from '@/config/router.ts'
+import BasicLayout from '@/layouts/BasicLayout.vue'
 
 const route = useRoute()
 console.log(route.query)

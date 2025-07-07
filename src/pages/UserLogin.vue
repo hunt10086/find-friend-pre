@@ -1,4 +1,5 @@
 <template>
+  <div>
   <van-form @submit="onSubmit">
     <van-cell-group inset>
       <van-field
@@ -20,13 +21,17 @@
     <div style="margin: 16px">
       <van-button round block type="primary" native-type="submit"> 登录 </van-button>
     </div>
+    <div style="margin: 16px">
+      <van-button round block type="primary" @click="Register"> 注册 </van-button>
+    </div>
   </van-form>
+    </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { postUserLogin } from '@/api/controller'
-import { showSuccessToast, showToast, Toast } from 'vant'
+import { getUserCurrent, postUserLogin } from '@/api/controller'
+import { showFailToast, showSuccessToast, showToast, Toast } from 'vant'
 import { useRouter } from 'vue-router'
 
 const router = useRouter();
@@ -39,7 +44,6 @@ const onSubmit = async () => {
     userAccount: userAccount.value,
     userPassword: userPassword.value
   };
-//todo 登录页不应该包含通用布局
 // 请求配置
   const config = {
     headers: {
@@ -53,6 +57,10 @@ const onSubmit = async () => {
   }else{
     showSuccessToast('登录失败');
   }
+}
+
+const Register=()=>{
+  router.push('/user/register');
 }
 
 

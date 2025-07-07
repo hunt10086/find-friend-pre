@@ -1,10 +1,9 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
-index
+  index
 </template>
+
+<script setup lang="ts">
+</script>
 
 <style scoped>
 

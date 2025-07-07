@@ -1,13 +1,24 @@
-
-
 <template>
-  <BasicLayout />
+  <div id="app">
+    <!-- 根据 meta 控制是否显示全局导航栏 -->
+    <header-nav v-if="$route.meta.showNavBar" />
+    <!-- 使用 keep-alive 缓存指定页面 -->
+    <keep-alive>
+      <router-view v-if="$route.meta.keepAlive" />
+    </keep-alive>
+    <!-- 非缓存页面直接渲染 -->
+    <router-view v-if="!$route.meta.keepAlive" />
+  </div>
 </template>
 
+<script>
+import HeaderNav from '@/layouts/BasicLayout.vue';
 
-<script setup lang="ts">
-import BasicLayout from '@/layouts/BasicLayout.vue'
+export default {
+  components: {
+    HeaderNav
+  }
+};
 </script>
-
-<style scoped >
+<style scoped>
 </style>

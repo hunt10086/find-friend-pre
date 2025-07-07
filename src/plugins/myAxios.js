@@ -1,4 +1,5 @@
 import axios from "axios";
+import router from '@/config/router.js'
 
 // 创建实例时配置默认值
 const myAxios = axios.create({
@@ -12,6 +13,7 @@ myAxios.defaults.withCredentials = true; // 请求携带 cookie
 myAxios.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
   console.log('我要发请求')
+  // router.push('/user/login');
   return config;
 }, function (error) {
   // 对请求错误做些什么

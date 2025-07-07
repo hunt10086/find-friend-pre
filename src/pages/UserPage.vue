@@ -64,6 +64,7 @@ import { useRouter } from 'vue-router'
 import { getUserCurrent } from '@/api/controller'
 import { onMounted, ref } from 'vue'
 import { showSuccessToast } from 'vant'
+import BasicLayout from '@/layouts/BasicLayout.vue'
 
 const router = useRouter()
 const user=ref()

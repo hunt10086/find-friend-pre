@@ -26,6 +26,7 @@ import { useRoute } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import myAxios from '../plugins/myAxios'
 import qs from 'qs'
+import BasicLayout from '@/layouts/BasicLayout.vue'
 const route = useRoute()
 const tags  = route.query
 const flag=ref(true);
