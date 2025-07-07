@@ -92,7 +92,6 @@ const onSubmit = async () => {
     email: email.value,
     code: code.value,
   }
-  //todo 登录页不应该包含通用布局
   // 请求配置
   const config = {
     headers: {
