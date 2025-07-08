@@ -7,4 +7,5 @@ export * from "./getUserSendCode";
 export * from "./getUserSearch";
 export * from "./getUserSearchOne";
 export * from "./getUserSearchTags";
+export * from "./getUserListLike";
 export * from "./getUserCurrent";

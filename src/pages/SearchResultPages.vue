@@ -15,6 +15,7 @@
         <van-button size="mini">联系我</van-button>
       </template>
     </van-card>
+    <van-divider />
   </div>
   <div v-if="!flag">
     <van-empty image="search" description="搜索失败" />
@@ -25,8 +26,6 @@
 import { useRoute } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import myAxios from '../plugins/myAxios'
-import qs from 'qs'
-import BasicLayout from '@/layouts/BasicLayout.vue'
 const route = useRoute()
 const tags  = route.query
 const flag=ref(true);
