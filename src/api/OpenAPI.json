@@ -157,6 +157,182 @@
         }
       }
     },
+    "/team/update": {
+      "post": {
+        "tags": [
+          "队伍接口"
+        ],
+        "summary": "更新队伍",
+        "operationId": "updateTeam",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/quit": {
+      "post": {
+        "tags": [
+          "队伍接口"
+        ],
+        "summary": "退出队伍",
+        "operationId": "quitTeam",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/join": {
+      "post": {
+        "tags": [
+          "队伍接口"
+        ],
+        "summary": "加入队伍",
+        "operationId": "joinTeam",
+        "parameters": [
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/delete": {
+      "post": {
+        "tags": [
+          "队伍接口"
+        ],
+        "summary": "删除队伍",
+        "operationId": "deleteTeam",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/create": {
+      "post": {
+        "tags": [
+          "队伍接口"
+        ],
+        "summary": "创建队伍",
+        "operationId": "addTeam",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTeamRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/sendCode": {
       "get": {
         "tags": [
@@ -326,6 +502,145 @@
           }
         }
       }
+    },
+    "/teamUser/list": {
+      "get": {
+        "tags": [
+          "展示队伍成员信息"
+        ],
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/search": {
+      "get": {
+        "tags": [
+          "队伍接口"
+        ],
+        "summary": "根据队伍名搜索队伍",
+        "operationId": "searchTeam",
+        "parameters": [
+          {
+            "name": "teamName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/myTeam": {
+      "get": {
+        "tags": [
+          "队伍接口"
+        ],
+        "summary": "展示创建的队伍列表",
+        "operationId": "getMyTeam",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/list": {
+      "get": {
+        "tags": [
+          "队伍接口"
+        ],
+        "summary": "获取队伍列表",
+        "operationId": "listTeam",
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/joinTeam": {
+      "get": {
+        "tags": [
+          "队伍接口"
+        ],
+        "summary": "展示加入队伍列表",
+        "operationId": "getJoinTeam",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -335,70 +650,55 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           },
           "userName": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "userAccount": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "avatarUrl": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "gender": {
             "type": "integer",
-            "format": "int32",
-            "refType": null
+            "format": "int32"
           },
           "tags": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "userPassword": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "phone": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "email": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "userStatus": {
             "type": "integer",
-            "format": "int32",
-            "refType": null
+            "format": "int32"
           },
           "createTime": {
             "type": "string",
-            "format": "date-time",
-            "refType": null
+            "format": "date-time"
           },
           "updateTime": {
             "type": "string",
-            "format": "date-time",
-            "refType": null
+            "format": "date-time"
           },
-          "isdelete": {
+          "isDelete": {
             "type": "integer",
-            "format": "int32",
-            "refType": null
+            "format": "int32"
           },
           "userRole": {
             "type": "integer",
-            "format": "int32",
-            "refType": null
+            "format": "int32"
           },
           "profile": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           }
         }
       },
@@ -488,6 +788,73 @@
           }
         }
       },
+      "TeamDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "teamName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "maxNum": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "password": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateTeamRequest": {
+        "type": "object",
+        "properties": {
+          "teamName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "maxNum": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
       "BaseResponseListUser": {
         "type": "object",
         "properties": {
@@ -499,6 +866,27 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/User"
+            }
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "BaseResponseListTeamDTO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamDTO"
             }
           },
           "message": {

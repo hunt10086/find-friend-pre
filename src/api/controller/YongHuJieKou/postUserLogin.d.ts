@@ -19,7 +19,7 @@ export declare function postUserLogin(input: UserLoginRequest, config?: AxiosReq
         userStatus: number;
         createTime: string;
         updateTime: string;
-        isdelete: number;
+        isDelete: number;
         userRole: number;
         profile: string;
     };

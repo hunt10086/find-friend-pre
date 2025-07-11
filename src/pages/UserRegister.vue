@@ -1,5 +1,5 @@
 <template>
-  <van-form class="Rform" @submit="onSubmit">
+  <van-form  label-width="100%" class="Rform" @submit="onSubmit">
     <van-cell-group :inset="false">
       <van-field
         v-model="userAccount"
@@ -106,8 +106,6 @@ const onSubmit = async () => {
     showSuccessToast('注册失败')
   }
 }
-
-
 </script>
 
 <style scoped>

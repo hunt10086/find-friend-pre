@@ -18,7 +18,7 @@ export declare function getUserSearchTags(params: GetUserSearchTagsParams, confi
         userStatus: number;
         createTime: string;
         updateTime: string;
-        isdelete: number;
+        isDelete: number;
         userRole: number;
         profile: string;
     }[];

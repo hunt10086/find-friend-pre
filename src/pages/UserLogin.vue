@@ -1,6 +1,6 @@
 <template>
   <div>
-  <van-form @submit="onSubmit">
+  <van-form label-width="100%" @submit="onSubmit">
     <van-cell-group inset>
       <van-field
         v-model="userAccount"

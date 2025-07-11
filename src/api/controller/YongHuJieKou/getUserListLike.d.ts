@@ -18,7 +18,7 @@ export declare function getUserListLike(params: GetUserListLikeParams, config?: 
         userStatus: number;
         createTime: string;
         updateTime: string;
-        isdelete: number;
+        isDelete: number;
         userRole: number;
         profile: string;
     }[];

@@ -4,4 +4,7 @@ export * from "./apiTypes/UserRegisterRequest";
 export * from "./apiTypes/BaseResponseLong";
 export * from "./apiTypes/UserLoginRequest";
 export * from "./apiTypes/BaseResponseUser";
+export * from "./apiTypes/TeamDto";
+export * from "./apiTypes/CreateTeamRequest";
 export * from "./apiTypes/BaseResponseListUser";
+export * from "./apiTypes/BaseResponseListTeamDto";

@@ -3,15 +3,18 @@
     <van-card class="card"
       v-for="user in userList"
       :desc="user.profile"
-      :title="`${user.userName}   编号:${user.id} `"
+      :title="`${user.userName}
+         编号:${user.id} `"
       :thumb="user.avatarUrl" size="80px"
     >
       <template #tags>
+
         <van-tag plain type="warning" v-for="tag in user.tags">
           {{ tag }}
         </van-tag>
       </template>
       <template #footer>
+
         <van-button size="mini">联系我</van-button>
       </template>
     </van-card>

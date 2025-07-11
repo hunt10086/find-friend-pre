@@ -18,7 +18,7 @@ export declare function getUserSearch(params: GetUserSearchParams, config?: Axio
         userStatus: number;
         createTime: string;
         updateTime: string;
-        isdelete: number;
+        isDelete: number;
         userRole: number;
         profile: string;
     }[];

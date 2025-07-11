@@ -8,23 +8,10 @@ import UserEditPages from '@/pages/UserEditPages.vue'
 import SearchResultPages from '@/pages/SearchResultPages.vue'
 import UserLogin from '@/pages/UserLogin.vue'
 import UserRegister from '@/pages/UserRegister.vue'
-
-// const routes = [
-//   { path: '/', component: Index , meta: {
-//     keepalive:  true
-//     }},
-//   { path: '/team', component: Team },
-//   { path: '/user' , component: User},
-//   { path: '/search',component: SearchPages},
-//   { path: '/user/edit' , component: UserEditPages},
-//   { path: '/user/list' , component: SearchResultPages},
-//   {path:'/user/login' ,component: UserLogin,meta:{
-//     showNavBar:false
-//     }},
-//   {path:'/user/register' ,component: UserRegister,meta: {
-//     showNavBar:false
-//     }}
-// ]
+import JoinTeam from '@/pages/JoinTeam.vue'
+import I from '@/pages/I.vue'
+import MyTeam from '@/pages/MyTeam.vue'
+import CreateTeam from '@/pages/CreateTeam.vue'
 
 const routes = [
   {
@@ -66,6 +53,26 @@ const routes = [
     path: '/user/register',
     component: UserRegister,
     meta: { keepAlive: true, showNavBar: false }
+  },
+  {
+    path: '/JoinTeam',
+    component: JoinTeam,
+    meta: { keepAlive: true, showNavBar: true }
+  },
+  {
+    path: '/Person',
+    component: I,
+    meta: { keepAlive: true, showNavBar: true }
+  },
+  {
+    path: '/myTeam',
+    component: MyTeam,
+    meta: { keepAlive: true, showNavBar: true }
+  },
+  {
+    path: '/create',
+    component: CreateTeam,
+    meta: { keepAlive: true, showNavBar: true }
   }
 ]
 

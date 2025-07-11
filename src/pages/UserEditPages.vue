@@ -1,28 +1,44 @@
 <template>
   <div>
-  <van-form @submit="onSubmit">
-    <van-cell-group inset>
-      <van-field
-        v-model="editUser.currentValue"
-        :name="editUser.editKey"
-        :label="editUser.editName"
-        :placeholder="`请输入 ${editUser.editName}`"
-      />
-    </van-cell-group>
-    <div style="margin: 16px">
-      <van-button round block type="primary" native-type="submit"> 提交 </van-button>
-    </div>
-  </van-form>
+    <van-form label-width="100%" @submit="onSubmit">
+      <van-cell-group inset>
+        <van-field
+          v-if="editUser.editKey !== 'gender'"
+          v-model="editUser.currentValue"
+          :name="editUser.editKey"
+          :label="editUser.editName"
+          :placeholder="`请输入 ${editUser.editName}`"
+        />
+        <van-field
+          v-else
+          v-model="displayValue"
+          name="gender"
+          label="性别"
+          placeholder="请选择性别"
+          :rules="[{ required: true, message: '请选择性别' }]"
+        >
+          <template #input>
+            <van-radio-group v-model="displayValue" direction="horizontal">
+              <van-radio name="男">男</van-radio>
+              <van-radio name="女">女</van-radio>
+            </van-radio-group>
+          </template>
+        </van-field>
+      </van-cell-group>
+
+      <div style="margin: 16px">
+        <van-button round block type="primary" native-type="submit">提交</van-button>
+      </div>
+    </van-form>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { postUserUpdate } from '@/api/controller'
-import { showSuccessToast } from 'vant'
+import { showFailToast, showSuccessToast } from 'vant'
 import router from '@/config/router.ts'
-import BasicLayout from '@/layouts/BasicLayout.vue'
 
 const route = useRoute()
 console.log(route.query)
@@ -32,9 +48,46 @@ const editUser = ref({
   editName: route.query.editName,
 })
 
+// 展示用的当前值（转换为“男/女/未知”）
+const displayValue = ref('')
+
+// 性别映射函数：数字 → 中文
+const numberToGender = (val: string | number): string => {
+  if (val === 1 || val === '1') return '男'
+  if (val === 0 || val === '0') return '女'
+  return '未知'
+}
+
+// 中文 → 数字
+const genderToNumber = (val: string): number | null => {
+  if (val === '男') return 1
+  if (val === '女') return 0
+  return null
+}
+
+// 页面加载时初始化展示值
+onMounted(() => {
+  if (editUser.value.editKey === 'gender') {
+    displayValue.value = numberToGender(editUser.value.currentValue)
+  } else {
+    displayValue.value = editUser.value.currentValue as string
+  }
+})
+
 const onSubmit = async (values) => {
+  let submitValue = values[editUser.value.editKey]
+
+  if (editUser.value.editKey === 'gender') {
+    // 将“男/女”转为数字
+    const genderNum = genderToNumber(submitValue)
+    if (genderNum === null) {
+      showFailToast('请选择正确的性别')
+      return
+    }
+    submitValue = genderNum
+  }
   const input = {
-    [editUser.value.editKey]: values[editUser.value.editKey],
+    [editUser.value.editKey]: submitValue,
   }
   const config = {
     headers: {

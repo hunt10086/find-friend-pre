@@ -18,7 +18,7 @@ export declare function getUserCurrent(config?: AxiosRequestConfig): Promise<imp
         userStatus: number;
         createTime: string;
         updateTime: string;
-        isdelete: number;
+        isDelete: number;
         userRole: number;
         profile: string;
     };

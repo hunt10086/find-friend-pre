@@ -3,7 +3,7 @@
       <p class="text-content">猜你喜欢:</p>
     </div>
     <div class="card-show" v-for="user in userList"  style="margin-bottom: 16px;">
-      <van-skeleton>
+      <van-skeleton >
         <template #template>
           <div :style="{ display: 'flex', width: '100%' }">
             <div v-if="user.avatarUrl" style="width: 100px;">
