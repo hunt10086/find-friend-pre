@@ -9,14 +9,14 @@
       :thumb="team.icon"
     >
       <template #tags>
-        <van-tag v-if="team.status===0" plain type="danger">公开</van-tag>
-        <van-tag v-if="team.status===1" plain type="danger">加密</van-tag>
+        <van-tag v-if="team.status === 0" plain type="danger">公开</van-tag>
+        <van-tag v-if="team.status === 1" plain type="danger">加密</van-tag>
         <div>
-          最大人数: {{team.maxNum}}
+          最大人数: {{ team.maxNum }}
           <van-divider />
-          创建时间: {{dayjs(team.createTime).format('YYYY-MM-DD HH:mm:ss')}}
+          创建时间: {{ dayjs(team.createTime).format('YYYY-MM-DD HH:mm:ss') }}
           <van-divider />
-          更新时间: {{dayjs(team.updateTime).format('YYYY-MM-DD HH:mm:ss')}}
+          更新时间: {{ dayjs(team.updateTime).format('YYYY-MM-DD HH:mm:ss') }}
         </div>
       </template>
 
@@ -36,35 +36,31 @@ import { useRouter } from 'vue-router'
 import { showSuccessToast } from 'vant'
 import dayjs from 'dayjs'
 
-const flag=ref(false);
-const teamList=ref();
-const router =useRouter()
+const flag = ref(false)
+const teamList = ref()
+const router = useRouter()
 
 onMounted(async () => {
-  const res=await getTeamJoinTeam();
-  teamList.value=res.data.data||[];
-  if(teamList.value.length>0){
-    flag.value=true;
+  const res = await getTeamJoinTeam()
+  teamList.value = res.data.data || []
+  if (teamList.value.length > 0) {
+    flag.value = true
   }
 })
-
 
 const inTeam = (team) => {
   router.push(`/showMembers/${team.id}`)
 }
 
 const quitTeam = async (team) => {
-  const res = await postTeamQuit({id:team.id});
+  const res = await postTeamQuit({ id: team.id })
   if (res.data.data === true) {
-    showSuccessToast("退出队伍成功")
-    await router.replace('/myTeam')
-  }else {
-    showSuccessToast("退出队伍失败")
+    showSuccessToast('退出队伍成功')
+    await router.replace('/Person')
+  } else {
+    showSuccessToast('退出队伍失败')
   }
 }
-
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

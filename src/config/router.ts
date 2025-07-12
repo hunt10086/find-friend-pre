@@ -14,82 +14,85 @@ import MyTeam from '@/pages/MyTeam.vue'
 import CreateTeam from '@/pages/CreateTeam.vue'
 import TeamMembers from '@/pages/TeamMembers.vue'
 import UpdateTeam from '@/pages/UpdateTeam.vue'
+import checkPassword from '@/pages/checkPassword.vue'
 
 const routes = [
   {
     path: '/',
     component: Index,
-    meta: { keepAlive: true, showNavBar: true }
+    meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/team',
     component: Team,
-    meta: { keepAlive: true,showNavBar: true }
+    meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/user',
     component: User,
-    meta: {keepAlive: true, showNavBar: true }
+    meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/search',
     component: SearchPages,
-    meta: { keepAlive: true,showNavBar: true }
+    meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/user/edit',
     component: UserEditPages,
-    meta: { keepAlive: true,showNavBar: true }
+    meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/user/list',
     component: SearchResultPages,
-    meta: { keepAlive: true, showNavBar: true }
+    meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/user/login',
     component: UserLogin,
-    meta: { keepAlive: true, showNavBar: false }
+    meta: { keepAlive: true, showNavBar: false },
   },
   {
     path: '/user/register',
     component: UserRegister,
-    meta: { keepAlive: true, showNavBar: false }
+    meta: { keepAlive: true, showNavBar: false },
   },
   {
     path: '/JoinTeam',
     component: JoinTeam,
-    meta: { keepAlive: true, showNavBar: true }
+    meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/Person',
     component: I,
-    meta: { keepAlive: true, showNavBar: true }
+    meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/myTeam',
     component: MyTeam,
-    meta: { keepAlive: true, showNavBar: true }
+    meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/create',
     component: CreateTeam,
-    meta: { keepAlive: true, showNavBar: true }
+    meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/showMembers/:teamId',
     component: TeamMembers,
-    meta: { keepAlive: true, showNavBar: true }
+    meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/updateTeam/:teamId',
     component: UpdateTeam,
-    meta: { keepAlive: true, showNavBar: true }
-  }
+    meta: { keepAlive: true, showNavBar: true },
+  },
+  {
+    path: '/check/:teamId',
+    component: checkPassword,
+    meta: { keepAlive: true, showNavBar: true },
+  },
 ]
-
-
-
 
 const router = createRouter({
   history: createWebHistory(),

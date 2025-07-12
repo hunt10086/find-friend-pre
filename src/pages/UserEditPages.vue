@@ -30,7 +30,7 @@
         <van-button round block type="primary" native-type="submit">提交</van-button>
       </div>
     </van-form>
-    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -94,15 +94,13 @@ const onSubmit = async (values) => {
       'Content-Type': 'application/json',
     },
   }
-  const res=await postUserUpdate(input,config);
-  if(res.data.code===0){
-    showSuccessToast('修改成功');
-    router.back();
-  }else {
-
-    showSuccessToast('修改失败');
+  const res = await postUserUpdate(input, config)
+  if (res.data.code === 0) {
+    showSuccessToast('修改成功')
+    router.back()
+  } else {
+    showSuccessToast('修改失败')
   }
-
 }
 </script>
 

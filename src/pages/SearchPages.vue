@@ -28,14 +28,13 @@
       :items="tagList"
     />
   </form>
-  <div style="padding: 16px;">
+  <div style="padding: 16px">
     <van-button block type="primary" @click="doSearchResult">搜索用户</van-button>
   </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import BasicLayout from '@/layouts/BasicLayout.vue'
 
 const router = useRouter()
 
@@ -52,7 +51,7 @@ const onCancel = () => {
   searchText.value = ''
   tagList.value = originTagList
 }
- //选中的标签
+//选中的标签
 const activeIds = ref([])
 const activeIndex = ref('')
 
@@ -71,11 +70,11 @@ const doClose = (tag) => {
  */
 const doSearchResult = () => {
   router.push({
-    path:'user/list',
-    query:{
-      tag:activeIds.value
-    }
-  });
+    path: 'user/list',
+    query: {
+      tag: activeIds.value,
+    },
+  })
 }
 const originTagList = [
   {

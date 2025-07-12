@@ -1,5 +1,5 @@
 <template>
-  <van-form  label-width="100%" class="Rform" @submit="onSubmit">
+  <van-form label-width="100%" class="Rform" @submit="onSubmit">
     <van-cell-group :inset="false">
       <van-field
         v-model="userAccount"
@@ -35,7 +35,15 @@
           placeholder="请输入邮箱"
           :rules="[{ required: true, message: '请填写邮箱' }]"
         />
-        <van-button class="buoo" type="primary" size="mini" @click="SendCode" :disabled="countdown > 0">  {{ countdown > 0 ? `${countdown}s后重发` : '发送验证码' }}</van-button>
+        <van-button
+          class="buoo"
+          type="primary"
+          size="mini"
+          @click="SendCode"
+          :disabled="countdown > 0"
+        >
+          {{ countdown > 0 ? `${countdown}s后重发` : '发送验证码' }}
+        </van-button>
       </div>
       <van-field
         v-model="code"
@@ -46,7 +54,7 @@
       />
     </van-cell-group>
     <div style="margin: 16px">
-      <van-button round block type="primary" native-type="submit" > 注册</van-button>
+      <van-button round block type="primary" native-type="submit"> 注册</van-button>
     </div>
   </van-form>
 </template>
@@ -67,7 +75,7 @@ const code = ref('')
 const countdown = ref(0)
 
 const SendCode = async () => {
-  const res=await getUserSendCode({ email: email.value })
+  const res = await getUserSendCode({ email: email.value })
   if (res.data.code === 0) {
     showSuccessToast('验证码已发送')
     // 启动倒计时
@@ -82,7 +90,6 @@ const SendCode = async () => {
     showToast('发送验证码失败')
   }
 }
-
 
 const onSubmit = async () => {
   const input = {
@@ -108,7 +115,4 @@ const onSubmit = async () => {
 }
 </script>
 
-<style scoped>
-</style>
-
-
+<style scoped></style>

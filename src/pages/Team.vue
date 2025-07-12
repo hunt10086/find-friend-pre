@@ -15,26 +15,26 @@
     :thumb="team.icon"
   >
     <template #tags>
-      <van-tag v-if="team.status===0" plain type="danger">公开</van-tag>
-      <van-tag v-if="team.status===1" plain type="danger">加密</van-tag>
+      <van-tag v-if="team.status === 0" plain type="danger">公开</van-tag>
+      <van-tag v-if="team.status === 1" plain type="danger">加密</van-tag>
       <div>
-        最大人数: {{team.maxNum}}
+        最大人数: {{ team.maxNum }}
         <van-divider />
-        创建时间: {{dayjs(team.createTime).format('YYYY-MM-DD HH:mm:ss')}}
+        创建时间: {{ dayjs(team.createTime).format('YYYY-MM-DD HH:mm:ss') }}
         <van-divider />
-        更新时间: {{dayjs(team.updateTime).format('YYYY-MM-DD HH:mm:ss')}}
+        更新时间: {{ dayjs(team.updateTime).format('YYYY-MM-DD HH:mm:ss') }}
       </div>
     </template>
 
     <template #footer>
       <van-button plain type="success" size="mini" @click="joinTeam(team)">加入队伍</van-button>
     </template>
-    <br/>
+    <br />
     <van-divider />
   </van-card>
 
-  <p class="pages">{{currentPage}}</p>
-  <div style="display: flex; justify-content: center; gap: 20px; margin-top: 16px;">
+  <p class="pages">{{ currentPage }}</p>
+  <div style="display: flex; justify-content: center; gap: 20px; margin-top: 16px">
     <van-button v-if="flagPre" type="primary" @click="GoPre">上一页</van-button>
     <van-button v-if="flag" type="primary" @click="loadMore">下一页</van-button>
   </div>
@@ -46,9 +46,10 @@ import { getTeamList, getTeamSearch, postTeamJoin } from '@/api/controller'
 import { showSuccessToast, showFailToast, showToast } from 'vant'
 import router from '@/config/router.ts'
 import dayjs from 'dayjs'
+
 const currentPage = ref(1)
-const flag=ref(true)
-const flagPre=ref(false)
+const flag = ref(true)
+const flagPre = ref(false)
 const teamList = ref()
 const values = ref('')
 onMounted(async () => {
@@ -57,75 +58,72 @@ onMounted(async () => {
   }
   const res = await getTeamList(params)
   teamList.value = res.data.data || []
-  if(res.data.code<6) {
-    flag.value = false;
+  if (res.data.code < 6) {
+    flag.value = false
   }
 })
 
 const loadMore = async () => {
-  currentPage.value++;
-  const res=await getTeamList({
-    count:currentPage.value
-
-  });
-  teamList.value=res.data.data||[];
-  if(res.data.code<6) {
-    flag.value = false;
+  currentPage.value++
+  const res = await getTeamList({
+    count: currentPage.value,
+  })
+  teamList.value = res.data.data || []
+  if (res.data.code < 6) {
+    flag.value = false
   }
-  flagPre.value=true;
-};
+  flagPre.value = true
+}
 
 const GoPre = async () => {
-  currentPage.value--;
-  const res=await getTeamList({
-    count:currentPage.value
-
-  });
-  teamList.value=res.data.data||[];
-  flag.value=true;
-  if(currentPage.value==1){
-    flagPre.value=false;
+  currentPage.value--
+  const res = await getTeamList({
+    count: currentPage.value,
+  })
+  teamList.value = res.data.data || []
+  flag.value = true
+  if (currentPage.value == 1) {
+    flagPre.value = false
   }
-};
+}
 
 const joinTeam = async (team) => {
-  if(team.status===1){
-    await router.push("/JoinTeam")
-  }else{
-    const res=await postTeamJoin({
-      password:team.password
-    },team)
-    if(res.data.code===0){
-      showSuccessToast("加入成功");
-    }else{
-      showFailToast("加入失败");
-    }
-  }
-};
-
-
-
-const onSearch = async () =>{
-  const res=await getTeamSearch({teamName:values.value})
-  if(res.data.code===0){
-    teamList.value=res.data.data
-    if(teamList.value.length<0){
-      showFailToast('没有找到该队伍');
+  if (team.status === 1) {
+    await router.push(`/check/${team.id}`)
+  } else {
+    const res = await postTeamJoin(
+      {
+        password: team.password,
+      },
+      team
+    )
+    if (res.data.code === 0) {
+      showSuccessToast('加入成功')
+    } else {
+      showFailToast('加入失败')
     }
   }
 }
 
-const onCancel =async () => {
-  showToast('取消');
-  currentPage.value = 1; // 回到第一页
-  const res = await getTeamList({ count: currentPage.value });
-  teamList.value = res.data.data || [];
-  flagPre.value = false;
-  flag.value = res.data.code >= 6;
+const onSearch = async () => {
+  const res = await getTeamSearch({ teamName: values.value })
+  if (res.data.code === 0) {
+    teamList.value = res.data.data
+    if (teamList.value.length < 0) {
+      showFailToast('没有找到该队伍')
+    }
+  }
 }
 
+const onCancel = async () => {
+  showToast('取消')
+  currentPage.value = 1 // 回到第一页
+  const res = await getTeamList({ count: currentPage.value })
+  teamList.value = res.data.data || []
+  flagPre.value = false
+  flag.value = res.data.code >= 6
+}
 </script>
-
 
 <style scoped>
 .custom-text-box {
@@ -143,10 +141,11 @@ const onCancel =async () => {
   line-height: 1.5;
 }
 
-.pages{
+.pages {
   text-align: center;
 }
-.van-search{
+
+.van-search {
   padding: 10px;
 }
 
@@ -154,11 +153,13 @@ const onCancel =async () => {
   padding: 10px;
   background-color: #fff;
 }
-.tag{
+
+.tag {
   margin: 2px;
 }
-.van-card{
-  --van-card-thumb-size: 100px;
+
+.van-card {
+  --van-card-thumb-size: 80px;
   margin-bottom: 30px;
 }
 </style>
