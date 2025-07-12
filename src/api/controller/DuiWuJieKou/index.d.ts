@@ -4,6 +4,7 @@ export * from "./postTeamJoin";
 export * from "./postTeamDelete";
 export * from "./postTeamCreate";
 export * from "./getTeamSearch";
+export * from "./getTeamSearchById";
 export * from "./getTeamMyTeam";
 export * from "./getTeamList";
 export * from "./getTeamJoinTeam";

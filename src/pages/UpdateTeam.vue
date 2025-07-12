@@ -4,10 +4,10 @@
       <van-field
         v-model="teamName"
         name="teamName"
-        label="队伍名称"
-        placeholder="请输入队伍名称"
+        label="更改伍名称"
+        placeholder="请更改队伍名称"
         maxlength=32
-        :rules="[{ required: true, message: '请填写队伍名称' }]"
+        :rules="[{ required: true, message: '请输入队伍名称' }]"
       />
       <van-field
         v-model="description"
@@ -16,20 +16,20 @@
         label="留言"
         type="textarea"
         maxlength="256"
-        placeholder="请输入队伍描述"
+        placeholder="请更改队伍描述"
         show-word-limit
       />
       <van-field
         v-model="icon"
         name="icon"
-        label="队伍头像链接"
+        label="更改队伍头像链接"
         placeholder="请输入链接"
         maxlength=256
-        :rules="[{ required: false , message: '请输入队伍头像链接'}]"
+        :rules="[{ required: true , message: '请输入队伍头像链接'}]"
       />
       <br/>
       <div>
-        <p>选择队伍人数</p>
+        <p>更改队伍人数</p>
         <van-stepper v-model="maxNum" min="3" max="15" />
       </div>
       <br/>
@@ -51,7 +51,7 @@
     </van-cell-group>
     <div style="margin: 16px;">
       <van-button round block type="primary" native-type="submit">
-        提交
+        更新
       </van-button>
     </div>
   </van-form>
@@ -61,19 +61,22 @@
 <script setup lang="ts">
 
 import { ref } from 'vue'
-import { getUserCurrent, postTeamCreate } from '@/api/controller'
+import { getTeamSearchById, getUserCurrent, postTeamCreate, postTeamUpdate } from '@/api/controller'
 import { watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router'
 import { showFailToast, showSuccessToast } from 'vant'
-import { useRouter } from 'vue-router'
 
-const teamName = ref('');
+let teamName = ref('');
 const description = ref('');
-const maxNum = ref();
 const icon = ref('');
 const userId = ref();
 const status = ref(0);
 const password = ref('');
 const router=useRouter();
+const maxNum=ref(3);
+let team = ref();
+const route=useRoute();
+const teamId=ref(Number(route.params.teamId));
 
 const check = async () => {
   const res=await getUserCurrent();
@@ -81,23 +84,26 @@ const check = async () => {
 }
 check();
 const onSubmit =async () => {
+  const res=await getTeamSearchById({teamId:teamId.value});
   const input = {
+    id: teamId.value,
     teamName: teamName.value,
-    description: description.value,
     maxNum: maxNum.value,
-    userId: userId.value,
+    description: description.value,
     status: status.value,
     icon: icon.value,
     password: password.value
   }
-  const res=await postTeamCreate(input);
-  if(res.data.code === 0){
-    showSuccessToast('创建队伍成功');
+  const response = await postTeamUpdate({id:teamId.value},input);
+  if(response.data.code === 0){
+    showSuccessToast('更新成功');
     await router.replace('/myTeam')
   }else{
-    showFailToast('创建失败');
+    showFailToast('更新失败');
   }
-};
+}
+
+
 
 watch(status, (newVal) => {
   if (newVal === 1 ) {

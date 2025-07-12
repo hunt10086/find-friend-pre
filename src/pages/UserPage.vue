@@ -63,8 +63,6 @@
     :value="user.email"
     @click="toEdit('email', '邮箱', user.email)"
   />
-  <van-cell title="用户状态" :value="user.userStatus" />
-  <van-cell title="身份" :value="user.userRole" />
     <br/>
   <van-cell
     title="标签"
@@ -73,7 +71,7 @@
     :value="user.tags"
     @click="toEdit('tags', '标签', user.tags)"
   />
-  <van-cell title="创建时间" :value="user.createTime" />
+  <van-cell title="创建时间" :value="dayjs(user.createTime).format('YYYY-MM-DD HH:mm:ss')" />
   </div>
 </template>
 
@@ -82,6 +80,7 @@ import { useRouter } from 'vue-router'
 import { getUserCurrent } from '@/api/controller'
 import { onMounted, ref } from 'vue'
 import { showSuccessToast } from 'vant'
+import dayjs from 'dayjs'
 
 const router = useRouter()
 const user=ref()

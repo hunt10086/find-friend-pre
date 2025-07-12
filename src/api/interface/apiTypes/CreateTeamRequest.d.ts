@@ -5,4 +5,5 @@ export interface CreateTeamRequest {
     userId?: number;
     status?: number;
     password?: string;
+    icon?: string;
 }

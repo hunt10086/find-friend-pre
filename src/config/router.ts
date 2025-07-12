@@ -12,6 +12,8 @@ import JoinTeam from '@/pages/JoinTeam.vue'
 import I from '@/pages/I.vue'
 import MyTeam from '@/pages/MyTeam.vue'
 import CreateTeam from '@/pages/CreateTeam.vue'
+import TeamMembers from '@/pages/TeamMembers.vue'
+import UpdateTeam from '@/pages/UpdateTeam.vue'
 
 const routes = [
   {
@@ -72,6 +74,16 @@ const routes = [
   {
     path: '/create',
     component: CreateTeam,
+    meta: { keepAlive: true, showNavBar: true }
+  },
+  {
+    path: '/showMembers/:teamId',
+    component: TeamMembers,
+    meta: { keepAlive: true, showNavBar: true }
+  },
+  {
+    path: '/updateTeam/:teamId',
+    component: UpdateTeam,
     meta: { keepAlive: true, showNavBar: true }
   }
 ]

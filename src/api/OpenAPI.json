@@ -526,10 +526,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
+                  "$ref": "#/components/schemas/BaseResponseListUser"
                 }
               }
             }
@@ -561,6 +558,38 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/searchByID": {
+      "get": {
+        "tags": [
+          "队伍接口"
+        ],
+        "summary": "根据id查找队伍",
+        "operationId": "searchTeamByID",
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseLong"
                 }
               }
             }
@@ -851,6 +880,9 @@
             "format": "int32"
           },
           "password": {
+            "type": "string"
+          },
+          "icon": {
             "type": "string"
           }
         }

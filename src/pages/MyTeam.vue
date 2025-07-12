@@ -14,12 +14,17 @@
         <van-tag v-if="team.status===1" plain type="danger">加密</van-tag>
         <div>
           最大人数: {{team.maxNum}}
+          <van-divider />
+          创建时间: {{dayjs(team.createTime).format('YYYY-MM-DD HH:mm:ss')}}
+          <van-divider />
+          更新时间: {{dayjs(team.updateTime).format('YYYY-MM-DD HH:mm:ss')}}
         </div>
       </template>
 
       <template #footer>
-        <van-button plain type="warning" size="mini" @click="">退出队伍</van-button>
-        <van-button plain type="danger" size="mini" @click="">解散队伍</van-button>
+        <van-button plain type="success" size="mini" @click="inTeam(team)">查看队伍详情</van-button>
+        <van-button plain type="warning" size="mini" @click="quitTeam(team)">退出队伍</van-button>
+        <van-button plain type="danger" size="mini" @click="delTeam(team)">解散队伍</van-button>
 
       </template>
       <van-divider />
@@ -31,11 +36,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getTeamMyTeam, getUserCurrent } from '@/api/controller'
-
+import { getTeamMyTeam, postTeamDelete, postTeamQuit } from '@/api/controller'
+import { showSuccessToast } from 'vant'
 const flag=ref(false);
 const router = useRouter();
 const userId=ref(0);
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime'; // 可选插件
+dayjs.extend(relativeTime);
 
 const createTeam = () => {
   router.push('/create');
@@ -49,12 +57,40 @@ onMounted(async () => {
     flag.value=true;
   }
 })
-//TODO 需要完成我的队伍的退出，解散，更新页面，查看队伍详细信息
+const inTeam = (team) => {
+  router.push(`/showMembers/${team.id}`)
+}
 
+const quitTeam = async (team) => {
+  const res = await postTeamQuit({id:team.id});
+  if (res.data.data === true) {
+    showSuccessToast("退出队伍成功")
+    await router.replace('/myTeam')
+  }else {
+    showSuccessToast("退出队伍失败")
+  }
+}
+
+const delTeam = async (team) => {
+  const res = await postTeamDelete({id:team.id});
+  if (res.data.data === true) {
+    showSuccessToast("解散队伍成功")
+    await router.replace('/myTeam')
+  }else {
+    showSuccessToast("解散队伍失败")
+  }
+}
 </script>
 
 
 
 <style scoped>
 
+.van-card {
+  margin-bottom: 40px;
+  background-color: #dbfafa;
+}
+.van-button{
+  margin-bottom: 20px;
+}
 </style>

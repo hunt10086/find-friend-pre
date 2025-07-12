@@ -68,10 +68,11 @@ onMounted(async () => {
 
 <style scoped>
 .van-tag {
-  margin-right: 8px;
+  margin-right: 4px;
 }
 .van-card{
   --van-card-thumb-size: 120px;
+  margin-bottom: 30px;
 }
 
 </style>
