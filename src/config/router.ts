@@ -91,7 +91,7 @@ const routes = [
     path: '/check/:teamId',
     component: checkPassword,
     meta: { keepAlive: true, showNavBar: true },
-  },
+  }
 ]
 
 const router = createRouter({

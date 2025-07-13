@@ -22,6 +22,9 @@ export declare function postUserLogin(input: UserLoginRequest, config?: AxiosReq
         isDelete: number;
         userRole: number;
         profile: string;
+        latitude:number;
+        longitude : number;
+
     };
     message: string;
     description: string;
