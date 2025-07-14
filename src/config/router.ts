@@ -15,6 +15,7 @@ import CreateTeam from '@/pages/CreateTeam.vue'
 import TeamMembers from '@/pages/TeamMembers.vue'
 import UpdateTeam from '@/pages/UpdateTeam.vue'
 import checkPassword from '@/pages/checkPassword.vue'
+import NearUsers from '@/pages/nearUsers.vue'
 
 const routes = [
   {
@@ -90,6 +91,11 @@ const routes = [
   {
     path: '/check/:teamId',
     component: checkPassword,
+    meta: { keepAlive: true, showNavBar: true },
+  },
+  {
+    path: '/nearUsers',
+    component: NearUsers,
     meta: { keepAlive: true, showNavBar: true },
   }
 ]

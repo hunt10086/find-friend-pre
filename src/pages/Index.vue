@@ -1,7 +1,9 @@
 <template>
+  <van-button type="primary" @click="findMore">寻找附近用户</van-button>
   <div class="custom-text-box">
     <p class="text-content">猜你喜欢:</p>
   </div>
+
   <div class="card-show" v-for="user in userList" style="margin-bottom: 16px">
     <van-skeleton>
       <template #template>
@@ -48,6 +50,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { getUserListLike } from '@/api/controller'
+import router from '@/config/router.ts'
 
 const userList = ref()
 const size = ref(8)
@@ -101,6 +104,11 @@ const GoPre = async () => {
 const getDefaultAvatarText = (user) => {
   return user.userName ? user.userName.charAt(0).toUpperCase() : 'U'
 }
+
+const findMore = () => {
+  router.push('/nearUsers')
+}
+
 </script>
 
 <style scoped>

@@ -71,7 +71,6 @@
       title="标签"
       is-link
       to="/user/edit"
-      :value="user.tags"
       @click="toEdit('tags', '标签', user.tags)"
     />
     <van-cell title="创建时间" :value="dayjs(user.createTime).format('YYYY-MM-DD HH:mm:ss')" />
