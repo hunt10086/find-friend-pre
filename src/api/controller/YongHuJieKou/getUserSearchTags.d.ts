@@ -21,6 +21,8 @@ export declare function getUserSearchTags(params: GetUserSearchTagsParams, confi
         isDelete: number;
         userRole: number;
         profile: string;
+        latitude: number;
+        longitude: number;
     }[];
     message: string;
     description: string;

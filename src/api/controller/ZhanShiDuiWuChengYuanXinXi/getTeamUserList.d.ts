@@ -20,6 +20,8 @@ export declare function getTeamUserList(params: GetTeamUserListParams, config?: 
         isDelete: number;
         userRole: number;
         profile: string;
+        latitude: number;
+        longitude: number;
     }[];
     message: string;
     description: string;

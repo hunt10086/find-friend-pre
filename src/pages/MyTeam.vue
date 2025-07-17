@@ -83,8 +83,9 @@ const delTeam = async (team) => {
 
 <style scoped>
 .van-card {
-  margin-bottom: 40px;
-  background-color: #dbfafa;
+  --van-card-thumb-size: 80px;
+  margin-bottom: 30px;
+  background-color: #c3eda6;
 }
 
 .van-button {

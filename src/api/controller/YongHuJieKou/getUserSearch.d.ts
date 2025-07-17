@@ -21,6 +21,8 @@ export declare function getUserSearch(params: GetUserSearchParams, config?: Axio
         isDelete: number;
         userRole: number;
         profile: string;
+        latitude: number;
+        longitude: number;
     }[];
     message: string;
     description: string;

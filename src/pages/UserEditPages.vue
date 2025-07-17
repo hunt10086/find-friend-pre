@@ -3,14 +3,14 @@
     <van-form label-width="100%" @submit="onSubmit">
       <van-cell-group inset>
         <van-field
-          v-if="editUser.editKey !== 'gender' && editUser.editKey !== 'tags'"
+          v-if="editUser.editKey !== 'gender'"
           v-model="editUser.currentValue"
           :name="editUser.editKey"
           :label="editUser.editName"
           :placeholder="`请输入 ${editUser.editName}`"
         />
         <van-field
-          v-if="editUser.editKey === 'gender'"
+          v-else
           v-model="displayValue"
           name="gender"
           label="性别"
@@ -24,16 +24,6 @@
             </van-radio-group>
           </template>
         </van-field>
-
-        <!-- 标签选择 -->
-        <van-cell v-if="editUser.editKey === 'tags'" title="选择标签" />
-        <van-tree-select
-          v-if="editUser.editKey === 'tags'"
-          v-model:active-id="activeIds"
-          v-model:main-active-index="activeIndex"
-          :items="tagList"
-        />
-
       </van-cell-group>
 
       <div style="margin: 16px">
@@ -49,8 +39,6 @@ import { useRoute } from 'vue-router'
 import { postUserUpdate } from '@/api/controller'
 import { showFailToast, showSuccessToast } from 'vant'
 import router from '@/config/router.ts'
-import {originTagList} from '@/config/tag.config.ts'
-const  tagList = ref(originTagList)
 
 const route = useRoute()
 console.log(route.query)
@@ -62,11 +50,6 @@ const editUser = ref({
 
 // 展示用的当前值（转换为“男/女/未知”）
 const displayValue = ref('')
-
-// 标签选择
-const activeIds = ref<string[]>([])  // 存储选中的标签
-const activeIndex = ref<number | string>(0)  // 当前激活的分类索引
-
 
 // 性别映射函数：数字 → 中文
 const numberToGender = (val: string | number): string => {
@@ -86,23 +69,13 @@ const genderToNumber = (val: string): number | null => {
 onMounted(() => {
   if (editUser.value.editKey === 'gender') {
     displayValue.value = numberToGender(editUser.value.currentValue)
-  }else if(editUser.value.editKey === 'tags'){
-    try {
-      // 尝试解析 JSON 字符串为数组
-      const parsedTags = JSON.parse(editUser.value.currentValue)
-      activeIds.value = Array.isArray(parsedTags) ? parsedTags : []
-    } catch (e) {
-      console.error('标签解析失败', e)
-      activeIds.value = []
-    }
-  }
-  else {
+  } else {
     displayValue.value = editUser.value.currentValue as string
   }
 })
 
 const onSubmit = async (values) => {
-  let submitValue: any
+  let submitValue = values[editUser.value.editKey]
 
   if (editUser.value.editKey === 'gender') {
     // 将“男/女”转为数字
@@ -112,11 +85,7 @@ const onSubmit = async (values) => {
       return
     }
     submitValue = genderNum
-  } else if (editUser.value.editKey === 'tags') {
-    submitValue = JSON.stringify(activeIds.value)
   }
-
-
   const input = {
     [editUser.value.editKey]: submitValue,
   }

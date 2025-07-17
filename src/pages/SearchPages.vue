@@ -1,12 +1,8 @@
 <template>
+  <div style="padding: 16px">
+    <van-button block type="primary" @click="doSearchResult">搜索用户</van-button>
+  </div>
   <form action="/">
-    <van-search
-      v-model="searchText"
-      show-action
-      placeholder="请输入搜索的标签"
-      @search="onSearch"
-      @cancel="onCancel"
-    />
     <van-divider content-position="left">已选标签</van-divider>
     <div v-if="activeIds.length === 0">请选择标签</div>
     <van-tag
@@ -28,29 +24,13 @@
       :items="tagList"
     />
   </form>
-  <div style="padding: 16px">
-    <van-button block type="primary" @click="doSearchResult">搜索用户</van-button>
-  </div>
+  <div id="divbo"></div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
-const searchText = ref('')
-const onSearch = (val) => {
-  tagList.value = originTagList.map((parentTag) => {
-    const tempChildren = [...parentTag.children]
-    const tempParentTag = { ...parentTag }
-    tempParentTag.children = tempChildren.filter((item) => item.text.includes(searchText.value))
-    return tempParentTag
-  })
-}
-const onCancel = () => {
-  searchText.value = ''
-  tagList.value = originTagList
-}
 //选中的标签
 const activeIds = ref([])
 const activeIndex = ref('')
@@ -170,5 +150,9 @@ let tagList = ref(originTagList)
 <style scoped>
 .van-tag {
   margin: 10px;
+}
+
+#divbo{
+  padding-bottom: 50px;
 }
 </style>

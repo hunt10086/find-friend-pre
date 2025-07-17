@@ -333,6 +333,77 @@
         }
       }
     },
+    "/blog/update": {
+      "post": {
+        "tags": [
+          "blog-controller"
+        ],
+        "operationId": "updateBlog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/create": {
+      "post": {
+        "tags": [
+          "blog-controller"
+        ],
+        "operationId": "createBlog",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlogRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/sendCode": {
       "get": {
         "tags": [
@@ -443,6 +514,27 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/BaseResponseListUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/nearUser": {
+      "get": {
+        "tags": [
+          "用户接口"
+        ],
+        "summary": "附近用户",
+        "operationId": "nearUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListUserVo"
                 }
               }
             }
@@ -625,17 +717,6 @@
         ],
         "summary": "获取队伍列表",
         "operationId": "listTeam",
-        "parameters": [
-          {
-            "name": "count",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -664,6 +745,119 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/list": {
+      "get": {
+        "tags": [
+          "blog-controller"
+        ],
+        "operationId": "getBlogList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListBlog"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/like": {
+      "get": {
+        "tags": [
+          "blog-controller"
+        ],
+        "operationId": "getBlogLike",
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/getOne": {
+      "get": {
+        "tags": [
+          "blog-controller"
+        ],
+        "operationId": "getBlog",
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBlog"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/delete": {
+      "get": {
+        "tags": [
+          "blog-controller"
+        ],
+        "operationId": "deleteBlog",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
                 }
               }
             }
@@ -728,6 +922,14 @@
           },
           "profile": {
             "type": "string"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double"
           }
         }
       },
@@ -796,6 +998,14 @@
           },
           "userPassword": {
             "type": "string"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double"
           }
         }
       },
@@ -887,6 +1097,38 @@
           }
         }
       },
+      "BlogRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "passage": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        }
+      },
+      "BaseResponseString": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
       "BaseResponseListUser": {
         "type": "object",
         "properties": {
@@ -908,6 +1150,52 @@
           }
         }
       },
+      "BaseResponseListUserVo": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserVo"
+            }
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "UserVo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "distance": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
       "BaseResponseListTeamDTO": {
         "type": "object",
         "properties": {
@@ -920,6 +1208,83 @@
             "items": {
               "$ref": "#/components/schemas/TeamDTO"
             }
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "BaseResponseListBlog": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Blog"
+            }
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "Blog": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "passage": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isDelete": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "praise": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "BaseResponseBlog": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/Blog"
           },
           "message": {
             "type": "string"

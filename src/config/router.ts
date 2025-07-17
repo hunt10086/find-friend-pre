@@ -16,6 +16,8 @@ import TeamMembers from '@/pages/TeamMembers.vue'
 import UpdateTeam from '@/pages/UpdateTeam.vue'
 import checkPassword from '@/pages/checkPassword.vue'
 import NearUsers from '@/pages/nearUsers.vue'
+import BlogPage from '@/pages/BlogPage.vue'
+import UserBlog from '@/pages/UserBlog.vue'
 
 const routes = [
   {
@@ -96,6 +98,16 @@ const routes = [
   {
     path: '/nearUsers',
     component: NearUsers,
+    meta: { keepAlive: true, showNavBar: true },
+  },
+  {
+    path: '/blog',
+    component: BlogPage,
+    meta: { keepAlive: true, showNavBar: true },
+  },
+  {
+    path: '/user/blog/:id',
+    component: UserBlog,
     meta: { keepAlive: true, showNavBar: true },
   }
 ]

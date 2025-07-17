@@ -21,6 +21,8 @@ export declare function getUserSearchOne(config?: AxiosRequestConfig): Promise<i
         isDelete: number;
         userRole: number;
         profile: string;
+        latitude: number;
+        longitude: number;
     }[];
     message: string;
     description: string;

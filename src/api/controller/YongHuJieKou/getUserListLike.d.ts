@@ -21,6 +21,8 @@ export declare function getUserListLike(params: GetUserListLikeParams, config?: 
         isDelete: number;
         userRole: number;
         profile: string;
+        latitude: number;
+        longitude: number;
     }[];
     message: string;
     description: string;

@@ -23,12 +23,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { getNearUser } from '@/api/controller/YongHuJieKou/getNearUser.js'
+import { getUserNearUser } from '@/api/controller/YongHuJieKou/getUserNearUser.js'
 import { showSuccessToast } from 'vant'
 
 const userList = ref()
 onMounted(async () => {
-  const res=await  getNearUser();
+  const res=await  getUserNearUser()
   res.data.data.forEach((user) => {
     user.tags = JSON.parse(user.tags)
   })

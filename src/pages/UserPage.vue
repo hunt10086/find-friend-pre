@@ -1,4 +1,4 @@
-<template>
+<template id="UserPage">
   <div v-if="user">
     <van-cell title="用户ID" :value="user?.id" />
     <van-cell
@@ -71,9 +71,16 @@
       title="标签"
       is-link
       to="/user/edit"
+      value=""
       @click="toEdit('tags', '标签', user.tags)"
-    />
-    <van-cell title="创建时间" :value="dayjs(user.createTime).format('YYYY-MM-DD HH:mm:ss')" />
+    >
+    <template #value>
+      <van-tag  color="#F0F" type="primary" v-for="tag in user.tags">
+        {{ tag }}
+      </van-tag>
+    </template>
+    </van-cell>
+    <van-cell id="createTime" title="创建时间" :value="dayjs(user.createTime).format('YYYY-MM-DD HH:mm:ss')" />
   </div>
 </template>
 
@@ -89,6 +96,7 @@ const user = ref()
 onMounted(async () => {
   const res = await getUserCurrent()
   user.value = res.data.data
+  user.value.tags = JSON.parse(user.value.tags)
   if (user) {
     showSuccessToast('获取用户信息成功')
   } else {
@@ -100,4 +108,11 @@ const toEdit = (editKey: string, editName: string, currentValue: string) => {
   router.push({ path: '/user/edit', query: { editKey, editName, currentValue } })
 }
 </script>
-<style scoped></style>
+<style scoped>
+.van-tag {
+  margin-right: 2px;
+}
+#createTime {
+  padding-bottom: 40px;
+}
+</style>

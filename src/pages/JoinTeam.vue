@@ -63,4 +63,8 @@ const quitTeam = async (team) => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.card {
+  padding-bottom: 50px;
+}
+</style>

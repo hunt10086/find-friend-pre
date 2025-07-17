@@ -33,59 +33,23 @@
     <van-divider />
   </van-card>
 
-  <p class="pages">{{ currentPage }}</p>
-  <div style="display: flex; justify-content: center; gap: 20px; margin-top: 16px">
-    <van-button v-if="flagPre" type="primary" @click="GoPre">上一页</van-button>
-    <van-button v-if="flag" type="primary" @click="loadMore">下一页</van-button>
-  </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { getTeamList, getTeamSearch, postTeamJoin } from '@/api/controller'
+import { getTeamSearch, postTeamJoin } from '@/api/controller'
 import { showSuccessToast, showFailToast, showToast } from 'vant'
 import router from '@/config/router.ts'
 import dayjs from 'dayjs'
+import { getTeamList } from '@/api/controller'
 
 const currentPage = ref(1)
-const flag = ref(true)
-const flagPre = ref(false)
 const teamList = ref()
 const values = ref('')
 onMounted(async () => {
-  const params = {
-    count: currentPage.value,
-  }
-  const res = await getTeamList(params)
+  const res = await getTeamList()
   teamList.value = res.data.data || []
-  if (res.data.code < 6) {
-    flag.value = false
-  }
 })
-
-const loadMore = async () => {
-  currentPage.value++
-  const res = await getTeamList({
-    count: currentPage.value,
-  })
-  teamList.value = res.data.data || []
-  if (res.data.code < 6) {
-    flag.value = false
-  }
-  flagPre.value = true
-}
-
-const GoPre = async () => {
-  currentPage.value--
-  const res = await getTeamList({
-    count: currentPage.value,
-  })
-  teamList.value = res.data.data || []
-  flag.value = true
-  if (currentPage.value == 1) {
-    flagPre.value = false
-  }
-}
 
 const joinTeam = async (team) => {
   if (team.status === 1) {
@@ -120,8 +84,6 @@ const onCancel = async () => {
   currentPage.value = 1 // 回到第一页
   const res = await getTeamList({ count: currentPage.value })
   teamList.value = res.data.data || []
-  flagPre.value = false
-  flag.value = res.data.code >= 6
 }
 </script>
 
@@ -151,7 +113,6 @@ const onCancel = async () => {
 
 .card-show {
   padding: 10px;
-  background-color: #fff;
 }
 
 .tag {
@@ -161,5 +122,10 @@ const onCancel = async () => {
 .van-card {
   --van-card-thumb-size: 80px;
   margin-bottom: 30px;
+  background-color: #c3eda6;
+}
+
+#button-css{
+  padding-bottom: 50px;
 }
 </style>

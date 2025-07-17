@@ -3,7 +3,7 @@ import { type AxiosRequestConfig } from "axios";
  * 获取队伍列表
  * /team/list
  */
-export declare function getTeamList(params: GetTeamListParams, config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{
+export declare function getTeamList(config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{
     code: number;
     data: {
         id: number;
@@ -20,6 +20,3 @@ export declare function getTeamList(params: GetTeamListParams, config?: AxiosReq
     message: string;
     description: string;
 }, any>>;
-export interface GetTeamListParams {
-    count: number;
-}

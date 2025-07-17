@@ -41,7 +41,7 @@
   </div>
 
   <p class="pages">{{ cont }}</p>
-  <div style="display: flex; justify-content: center; gap: 20px; margin-top: 16px">
+  <div id="index-button-css" style="display: flex; justify-content: center; gap: 20px; margin-top: 16px">
     <van-button v-if="flagPre" type="primary" @click="GoPre">上一页</van-button>
     <van-button v-if="flag" type="primary" @click="loadMore">下一页</van-button>
   </div>
@@ -138,5 +138,9 @@ const findMore = () => {
 
 .tag {
   margin: 2px;
+}
+
+#index-button-css {
+  padding-bottom: 50px;
 }
 </style>

@@ -14,4 +14,6 @@ export interface User {
     isDelete?: number;
     userRole?: number;
     profile?: string;
+    latitude?: number;
+    longitude?: number;
 }
