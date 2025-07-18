@@ -18,6 +18,9 @@ import checkPassword from '@/pages/checkPassword.vue'
 import NearUsers from '@/pages/nearUsers.vue'
 import BlogPage from '@/pages/BlogPage.vue'
 import UserBlog from '@/pages/UserBlog.vue'
+import CreateBlog from '@/pages/CreateBlog.vue'
+import MyBlog from '@/pages/MyBlog.vue'
+import Talk from '@/pages/Talk.vue'
 
 const routes = [
   {
@@ -108,6 +111,21 @@ const routes = [
   {
     path: '/user/blog/:id',
     component: UserBlog,
+    meta: { keepAlive: true, showNavBar: true },
+  },
+  {
+    path: '/blog/create',
+    component: CreateBlog ,
+    meta: { keepAlive: true, showNavBar: true },
+  },
+  {
+    path: '/my/blog',
+    component: MyBlog ,
+    meta: { keepAlive: true, showNavBar: true },
+  },
+  {
+    path: '/talk',
+    component: Talk ,
     meta: { keepAlive: true, showNavBar: true },
   }
 ]

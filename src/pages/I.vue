@@ -6,9 +6,13 @@
   <br />
   <van-divider />
   <van-cell title="我创建的队伍" is-link to="/myTeam" />
+  <br />
+  <van-divider />
+  <van-cell title="我的博客分享" is-link to="/my/blog" />
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+</script>
 
 <style scoped>
 </style>

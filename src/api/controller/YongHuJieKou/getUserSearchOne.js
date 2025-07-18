@@ -1,8 +1,14 @@
 import request from "@/plugins/myAxios.js";
 /**
- * 查询单个用户
- * /user/searchOne
+ * 根据id查询
+ * /user/search/one
  */
-export function getUserSearchOne(config) {
-    return request.get(`/user/searchOne`, config);
+export function getUserSearchOne(params, config) {
+    const paramsInput = {
+        id: params.id,
+    };
+    return request.get(`/user/search/one`, {
+        params: paramsInput,
+        ...config,
+    });
 }

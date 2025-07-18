@@ -10,6 +10,7 @@
     <van-tabbar-item to="/" icon="home-o" name="主页">主页</van-tabbar-item>
     <van-tabbar-item to="/blog" icon="description" name="分享">分享</van-tabbar-item>
     <van-tabbar-item to="/team" icon="search" name="队伍大厅">队伍大厅</van-tabbar-item>
+    <van-tabbar-item to="/talk" icon="envelop-o" name="交流">交流</van-tabbar-item>
     <van-tabbar-item to="/Person" icon="user-circle-o" name="个人">个人</van-tabbar-item>
   </van-tabbar>
 </template>

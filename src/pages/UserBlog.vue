@@ -1,31 +1,283 @@
-
-
 <template>
-{{title}}
-  {{passage}}
+  <div class="blog-container">
+    <!-- 博客标题 -->
+    <h1 class="blog-title">{{ title }}</h1>
+
+    <!-- 博客分类 -->
+    <p class="blog-kind"><strong>分类:</strong> {{ kind }}</p>
+
+    <!-- 用户信息 -->
+    <div class="user-info">
+      <img :src="userAvatar"  width="50px" alt="用户头像" class="avatar"  />
+      <div class="user-details">
+        <p><strong>作者:</strong> {{ userName }}</p>
+        <p><strong>简介:</strong> {{ userProfile }}</p>
+      </div>
+    </div>
+
+    <!-- 博客内容 -->
+    <div class="blog-content">
+      <p>{{ passage }}</p>
+    </div>
+  </div>
+<!-- 点赞-->
+  <div>
+    <van-button icon="like" size="small" @click="like">{{praise}}</van-button>
+  </div>
+
+
+  <!-- 评论区 -->
+  <div class="comments-section">
+    <h2>评论区</h2>
+    <div v-if="comments.length > 0">
+      <div v-for="comment in comments"  class="comment-item">
+        <div class="comment-header">
+          <img :src="comment.avatarUrl" alt="用户头像" class="comment-avatar" />
+          <div class="comment-user-info">
+            <p><strong>{{ comment.userName }}</strong></p>
+            {{ dayjs(comment.createTime).format('YYYY-MM-DD HH:mm:ss') }}
+          </div>
+        </div>
+        <div class="comment-content">
+          <van-text-ellipsis :content="comment.content" expand-text="展开" collapse-text="收起" />
+        </div>
+      </div>
+    </div>
+    <p v-else>暂无评论</p>
+  </div>
+
+  <div class="add-comment">
+    <textarea v-model="newCommentContent" placeholder="写下你的评论..." rows="5" class="comment-textarea"></textarea>
+    <button @click="submitComment"  class="submit-button">提交评论</button>
+    <br/>
+    <button  v-if="userId===id" @click="DeleteBlog" class="submit-button">删除博客</button>
+  </div>
+
+  <div>
+  </div>
+
+
 </template>
+
 
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { getBlogGetOne } from '@/api/controller'
+import { getBlogDelete, getBlogGetOne, getBlogLike, getUserCurrent } from '@/api/controller'
+import myAxios from '@/plugins/myAxios'
+import router from '@/config/router.ts'
+import dayjs from 'dayjs'
+import { showSuccessToast } from 'vant'
 const route= useRoute()
 const blogId = ref(Number(route.params.id))
 const blog= ref()
 const title= ref('')
 const passage= ref('')
+const kind= ref('')
+const praise= ref()
+
+const comments=ref([])
+const userAvatar= ref('')
+const userName= ref('')
+const userProfile= ref('')
+const id= ref(0)
+const userId= ref(0)
 onMounted(async () => {
   const response = await getBlogGetOne({blogId : blogId.value})
   blog.value = response.data.data;
   console.log(blog.value)
   title.value = blog.value.title
   passage.value = blog.value.passage
+  kind.value = blog.value.kind
+  praise.value = blog.value.praise
+  userId.value = blog.value.userId
+
+  // 获取当前用户信息（根据博客中的 userId）
+  const userResponse = await myAxios.get(`/user/search/one`, {
+    params:{
+      id: blog.value.userId
+    }
+  })
+  const userData = userResponse.data.data
+  userAvatar.value = userData.avatarUrl
+  userName.value = userData.userName
+  userProfile.value = userData.profile
+
+  const commentResponse = await myAxios.get(`/comment/list`, {
+    params:{
+      blogId: blogId.value
+    }
+  })
+  comments.value = commentResponse.data.data||[]
 })
+
+const newCommentContent = ref('')
+
+const submitComment = async () => {
+  // if (!newCommentContent.value.trim()) return
+  try {
+    await myAxios.get('/comment/create', {
+      params:{
+        blogId: blogId.value,
+        comment: newCommentContent.value
+      }
+    })
+    location.reload()
+  } catch (error) {
+    console.error('提交评论失败:', error)
+  }
+}
+
+const like=async()=>{
+  const params={
+    blogId: blogId.value
+  }
+  const res=await getBlogLike(params)
+  location.reload()
+}
+
+const getId=async()=>{
+  const res=await getUserCurrent()
+  id.value=res.data.data.id
+}
+getId()
+
+const DeleteBlog=async()=>{
+  const res=await getBlogDelete({id:blogId.value})
+  if(res.data.code===0){
+    showSuccessToast('删除成功')
+    router.push('/Blog')
+  }else{
+    showSuccessToast('删除失败')
+  }
+}
 
 </script>
 
 
 <style scoped>
+.blog-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.blog-title {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.blog-kind {
+  font-size: 1em;
+  color: #555;
+  margin-bottom: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.blog-content {
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
+.comments-section {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #ccc;
+}
+
+.comment-item {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.comment-user-info p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.comment-user-info small {
+  color: #999;
+}
+
+.comment-content {
+  font-size: 15px;
+}
+
+.add-comment {
+  margin-top: 20px;
+  padding-bottom: 50px;
+}
+
+.comment-textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  resize: none;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.submit-button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  font-size: 14px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+}
+
+.blog-content {
+  font-size: 1.1em;
+  line-height: 1.6;
+  word-break: break-all; /* 或使用 overflow-wrap: break-word; */
+}
+
+.blog-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+
+
 
 </style>

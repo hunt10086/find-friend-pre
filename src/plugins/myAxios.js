@@ -1,6 +1,5 @@
 import axios from 'axios'
 import router from '@/config/router.js'
-
 // 创建实例时配置默认值
 const myAxios = axios.create({
   baseURL: 'http://localhost:8080/api',
@@ -36,5 +35,6 @@ myAxios.interceptors.response.use(
     return Promise.reject(error)
   },
 )
+
 
 export default myAxios

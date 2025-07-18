@@ -1,8 +1,8 @@
 import { type AxiosRequestConfig } from "axios";
 /**
- * /blog/list
+ * /blog/my/list
  */
-export declare function getBlogList(config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{
+export declare function getBlogMyList(config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{
     code: number;
     data: {
         id: number;

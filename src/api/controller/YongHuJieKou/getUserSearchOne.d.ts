@@ -1,9 +1,9 @@
 import { type AxiosRequestConfig } from "axios";
 /**
- * 查询单个用户
- * /user/searchOne
+ * 根据id查询
+ * /user/search/one
  */
-export declare function getUserSearchOne(config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{
+export declare function getUserSearchOne(params: GetUserSearchOneParams, config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{
     code: number;
     data: {
         id: number;
@@ -23,7 +23,10 @@ export declare function getUserSearchOne(config?: AxiosRequestConfig): Promise<i
         profile: string;
         latitude: number;
         longitude: number;
-    }[];
+    };
     message: string;
     description: string;
 }, any>>;
+export interface GetUserSearchOneParams {
+    id: number;
+}

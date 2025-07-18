@@ -1,5 +1,4 @@
 <template>
-  <van-button plain type="primary" @click="createTeam">创建队伍</van-button>
   <van-empty v-if="!flag" description="还没有创建队伍" />
   <div v-if="flag">
     <van-card
@@ -43,10 +42,6 @@ const userId = ref(0)
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime' // 可选插件
 dayjs.extend(relativeTime)
-
-const createTeam = () => {
-  router.push('/create')
-}
 
 const teamList = ref()
 onMounted(async () => {

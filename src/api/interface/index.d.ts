@@ -12,9 +12,14 @@ export * from "./apiTypes/BaseResponseListUser";
 export * from "./apiTypes/BaseResponseListUserVo";
 export * from "./apiTypes/UserVo";
 export * from "./apiTypes/BaseResponseListTeamDto";
-export * from "./apiTypes/BaseResponseListBlog";
-export * from "./apiTypes/Blog";
+export * from "./apiTypes/BaseResponseListCommentVo";
+export * from "./apiTypes/CommentVo";
+export * from "./apiTypes/BaseResponseUserComment";
+export * from "./apiTypes/UserComment";
+export * from "./apiTypes/BaseResponseListBlogVo";
+export * from "./apiTypes/BlogVo";
 export * from "./apiTypes/BaseResponseBlog";
+export * from "./apiTypes/Blog";
 export type Primitive = undefined | null | boolean | string | number | symbol;
 export type DeepRequired<T> = T extends Primitive ? T : keyof T extends never ? T : {
     [K in keyof T]-?: DeepRequired<T[K]>;

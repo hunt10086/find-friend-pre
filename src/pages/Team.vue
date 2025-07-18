@@ -32,6 +32,18 @@
     <br />
     <van-divider />
   </van-card>
+  <!-- 固定在右下角的按钮 -->
+  <van-sticky :offset-bottom="20" position="bottom">
+    <van-button
+      icon="plus"
+      type="primary"
+      class="round-button"
+      round
+      style="position: fixed; right: 20px; bottom: 70px; z-index: 999999999"
+      @click="createTeam"
+    >
+    </van-button>
+  </van-sticky>
 
 </template>
 
@@ -85,6 +97,11 @@ const onCancel = async () => {
   const res = await getTeamList({ count: currentPage.value })
   teamList.value = res.data.data || []
 }
+
+const createTeam = () => {
+  router.push('/create')
+}
+
 </script>
 
 <style scoped>
