@@ -16,6 +16,7 @@ export declare function getTeamJoinTeam(config?: AxiosRequestConfig): Promise<im
         updateTime: string;
         password: string;
         icon: string;
+        nowNum: number;
     }[];
     message: string;
     description: string;

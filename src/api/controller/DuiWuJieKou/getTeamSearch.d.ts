@@ -16,6 +16,7 @@ export declare function getTeamSearch(params: GetTeamSearchParams, config?: Axio
         updateTime: string;
         password: string;
         icon: string;
+        nowNum: number;
     }[];
     message: string;
     description: string;

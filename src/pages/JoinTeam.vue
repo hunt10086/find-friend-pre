@@ -12,7 +12,7 @@
         <van-tag v-if="team.status === 0" plain type="danger">公开</van-tag>
         <van-tag v-if="team.status === 1" plain type="danger">加密</van-tag>
         <div>
-          最大人数: {{ team.maxNum }}
+          {{team.nowNum}} /  {{team.maxNum }}
           <van-divider />
           创建时间: {{ dayjs(team.createTime).format('YYYY-MM-DD HH:mm:ss') }}
           <van-divider />
@@ -66,5 +66,11 @@ const quitTeam = async (team) => {
 <style scoped>
 .card {
   padding-bottom: 50px;
+}
+
+.van-card {
+  --van-card-thumb-size: 80px;
+  margin-bottom: 30px;
+  background-color: #E6E6FA;
 }
 </style>

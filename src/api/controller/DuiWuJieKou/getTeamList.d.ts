@@ -16,6 +16,7 @@ export declare function getTeamList(config?: AxiosRequestConfig): Promise<import
         updateTime: string;
         password: string;
         icon: string;
+        nowNum: number;
     }[];
     message: string;
     description: string;

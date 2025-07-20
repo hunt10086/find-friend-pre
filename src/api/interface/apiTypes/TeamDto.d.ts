@@ -9,4 +9,5 @@ export interface TeamDto {
     updateTime?: string;
     password?: string;
     icon?: string;
+    nowNum?: number;
 }

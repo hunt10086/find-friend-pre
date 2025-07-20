@@ -12,7 +12,7 @@
         <van-tag v-if="team.status === 0" plain type="danger">公开</van-tag>
         <van-tag v-if="team.status === 1" plain type="danger">加密</van-tag>
         <div>
-          最大人数: {{ team.maxNum }}
+          {{team.nowNum}} /  {{team.maxNum }}
           <van-divider />
           创建时间: {{ dayjs(team.createTime).format('YYYY-MM-DD HH:mm:ss') }}
           <van-divider />
@@ -25,9 +25,23 @@
         <van-button plain type="warning" size="mini" @click="quitTeam(team)">退出队伍</van-button>
         <van-button plain type="danger" size="mini" @click="delTeam(team)">解散队伍</van-button>
       </template>
+
       <van-divider />
     </van-card>
   </div>
+
+  <van-sticky :offset-bottom="20" position="bottom">
+    <van-button
+      icon="plus"
+      type="primary"
+      class="round-button"
+      round
+      style="position: fixed; right: 20px; bottom: 70px; z-index: 999999999"
+      @click="createTeam"
+    >
+    </van-button>
+  </van-sticky>
+
 </template>
 
 <script setup lang="ts">
@@ -74,13 +88,19 @@ const delTeam = async (team) => {
     showSuccessToast('解散队伍失败')
   }
 }
+
+const createTeam = () => {
+  router.push('/create')
+}
+
+
 </script>
 
 <style scoped>
 .van-card {
   --van-card-thumb-size: 80px;
   margin-bottom: 30px;
-  background-color: #c3eda6;
+  background-color: #E6E6FA;
 }
 
 .van-button {

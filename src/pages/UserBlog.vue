@@ -277,7 +277,85 @@ const DeleteBlog=async()=>{
   display: block;
 }
 
+.blog-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
+.blog-title {
+  font-size: 2.5em;
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.blog-kind {
+  font-size: 1em;
+  color: #3498db;
+  margin-bottom: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+
+.blog-content {
+  font-size: 1.1em;
+  line-height: 1.8;
+  color: #333;
+  word-break: break-word;
+}
+
+.blog-content p {
+  margin-bottom: 1.2em;
+}
+
+.blog-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 10px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.submit-button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #2980b9;
+}
+
+.van-button--small {
+  margin: 20px auto 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  padding: 8px 16px;
+}
+
+.blog-content {
+  font-size: 1.1em;
+  line-height: 1.8;
+  color: #333;
+  white-space: pre-line; /* 关键样式 */
+  word-break: break-word;
+}
 
 
 </style>

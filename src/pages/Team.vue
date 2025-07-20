@@ -7,7 +7,8 @@
     @search="onSearch"
     @cancel="onCancel"
   />
-  <van-card
+  <div v-if="flag">
+    <van-card
     class="card"
     v-for="team in teamList"
     :desc="`队伍描述: ${team.description}`"
@@ -18,7 +19,7 @@
       <van-tag v-if="team.status === 0" plain type="danger">公开</van-tag>
       <van-tag v-if="team.status === 1" plain type="danger">加密</van-tag>
       <div>
-        最大人数: {{ team.maxNum }}
+        {{team.nowNum}} /  {{team.maxNum }}
         <van-divider />
         创建时间: {{ dayjs(team.createTime).format('YYYY-MM-DD HH:mm:ss') }}
         <van-divider />
@@ -27,11 +28,17 @@
     </template>
 
     <template #footer>
+      <van-button plain type="success" size="mini" @click="inTeam(team)">查看队伍详情</van-button>
       <van-button plain type="success" size="mini" @click="joinTeam(team)">加入队伍</van-button>
     </template>
     <br />
     <van-divider />
   </van-card>
+  </div>
+  <div v-else>
+    <van-empty description="暂无可加入的队伍" />
+  </div>
+
   <!-- 固定在右下角的按钮 -->
   <van-sticky :offset-bottom="20" position="bottom">
     <van-button
@@ -58,9 +65,13 @@ import { getTeamList } from '@/api/controller'
 const currentPage = ref(1)
 const teamList = ref()
 const values = ref('')
+const flag=ref(false)
 onMounted(async () => {
   const res = await getTeamList()
   teamList.value = res.data.data || []
+  if(teamList.value.length > 0){
+    flag.value = true
+  }
 })
 
 const joinTeam = async (team) => {
@@ -102,6 +113,9 @@ const createTeam = () => {
   router.push('/create')
 }
 
+const inTeam = (team) => {
+  router.push(`/showMembers/${team.id}`)
+}
 </script>
 
 <style scoped>
@@ -139,7 +153,7 @@ const createTeam = () => {
 .van-card {
   --van-card-thumb-size: 80px;
   margin-bottom: 30px;
-  background-color: #c3eda6;
+  background-color: #F5F5DC;
 }
 
 #button-css{

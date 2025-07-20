@@ -15,6 +15,10 @@ export default defineConfig({
       resolvers: [VantResolver()],
     }),
   ],
+  server: {
+    host: '0.0.0.0', // 监听所有网络接口
+    port: 9090, // 指定端口号
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

@@ -54,4 +54,20 @@ const handleAddBlog = () => {
 #blank{
   padding-bottom: 50px;
 }
+.van-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+  background-color: #F5F5DC;
+}
+
+.van-card__title {
+  font-size: 24px;
+  color: #333333;
+}
+
+.van-card__desc {
+  font-size: 20px;
+  color: #666666;
+}
 </style>

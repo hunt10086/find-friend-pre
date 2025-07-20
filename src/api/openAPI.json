@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8080/api",
+      "url": "http://localhost:7777/api",
       "description": "Generated server url"
     }
   ],
@@ -789,7 +789,7 @@
         "tags": [
           "comment-controller"
         ],
-        "operationId": "list",
+        "operationId": "list_1",
         "parameters": [
           {
             "name": "blogId",
@@ -1154,39 +1154,54 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "refType": null
           },
           "teamName": {
-            "type": "string"
+            "type": "string",
+            "refType": null
           },
           "description": {
-            "type": "string"
+            "type": "string",
+            "refType": null
           },
           "maxNum": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "refType": null
           },
           "userId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "refType": null
           },
           "status": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "refType": null
           },
           "createTime": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "refType": null
           },
           "updateTime": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "refType": null
           },
           "password": {
-            "type": "string"
+            "type": "string",
+            "refType": null
           },
           "icon": {
-            "type": "string"
+            "type": "string",
+            "refType": null
+          },
+          "nowNum": {
+            "type": "integer",
+            "format": "int64",
+            "refType": null
           }
         }
       },
@@ -1535,32 +1550,5 @@
         }
       }
     }
-  },
-  "x-openapi": {
-    "x-setting": {
-      "customCode": 200,
-      "language": "zh-CN",
-      "enableSwaggerModels": true,
-      "swaggerModelName": "Swagger Models",
-      "enableReloadCacheParameter": false,
-      "enableAfterScript": true,
-      "enableDocumentManage": true,
-      "enableVersion": false,
-      "enableRequestCache": true,
-      "enableFilterMultipartApis": false,
-      "enableFilterMultipartApiMethodType": "POST",
-      "enableHost": false,
-      "enableHostText": "",
-      "enableDynamicParameter": false,
-      "enableDebug": true,
-      "enableFooter": true,
-      "enableFooterCustom": false,
-      "enableSearch": true,
-      "enableOpenApi": true,
-      "enableHomeCustom": false,
-      "enableGroup": true,
-      "enableResponseCode": true
-    },
-    "x-markdownFiles": []
   }
 }

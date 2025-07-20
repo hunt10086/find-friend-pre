@@ -17,7 +17,7 @@
 
     <template #footer>
       <div v-if="captain === user.id">队长</div>
-      <van-button size="mini">查看</van-button>
+<!--      <van-button size="mini">查看</van-button>-->
     </template>
     <br />
   </van-card>
@@ -66,4 +66,30 @@ const updateTeam = async (teamId) => {
 .van-card {
   margin-bottom: 30px;
 }
+
+.card :deep(.van-tag) {
+  background: linear-gradient(45deg, #ff6ec4, #7873f5); /* 粉紫渐变 */
+  color: white;
+}
+
+.card :deep(.van-card__content) {
+  background-color: #f9f9f9; /* 浅灰色背景 */
+  border-radius: 10px;
+}
+
+.van-card {
+  margin-bottom: 30px;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+}
+.card :deep(.van-button--mini) {
+  background-color: #ff9900;
+  color: white;
+}
+
+.card :deep(.van-card__title) {
+  color: #007AFF; /* 修改为你喜欢的颜色，如 #e60012 或 #007AFF */
+}
+
+
 </style>

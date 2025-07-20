@@ -21,6 +21,7 @@ import UserBlog from '@/pages/UserBlog.vue'
 import CreateBlog from '@/pages/CreateBlog.vue'
 import MyBlog from '@/pages/MyBlog.vue'
 import Talk from '@/pages/Talk.vue'
+import TagEditPage from '@/pages/TagEditPage.vue'
 
 const routes = [
   {
@@ -126,6 +127,11 @@ const routes = [
   {
     path: '/talk',
     component: Talk ,
+    meta: { keepAlive: true, showNavBar: true },
+  },
+  {
+    path: '/edit/tags',
+    component: TagEditPage ,
     meta: { keepAlive: true, showNavBar: true },
   }
 ]

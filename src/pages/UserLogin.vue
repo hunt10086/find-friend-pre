@@ -37,50 +37,33 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const userAccount = ref('')
 const userPassword = ref('')
-const latitude = ref()
-const longitude = ref()
+const latitude = ref(30)
+const longitude = ref(120)
 
 
 
 const onSubmit = async () => {
-
-  // 获取地理位置
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        latitude.value =position.coords.latitude;
-        longitude.value =position.coords.longitude;
-        console.log(`Latitude: ${latitude.value}, Longitude: ${longitude.value}`);
-        const input = {
-          userAccount: userAccount.value,
-          userPassword: userPassword.value,
-          latitude: latitude.value,
-          longitude: longitude.value
-        }
-        // 请求配置
-        const config = {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-        const res = await postUserLogin(input, config)
-        if (res.data.code === 0) {
-          showSuccessToast('登录成功')
-          router.replace('/')
-        } else {
-          showSuccessToast('登录失败')
-        }
-
-      },
-      (error) => {
-        console.error(`Error Code = ${error.code} - ${error.message}`);
-      }
-    );
-  } else {
-    console.error("Geolocation is not supported by this browser.");
+  const input = {
+    userAccount: userAccount.value,
+    userPassword: userPassword.value,
+    latitude: latitude.value,
+    longitude: longitude.value
   }
-}
+  // 请求配置
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }
+  const res = await postUserLogin(input, config)
+  if (res.data.code === 0) {
+    showSuccessToast('登录成功')
+    await router.replace('/')
+  } else {
+    showSuccessToast('登录失败')
+  }
 
+}
 const Register = () => {
   router.push('/user/register')
 }

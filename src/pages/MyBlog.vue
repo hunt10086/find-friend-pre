@@ -59,7 +59,43 @@ const handleAddBlog = () => {
 }
 </script>
 <style scoped>
-#blank{
-  padding-bottom: 50px;
+.van-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin: 10px 15px;
+  padding: 15px;
+}
+
+.van-card__title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.van-card__desc {
+  font-size: 14px;
+  color: #777;
+}
+
+#blank {
+  padding-bottom: 60px;
+}
+
+.round-button {
+  width: 50px;
+  height: 50px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 20px;
+}
+
+.van-empty__description {
+  font-size: 16px;
+  color: #999;
+}
+
+.van-button--mini {
+  font-size: 12px;
+  padding: 4px 8px;
 }
 </style>
+

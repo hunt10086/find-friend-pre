@@ -1,40 +1,53 @@
 <template>
-  <van-card
-    class="card"
-    v-for="user in userList"
-    :title="`${user.userName}  编号:${user.id} `"
-    :thumb="user.avatarUrl"
-    size="80px"
-  >
-    <template #tags>
-      <van-tag plain type="warning" v-for="tag in user.tags">
-        {{ tag }}
-      </van-tag>
-    </template>
+  <div v-if="flag">
+    <van-card
+      class="card"
+      v-for="user in userList"
+      :title="`${user.userName}  编号:${user.id} `"
+      :thumb="user.avatarUrl"
+      size="80px"
+    >
+      <template #tags>
+        <van-tag plain type="warning" v-for="tag in user.tags">
+          {{ tag }}
+        </van-tag>
+      </template>
 
-    <template #footer>
-      <div>距离你的距离:{{user.distance}}  km</div>
-    </template>
-    <br />
-  </van-card>
-
+      <template #footer>
+        <div>距离你的距离:{{user.distance}}  km</div>
+      </template>
+      <br />
+    </van-card>
+    <van-divider />
+  </div>
+<div v-else>
   <van-divider />
+  <van-empty description="附近没有用户" />
+</div>
+
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { getUserNearUser } from '@/api/controller/YongHuJieKou/getUserNearUser.js'
-import { showSuccessToast } from 'vant'
+import { showFailToast, showSuccessToast } from 'vant'
 
 const userList = ref()
+const flag = ref(false)
 onMounted(async () => {
   const res=await  getUserNearUser()
   res.data.data.forEach((user) => {
     user.tags = JSON.parse(user.tags)
   })
   if(res.data.code==0){
-    showSuccessToast('获取成功');
     userList.value=res.data.data||[];
+    if(userList.value.length>0){
+      flag.value=true;
+      showSuccessToast('获取成功');
+    }else{
+      showFailToast('附近没有用户');
+
+    }
   }else{
     showSuccessToast('获取失败');
   }

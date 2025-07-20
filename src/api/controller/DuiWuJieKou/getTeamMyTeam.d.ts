@@ -16,6 +16,7 @@ export declare function getTeamMyTeam(config?: AxiosRequestConfig): Promise<impo
         updateTime: string;
         password: string;
         icon: string;
+        nowNum: number;
     }[];
     message: string;
     description: string;

@@ -1,4 +1,4 @@
-<template>
+<template id="app">
   <div id="app">
     <!-- 根据 meta 控制是否显示全局导航栏 -->
     <header-nav v-if="$route.meta.showNavBar" />

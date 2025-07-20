@@ -68,14 +68,30 @@
     />
     <br />
     <van-cell
+      title="经度"
+      is-link
+      to="/user/edit"
+      :value="user.longitude"
+      @click="toEdit('longitude', '经度', user.longitude)"
+    />
+    <br />
+    <van-cell
+      title="纬度"
+      is-link
+      to="/user/edit"
+      :value="user.latitude"
+      @click="toEdit('latitude', '纬度', user.latitude)"
+    />
+    <br />
+    <van-cell
       title="标签"
       is-link
       to="/user/edit"
       value=""
-      @click="toEdit('tags', '标签', user.tags)"
+      @click="toEditTags('tags', '标签', user.tags)"
     >
     <template #value>
-      <van-tag  color="#F0F" type="primary" v-for="tag in user.tags">
+      <van-tag  color="#D94F4F" type="primary" v-for="tag in user.tags">
         {{ tag }}
       </van-tag>
     </template>
@@ -106,6 +122,10 @@ onMounted(async () => {
 
 const toEdit = (editKey: string, editName: string, currentValue: string) => {
   router.push({ path: '/user/edit', query: { editKey, editName, currentValue } })
+}
+
+const toEditTags = (editKey: string, editName: string, currentValue: string) => {
+  router.push({ path: '/edit/tags', query: { editKey, editName, currentValue } })
 }
 </script>
 <style scoped>
