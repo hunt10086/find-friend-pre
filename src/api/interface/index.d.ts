@@ -8,6 +8,7 @@ export * from "./apiTypes/TeamDto";
 export * from "./apiTypes/CreateTeamRequest";
 export * from "./apiTypes/BlogRequest";
 export * from "./apiTypes/BaseResponseString";
+export * from "./apiTypes/TeamChatMessageRequest";
 export * from "./apiTypes/BaseResponseListUser";
 export * from "./apiTypes/BaseResponseListUserVo";
 export * from "./apiTypes/UserVo";
@@ -20,6 +21,8 @@ export * from "./apiTypes/BaseResponseListBlogVo";
 export * from "./apiTypes/BlogVo";
 export * from "./apiTypes/BaseResponseBlog";
 export * from "./apiTypes/Blog";
+export * from "./apiTypes/BaseResponseListTeamChatMessageVo";
+export * from "./apiTypes/TeamChatMessageVo";
 export type Primitive = undefined | null | boolean | string | number | symbol;
 export type DeepRequired<T> = T extends Primitive ? T : keyof T extends never ? T : {
     [K in keyof T]-?: DeepRequired<T[K]>;

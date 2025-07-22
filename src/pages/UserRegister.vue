@@ -62,7 +62,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { getUserSendCode, postUserLogin, postUserRegister } from '@/api/controller'
-import { showSuccessToast, showToast, Toast } from 'vant'
+import { showFailToast, showSuccessToast, showToast, Toast } from 'vant'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -92,6 +92,14 @@ const SendCode = async () => {
 }
 
 const onSubmit = async () => {
+  if(userAccount.value.length < 4){
+    showFailToast('用户名长度不能小于4位');
+    return;
+  }
+  if(userPassword.value.length < 8 || checkPassword.value.length < 8){
+    showFailToast('密码长度不能小于8位');
+    return;
+  }
   const input = {
     userAccount: userAccount.value,
     userPassword: userPassword.value,

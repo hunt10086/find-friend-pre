@@ -1,8 +1,16 @@
 <template>
-  <van-button type="primary" @click="findMore">寻找附近用户</van-button>
-  <div class="custom-text-box">
-    <p class="text-content">猜你喜欢:</p>
-  </div>
+  <van-row justify="space-between" align="center" style="padding: 10px;">
+    <van-col span="12">
+      <van-cell title="猜你喜欢" icon="like-o" />
+    </van-col>
+    <van-col span="12" style="text-align: right;">
+      <van-button type="success" round @click="findMore">
+        <van-icon name="map-marked" />
+        寻找附近用户
+      </van-button>
+    </van-col>
+  </van-row>
+
 
   <div class="card-show" v-for="user in userList" style="margin-bottom: 16px">
     <van-skeleton>
@@ -143,4 +151,20 @@ const findMore = () => {
 #index-button-css {
   padding-bottom: 50px;
 }
+
+.van-cell {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.van-button {
+  padding: 8px 16px;
+}
+
+.van-button:active {
+  transform: scale(0.98);
+}
+
+
 </style>

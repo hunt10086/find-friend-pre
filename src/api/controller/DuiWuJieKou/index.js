@@ -8,3 +8,4 @@ export * from "./getTeamSearchById";
 export * from "./getTeamMyTeam";
 export * from "./getTeamList";
 export * from "./getTeamJoinTeam";
+export * from "./getTeamGetTeam";

@@ -22,6 +22,7 @@ import CreateBlog from '@/pages/CreateBlog.vue'
 import MyBlog from '@/pages/MyBlog.vue'
 import Talk from '@/pages/Talk.vue'
 import TagEditPage from '@/pages/TagEditPage.vue'
+import TeamChat from '@/pages/TeamChat.vue'
 
 const routes = [
   {
@@ -132,6 +133,11 @@ const routes = [
   {
     path: '/edit/tags',
     component: TagEditPage ,
+    meta: { keepAlive: true, showNavBar: true },
+  },
+  {
+    path: '/teamChat/:teamId',
+    component: TeamChat,
     meta: { keepAlive: true, showNavBar: true },
   }
 ]

@@ -15,7 +15,7 @@
         </van-tag>
       </template>
       <template #footer>
-        <van-button size="mini">联系我</van-button>
+        <van-button size="mini" @click="addUser">联系我</van-button>
       </template>
     </van-card>
     <van-divider />
@@ -29,6 +29,7 @@
 import { useRoute } from 'vue-router'
 import { onMounted, ref } from 'vue'
 import myAxios from '../plugins/myAxios'
+import { showFailToast } from 'vant'
 
 const route = useRoute()
 const tags = route.query
@@ -62,6 +63,10 @@ onMounted(async () => {
     console.error('Failed to fetch data:', error)
   }
 })
+
+const addUser = async () => {
+  showFailToast('功能暂未开放，敬请期待')
+}
 </script>
 
 <style scoped>

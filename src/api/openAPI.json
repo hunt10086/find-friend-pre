@@ -404,6 +404,36 @@
         }
       }
     },
+    "/api/teamChat/send": {
+      "post": {
+        "tags": [
+          "team-chat-message-controller"
+        ],
+        "operationId": "sendMessage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamChatMessageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/sendCode": {
       "get": {
         "tags": [
@@ -784,6 +814,26 @@
         }
       }
     },
+    "/team/get/team": {
+      "get": {
+        "tags": [
+          "队伍接口"
+        ],
+        "operationId": "getTeam",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/comment/list": {
       "get": {
         "tags": [
@@ -980,6 +1030,37 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/teamChat/list": {
+      "get": {
+        "tags": [
+          "team-chat-message-controller"
+        ],
+        "operationId": "getMessageList",
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListTeamChatMessageVo"
                 }
               }
             }
@@ -1266,6 +1347,18 @@
           }
         }
       },
+      "TeamChatMessageRequest": {
+        "type": "object",
+        "properties": {
+          "teamId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "content": {
+            "type": "string"
+          }
+        }
+      },
       "BaseResponseListUser": {
         "type": "object",
         "properties": {
@@ -1546,6 +1639,57 @@
           "praise": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "BaseResponseListTeamChatMessageVo": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamChatMessageVo"
+            }
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "TeamChatMessageVo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "teamId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "avatarUrl": {
+            "type": "string"
           }
         }
       }
