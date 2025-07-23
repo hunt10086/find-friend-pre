@@ -1,3 +1,27 @@
+<template>
+  <div class="chat-container">
+    <div class="message-list">
+      <div
+        v-for="msg in messageList"
+        :key="msg.id"
+        :class="['message-item', msg.userId === currentUserId ? 'self' : 'other']"
+      >
+        <img class="avatar" :src="msg.avatarUrl || defaultAvatar" />
+        <div class="meta-info">
+          <span class="user-name">{{ msg.userName }}</span>
+          <span class="time">{{ formatTime(msg.createTime) }}</span>
+        </div>
+        <div class="bubble">
+          <div class="content">{{ msg.content }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <input v-model="newMessage" placeholder="输入消息..." @keyup.enter="sendMessage" />
+      <button @click="sendMessage">发送</button>
+    </div>
+  </div>
+</template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
@@ -56,7 +80,7 @@ const fetchCurrentUser = async () => {
 }
 
 const formatTime = (time: string) => {
-  return dayjs(time).format('HH:mm')
+  return dayjs(time).format('YYYY-MM-DD HH:mm')
 }
 
 onMounted(() => {
@@ -65,30 +89,7 @@ onMounted(() => {
 })
 </script>
 
-<template>
-  <div class="chat-container">
-    <div class="message-list">
-      <div
-        v-for="msg in messageList"
-        :key="msg.id"
-        :class="['message-item', msg.userId === currentUserId ? 'self' : 'other']"
-      >
-        <img class="avatar" :src="msg.avatarUrl || defaultAvatar" />
-        <div class="meta-info">
-          <span class="user-name">{{ msg.userName }}</span>
-          <span class="time">{{ formatTime(msg.createTime) }}</span>
-        </div>
-        <div class="bubble">
-          <div class="content">{{ msg.content }}</div>
-        </div>
-      </div>
-    </div>
-    <div class="input-area">
-      <input v-model="newMessage" placeholder="输入消息..." @keyup.enter="sendMessage" />
-      <button @click="sendMessage">发送</button>
-    </div>
-  </div>
-</template>
+
 
 <style scoped>
 .chat-container {
