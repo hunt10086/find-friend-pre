@@ -16,20 +16,8 @@
     <van-skeleton>
       <template #template>
         <div :style="{ display: 'flex', width: '100%' }">
-          <div v-if="user.avatarUrl" style="width: 100px">
-            <img :src="user.avatarUrl" style="width: 100%" />
-          </div>
-          <div
-            v-else
-            style="
-              width: 100px;
-              text-align: center;
-              line-height: 100px;
-              background-color: #f0f0f0;
-              font-weight: bold;
-            "
-          >
-            {{ getDefaultAvatarText(user) }}
+          <div style="width: 100px">
+            <img :src="user.avatarUrl || '/ava.jpg'" style="width: 100%" @error="handleImageError" />
           </div>
         </div>
 
@@ -115,6 +103,11 @@ const getDefaultAvatarText = (user) => {
 
 const findMore = () => {
   router.push('/nearUsers')
+}
+
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  img.src = '/ava.jpg'
 }
 
 </script>

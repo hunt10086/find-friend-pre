@@ -6,7 +6,7 @@
         :key="msg.id"
         :class="['message-item', msg.userId === currentUserId ? 'self' : 'other']"
       >
-        <img class="avatar" :src="msg.avatarUrl || defaultAvatar" />
+        <img class="avatar" :src="msg.avatarUrl || '/ava.jpg'" @error="handleImageError" />
         <div class="meta-info">
           <span class="user-name">{{ msg.userName }}</span>
           <span class="time">{{ formatTime(msg.createTime) }}</span>
@@ -18,12 +18,27 @@
     </div>
     <div class="input-area">
       <input v-model="newMessage" placeholder="输入消息..." @keyup.enter="sendMessage" />
+      <button @click="toggleEmojiPicker" class="emoji-btn">😊</button>
       <button @click="sendMessage">发送</button>
+      
+      <!-- Emoji Picker -->
+      <div v-if="showEmojiPicker" class="emoji-picker">
+        <div class="emoji-grid">
+          <span 
+            v-for="emoji in commonEmojis" 
+            :key="emoji"
+            @click="insertEmoji(emoji)"
+            class="emoji-item"
+          >
+            {{ emoji }}
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { showFailToast, showSuccessToast } from 'vant'
 import myAxios from '@/plugins/myAxios.js'
@@ -33,8 +48,10 @@ const route = useRoute()
 const teamId = route.params.teamId
 const messageList = ref<any[]>([])
 const newMessage = ref('')
-const defaultAvatar = '/default-avatar.png' // 可替换为你的默认头像
 const currentUserId = ref<number>()
+const showEmojiPicker = ref(false)
+const commonEmojis = ref(['😊', '😂', '🥰', '😍', '🤔', '😎', '👍', '❤️', '🔥', '⭐', '🎉', '🎈', '🌟', '💯', '🙌', '👏', '💪', '🎯', '🏆', '🎊', '🎁', '🌈', '🌸', '🌺', '🌻', '🌝', '🌞', '🌙', '⭐', '🌟', '💫', '🌈', '🌸', '🌺', '🌻', '🌝', '🌞', '🌙', '⭐', '🌟', '💫'])
+let fetchTimer: NodeJS.Timeout | null = null
 
 const fetchMessages = async () => {
   try {
@@ -63,7 +80,10 @@ const sendMessage = async () => {
     if (res.data.code === 0) {
       showSuccessToast('发送成功')
       newMessage.value = ''
+      // 立即获取最新消息
       await fetchMessages()
+      // 重置定时器，避免重复请求
+      startFetchTimer()
     } else {
       showFailToast(res.data.message || '发送失败')
     }
@@ -83,9 +103,51 @@ const formatTime = (time: string) => {
   return dayjs(time).format('YYYY-MM-DD HH:mm')
 }
 
+const toggleEmojiPicker = () => {
+  showEmojiPicker.value = !showEmojiPicker.value
+}
+
+const insertEmoji = (emoji: string) => {
+  newMessage.value += emoji
+  showEmojiPicker.value = false
+}
+
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  img.src = '/ava.jpg'
+}
+
+// 启动定时器
+const startFetchTimer = () => {
+  // 清除现有定时器
+  if (fetchTimer) {
+    clearInterval(fetchTimer)
+  }
+  
+  // 设置新的定时器，每20秒获取一次消息
+  fetchTimer = setInterval(() => {
+    fetchMessages()
+  }, 20000) // 20秒 = 20000毫秒
+}
+
+// 停止定时器
+const stopFetchTimer = () => {
+  if (fetchTimer) {
+    clearInterval(fetchTimer)
+    fetchTimer = null
+  }
+}
+
 onMounted(() => {
   fetchCurrentUser()
   fetchMessages()
+  // 启动定时器
+  startFetchTimer()
+})
+
+// 组件卸载时清理定时器
+onUnmounted(() => {
+  stopFetchTimer()
 })
 </script>
 
@@ -175,5 +237,47 @@ onMounted(() => {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+.input-area .emoji-btn {
+  padding: 8px 12px;
+  background: #f0f0f0;
+  color: #333;
+  font-size: 18px;
+  margin-right: 8px;
+}
+.emoji-picker {
+  position: absolute;
+  bottom: 60px;
+  left: 12px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  padding: 8px;
+  z-index: 100;
+  max-width: 280px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+.emoji-item {
+  font-size: 18px;
+  padding: 6px 4px;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  min-width: 30px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.emoji-item:hover {
+  background-color: #f0f0f0;
 }
 </style>

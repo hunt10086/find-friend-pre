@@ -6,7 +6,7 @@
       v-for="team in teamList"
       :desc="`队伍描述: ${team.description}`"
       :title="` 队伍名:  ${team.teamName} `"
-      :thumb="team.icon"
+      :thumb="team.icon || '/ava.jpg'"
     >
       <template #tags>
         <van-tag v-if="team.status === 0" plain type="danger">公开</van-tag>

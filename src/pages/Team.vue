@@ -13,7 +13,7 @@
     v-for="team in teamList"
     :desc="`队伍描述: ${team.description}`"
     :title="` 队伍名:  ${team.teamName} `"
-    :thumb="team.icon"
+    :thumb="team.icon || '/ava.jpg'"
   >
     <template #tags>
       <van-tag v-if="team.status === 0" plain type="danger">公开</van-tag>
@@ -36,7 +36,19 @@
   </van-card>
   </div>
   <div v-else>
-    <van-empty description="暂无可加入的队伍" />
+    <van-empty 
+      image="https://fastly.jsdelivr.net/npm/@vant/assets/custom-empty-image.png"
+      description="暂无可加入的队伍"
+    >
+      <van-button 
+        round 
+        type="primary" 
+        class="bottom-button"
+        @click="createTeam"
+      >
+        创建队伍
+      </van-button>
+    </van-empty>
   </div>
 
   <!-- 固定在右下角的按钮 -->
@@ -95,8 +107,9 @@ const joinTeam = async (team) => {
 const onSearch = async () => {
   const res = await getTeamSearch({ teamName: values.value })
   if (res.data.code === 0) {
-    teamList.value = res.data.data
-    if (teamList.value.length < 0) {
+    teamList.value = res.data.data || []
+    flag.value = teamList.value.length > 0
+    if (teamList.value.length === 0) {
       showFailToast('没有找到该队伍')
     }
   }
@@ -107,6 +120,7 @@ const onCancel = async () => {
   currentPage.value = 1 // 回到第一页
   const res = await getTeamList({ count: currentPage.value })
   teamList.value = res.data.data || []
+  flag.value = teamList.value.length > 0
 }
 
 const createTeam = () => {
@@ -158,5 +172,10 @@ const inTeam = (team) => {
 
 #button-css{
   padding-bottom: 50px;
+}
+
+.bottom-button {
+  width: 160px;
+  height: 40px;
 }
 </style>

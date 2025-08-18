@@ -8,7 +8,7 @@
 
     <!-- 用户信息 -->
     <div class="user-info">
-      <img :src="userAvatar"  width="50px" alt="用户头像" class="avatar"  />
+      <img :src="userAvatar || '/ava.jpg'"  width="50px" alt="用户头像" class="avatar" @error="handleImageError" />
       <div class="user-details">
         <p><strong>作者:</strong> {{ userName }}</p>
         <p><strong>简介:</strong> {{ userProfile }}</p>
@@ -32,7 +32,7 @@
     <div v-if="comments.length > 0">
       <div v-for="comment in comments"  class="comment-item">
         <div class="comment-header">
-          <img :src="comment.avatarUrl" alt="用户头像" class="comment-avatar" />
+          <img :src="comment.avatarUrl || '/ava.jpg'" alt="用户头像" class="comment-avatar" @error="handleImageError" />
           <div class="comment-user-info">
             <p><strong>{{ comment.userName }}</strong></p>
             {{ dayjs(comment.createTime).format('YYYY-MM-DD HH:mm:ss') }}
@@ -83,7 +83,7 @@ const userName= ref('')
 const userProfile= ref('')
 const id= ref(0)
 const userId= ref(0)
-onMounted(async () => {
+const getBlogData = async () => {
   const response = await getBlogGetOne({blogId : blogId.value})
   blog.value = response.data.data;
   console.log(blog.value)
@@ -110,6 +110,10 @@ onMounted(async () => {
     }
   })
   comments.value = commentResponse.data.data||[]
+}
+
+onMounted(async () => {
+  await getBlogData()
 })
 
 const newCommentContent = ref('')
@@ -123,7 +127,8 @@ const submitComment = async () => {
         comment: newCommentContent.value
       }
     })
-    location.reload()
+    newCommentContent.value = ''
+    await getBlogData()
   } catch (error) {
     console.error('提交评论失败:', error)
   }
@@ -134,7 +139,7 @@ const like=async()=>{
     blogId: blogId.value
   }
   const res=await getBlogLike(params)
-  location.reload()
+  await getBlogData()
 }
 
 const getId=async()=>{
@@ -151,6 +156,11 @@ const DeleteBlog=async()=>{
   }else{
     showSuccessToast('删除失败')
   }
+}
+
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  img.src = '/ava.jpg'
 }
 
 </script>

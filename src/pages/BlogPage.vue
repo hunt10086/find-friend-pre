@@ -3,7 +3,7 @@
     v-for="blog in blogList"
     :title="blog.title"
     :desc="blog.kind"
-    :thumb="blog.avatarUrl"
+    :thumb="blog.avatarUrl || '/ava.jpg'"
     @click="goToBlog(blog.id)"
   >
     <template #footer>

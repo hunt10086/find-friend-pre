@@ -18,7 +18,7 @@
       @click="toEdit('avatarUrl', '头像地址', user.avatarUrl)"
     >
       <br />
-      <img :src="user.avatarUrl" style="height: 50px" />
+      <img :src="user.avatarUrl || '/ava.jpg'" style="height: 50px" @error="handleImageError" />
     </van-cell>
     <van-cell
       v-if="user.gender === 1"
@@ -126,6 +126,11 @@ const toEdit = (editKey: string, editName: string, currentValue: string) => {
 
 const toEditTags = (editKey: string, editName: string, currentValue: string) => {
   router.push({ path: '/edit/tags', query: { editKey, editName, currentValue } })
+}
+
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  img.src = '/ava.jpg'
 }
 </script>
 <style scoped>

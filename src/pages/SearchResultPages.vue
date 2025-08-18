@@ -6,7 +6,7 @@
       :desc="user.profile"
       :title="`${user.userName}
          编号:${user.id} `"
-      :thumb="user.avatarUrl"
+      :thumb="user.avatarUrl || '/ava.jpg'"
       size="80px"
     >
       <template #tags>
