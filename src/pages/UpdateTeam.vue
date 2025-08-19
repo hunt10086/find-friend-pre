@@ -101,13 +101,12 @@ const onSubmit = async () => {
 
 watch(status, (newVal) => {
   if (newVal === 1) {
-    console.log('加密模式开启')
+    // 加密模式开启
   } else {
-    console.log('公开模式')
+    // 公开模式
     password.value = '' // 可选：清空密码
   }
 })
-console.log(status.value)
 </script>
 
 <style scoped>

@@ -41,7 +41,6 @@ import { showFailToast, showSuccessToast } from 'vant'
 import router from '@/config/router.ts'
 
 const route = useRoute()
-console.log(route.query)
 const editUser = ref({
   editKey: route.query.editKey,
   currentValue: route.query.currentValue,

@@ -22,12 +22,12 @@
             <van-field
               v-model="userAccount"
               name="userAccount"
-              label="用户名"
-              placeholder="请输入用户名（至少4位）"
+              label="账号"
+              placeholder="账号(最少4位)"
               left-icon="manager"
               clearable
               :minlength="4"
-              :rules="[{ required: true, message: '请填写不小于4位的用户名' }]"
+              :rules="[{ required: true, message: '请填写不小于4位的账号' }]"
               :error="accountError"
               :error-message="accountErrorMessage"
               @blur="validateAccount"
@@ -37,7 +37,7 @@
               type="password"
               name="userPassword"
               label="密码"
-              placeholder="请输入密码（至少8位）"
+              placeholder="密码(至少8位)"
               left-icon="lock"
               clearable
               :minlength="8"
@@ -51,7 +51,7 @@
               type="password"
               name="checkPassword"
               label="确认密码"
-              placeholder="请再次输入密码"
+              placeholder="再次输入密码"
               left-icon="lock"
               clearable
               :minlength="8"
@@ -74,7 +74,7 @@
               v-model="email"
               name="email"
               label="邮箱"
-              placeholder="请输入邮箱地址"
+              placeholder="邮箱地址"
               left-icon="envelop-o"
               clearable
               :rules="[{ required: true, message: '请填写邮箱' }]"
@@ -87,7 +87,7 @@
                 v-model="code"
                 name="code"
                 label="验证码"
-                placeholder="请输入验证码"
+                placeholder="验证码"
                 left-icon="shield-o"
                 clearable
                 :rules="[{ required: true, message: '请输入验证码' }]"
@@ -109,10 +109,10 @@
 
         <!-- 注册按钮 -->
         <div class="button-section">
-          <van-button 
-            round 
-            block 
-            type="primary" 
+          <van-button
+            round
+            block
+            type="primary"
             native-type="submit"
             :loading="isRegistering"
             :disabled="isRegistering"
@@ -125,10 +125,10 @@
         <!-- 登录链接 -->
         <div class="login-section">
           <van-divider>已经是学习社区成员？</van-divider>
-          <van-button 
-            round 
-            block 
-            type="default" 
+          <van-button
+            round
+            block
+            type="default"
             @click="goToLogin"
             class="login-link-btn"
           >
@@ -177,19 +177,19 @@ const validateAccount = () => {
     accountErrorMessage.value = ''
     return false
   }
-  
+
   if (userAccount.value.length < 4) {
     accountError.value = true
-    accountErrorMessage.value = '用户名至少需要4个字符'
+    accountErrorMessage.value = '用户名至少4位'
     return false
   }
-  
+
   if (!/^[a-zA-Z0-9_]+$/.test(userAccount.value)) {
     accountError.value = true
-    accountErrorMessage.value = '用户名只能包含字母、数字和下划线'
+    accountErrorMessage.value = '只能包含字母数字下划线'
     return false
   }
-  
+
   accountError.value = false
   accountErrorMessage.value = ''
   return true
@@ -202,13 +202,13 @@ const validatePassword = () => {
     passwordErrorMessage.value = ''
     return false
   }
-  
+
   if (userPassword.value.length < 8) {
     passwordError.value = true
-    passwordErrorMessage.value = '密码至少需要8个字符'
+    passwordErrorMessage.value = '密码至少8位'
     return false
   }
-  
+
   passwordError.value = false
   passwordErrorMessage.value = ''
   return true
@@ -221,13 +221,13 @@ const validateConfirmPassword = () => {
     confirmPasswordErrorMessage.value = ''
     return false
   }
-  
+
   if (checkPassword.value !== userPassword.value) {
     confirmPasswordError.value = true
-    confirmPasswordErrorMessage.value = '两次输入的密码不一致'
+    confirmPasswordErrorMessage.value = '密码不一致'
     return false
   }
-  
+
   confirmPasswordError.value = false
   confirmPasswordErrorMessage.value = ''
   return true
@@ -241,13 +241,13 @@ const validateEmail = () => {
     emailErrorMessage.value = ''
     return false
   }
-  
+
   if (!emailRegex.test(email.value)) {
     emailError.value = true
-    emailErrorMessage.value = '请输入正确的邮箱格式'
+    emailErrorMessage.value = '邮箱格式错误'
     return false
   }
-  
+
   emailError.value = false
   emailErrorMessage.value = ''
   return true
@@ -278,7 +278,7 @@ const startCountdown = () => {
 const SendCode = async () => {
   // 立即显示加载状态，提供即时反馈
   isSending.value = true
-  
+
   try {
     // 验证邮箱格式
     if (!validateEmail()) {
@@ -288,7 +288,7 @@ const SendCode = async () => {
 
     // 发送请求
     const res = await getUserSendCode({ email: email.value })
-    
+
     if (res.data.code === 0) {
       showSuccessToast('验证码已发送')
       startCountdown()
@@ -312,19 +312,19 @@ const onSubmit = async () => {
   const isPasswordValid = validatePassword()
   const isConfirmPasswordValid = validateConfirmPassword()
   const isEmailValid = validateEmail()
-  
+
   if (!isAccountValid || !isPasswordValid || !isConfirmPasswordValid || !isEmailValid) {
     showFailToast('请检查输入信息')
     return
   }
-  
+
   if (!code.value) {
     showFailToast('请输入验证码')
     return
   }
-  
+
   isRegistering.value = true
-  
+
   try {
     const input = {
       userAccount: userAccount.value,
@@ -333,15 +333,15 @@ const onSubmit = async () => {
       email: email.value,
       code: code.value,
     }
-    
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
       },
     }
-    
+
     const res = await postUserRegister(input, config)
-    
+
     if (res.data.code === 0) {
       showSuccessToast('注册成功！即将跳转到登录页面')
       setTimeout(() => {
@@ -603,45 +603,204 @@ const goToLogin = () => {
   color: #ee0a24;
 }
 
+/* Toast 提示信息优化 */
+:deep(.van-toast) {
+  max-width: calc(100vw - 32px);
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: pre-wrap;
+  line-height: 1.4;
+  padding: 12px 16px;
+}
+
+:deep(.van-toast--text) {
+  min-width: 120px;
+  font-size: 14px;
+}
+
+/* 错误消息优化 */
+:deep(.van-field__error-message) {
+  font-size: 12px;
+  line-height: 1.3;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+  padding: 4px 0;
+}
+
+/* 表单字段标签优化 */
+:deep(.van-field__label) {
+  font-size: 14px;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+:deep(.van-field__control) {
+  font-size: 14px;
+}
+
+/* Placeholder 样式优化 */
+:deep(.van-field__control::placeholder) {
+  color: #c8c9cc;
+  font-size: 14px;
+  opacity: 1;
+}
+
 /* 响应式设计 */
 @media (max-width: 375px) {
   .app-title {
     font-size: 24px;
   }
-  
+
   .app-subtitle {
     font-size: 13px;
   }
-  
+
   .step-title {
     font-size: 14px;
   }
-  
+
   .register-btn {
     height: 44px;
     font-size: 15px;
   }
-  
+
   .send-code-btn {
     min-width: 90px;
     font-size: 12px;
   }
-  
+
   .form-section {
     padding: 0 12px 60px;
   }
-  
+
   .header-section {
     padding: 15px 15px 10px;
   }
-  
+
   .footer-section {
     padding: 12px 15px 15px;
   }
-  
+
   .footer-text {
     font-size: 11px;
     line-height: 1.3;
+  }
+
+  /* 小屏幕下的Toast优化 */
+  :deep(.van-toast) {
+    max-width: calc(100vw - 24px);
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+
+  /* 小屏幕下的错误消息优化 */
+  :deep(.van-field__error-message) {
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  /* 小屏幕下的表单字段优化 */
+  :deep(.van-field__label) {
+    font-size: 13px;
+    min-width: 55px;
+  }
+
+  :deep(.van-field__control) {
+    font-size: 13px;
+  }
+
+  /* 验证码行优化 */
+  .verification-row {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  /* 小屏幕下的Placeholder优化 */
+  :deep(.van-field__control::placeholder) {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 320px) {
+  .app-title {
+    font-size: 22px;
+  }
+
+  .app-subtitle {
+    font-size: 12px;
+  }
+
+  .step-title {
+    font-size: 13px;
+  }
+
+  .register-btn {
+    height: 42px;
+    font-size: 14px;
+  }
+
+  .send-code-btn {
+    min-width: 80px;
+    font-size: 11px;
+    height: 32px;
+  }
+
+  .form-section {
+    padding: 0 8px 50px;
+  }
+
+  .header-section {
+    padding: 12px 12px 8px;
+  }
+
+  .footer-section {
+    padding: 10px 12px 12px;
+  }
+
+  /* 超小屏幕下的Toast优化 */
+  :deep(.van-toast) {
+    max-width: calc(100vw - 16px);
+    font-size: 12px;
+    padding: 8px 12px;
+    line-height: 1.3;
+  }
+
+  /* 超小屏幕下的错误消息优化 */
+  :deep(.van-field__error-message) {
+    font-size: 10px;
+    line-height: 1.1;
+  }
+
+  /* 超小屏幕下的表单字段优化 */
+  :deep(.van-field__label) {
+    font-size: 12px;
+    min-width: 50px;
+  }
+
+  :deep(.van-field__control) {
+    font-size: 12px;
+  }
+
+  /* 验证码行优化 */
+  .verification-row {
+    padding: 8px 10px;
+    gap: 4px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .code-field {
+    margin-bottom: 8px;
+  }
+
+  .send-code-btn {
+    width: 100%;
+  }
+
+  /* 超小屏幕下的Placeholder优化 */
+  :deep(.van-field__control::placeholder) {
+    font-size: 12px;
   }
 }
 

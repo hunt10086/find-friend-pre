@@ -5,7 +5,7 @@ import router from '@/config/router.js'
 
 export const BASE_URL = import.meta.env.MODE === 'development'
   ? "http://localhost:7777/api"
-  : "yours production url";
+  : "http://www.seestars.top:7777/api";
 
 const myAxios = axios.create({
   baseURL: BASE_URL,
@@ -33,7 +33,6 @@ myAxios.interceptors.response.use(
     if (response?.data?.code === 40100) {
       window.location.href = '/user/login'
     }
-    console.log('Received response:', response)
     return response
   },
   function (error) {

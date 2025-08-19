@@ -154,13 +154,14 @@
   </div>
 
   <!-- 退出登录按钮 -->
-  <div class="logout-container">
+  <div class="logout-section">
     <van-button 
-      class="logout-button" 
+      class="logout-button-inline" 
       type="primary" 
       @click="quit"
       :loading="logoutLoading"
       loading-text="退出中..."
+      block
     >
       退出登录
     </van-button>
@@ -310,11 +311,10 @@ const handleImageError = (event: Event) => {
 
 /* 用户信息区域样式 */
 .user-info-section {
-  padding: 16px 20px;
+  padding: 16px;
   background: #fff;
-  margin-bottom: 10px;
-  border-radius: 12px;
   margin: 0 8px 10px 8px;
+  border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
@@ -561,28 +561,26 @@ const handleImageError = (event: Event) => {
 }
 
 /* 退出登录按钮样式 */
-.logout-container {
-  position: fixed;
-  bottom: 70px;
-  right: 20px;
-  z-index: 2000;
+.logout-section {
+  margin: 0 8px 20px 8px;
+  padding-bottom: 20px;
 }
 
-.logout-button {
+.logout-button-inline {
   background-color: #64c8aa;
   border-color: #64c8aa;
   color: white;
-  border-radius: 24px;
-  padding: 0 24px;
-  min-height: 44px;
+  border-radius: 12px;
+  min-height: 48px;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(100, 200, 170, 0.3);
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(100, 200, 170, 0.2);
   transition: all 0.3s ease;
 }
 
-.logout-button:active {
+.logout-button-inline:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 8px rgba(100, 200, 170, 0.3);
+  box-shadow: 0 1px 4px rgba(100, 200, 170, 0.2);
 }
 
 /* 响应式设计 */
@@ -615,9 +613,13 @@ const handleImageError = (event: Event) => {
     font-size: 12px;
   }
   
-  .logout-button {
-    padding: 0 20px;
-    min-height: 40px;
+  .logout-section {
+    margin: 0 4px 16px 4px;
+  }
+  
+  .logout-button-inline {
+    min-height: 44px;
+    font-size: 15px;
   }
 }
 

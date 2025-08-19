@@ -40,7 +40,6 @@ const activeIndex = ref('')
 onMounted(async () => {
   const res=await getUserCurrent();
   activeIds.value = JSON.parse(res.data.data.tags);
-  console.log(activeIds.value);
 })
 
 

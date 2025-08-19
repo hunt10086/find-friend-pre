@@ -16,11 +16,11 @@
           <van-field
             v-model="userAccount"
             name="userAccount"
-            label="用户名"
-            placeholder="请输入用户名"
+            label="账号"
+            placeholder="请输入账号"
             left-icon="manager"
             clearable
-            :rules="[{ required: true, message: '请填写用户名' }]"
+            :rules="[{ required: true, message: '请填写账号' }]"
             :error="accountError"
             :error-message="accountErrorMessage"
             @blur="validateAccount"
@@ -42,10 +42,10 @@
 
         <!-- 登录按钮 -->
         <div class="button-section">
-          <van-button 
-            round 
-            block 
-            type="primary" 
+          <van-button
+            round
+            block
+            type="primary"
             native-type="submit"
             :loading="isLoading"
             :disabled="isLoading"
@@ -58,10 +58,10 @@
         <!-- 注册链接 -->
         <div class="register-section">
           <van-divider>还没有学习账号？</van-divider>
-          <van-button 
-            round 
-            block 
-            type="default" 
+          <van-button
+            round
+            block
+            type="default"
             @click="Register"
             class="register-btn"
           >
@@ -109,13 +109,13 @@ const validateAccount = () => {
     accountErrorMessage.value = ''
     return false
   }
-  
+
   if (userAccount.value.length < 4) {
     accountError.value = true
     accountErrorMessage.value = '用户名至少4个字符'
     return false
   }
-  
+
   accountError.value = false
   accountErrorMessage.value = ''
   return true
@@ -128,13 +128,13 @@ const validatePassword = () => {
     passwordErrorMessage.value = ''
     return false
   }
-  
+
   if (userPassword.value.length < 8) {
     passwordError.value = true
     passwordErrorMessage.value = '密码至少需要8个字符'
     return false
   }
-  
+
   passwordError.value = false
   passwordErrorMessage.value = ''
   return true
@@ -144,14 +144,14 @@ const onSubmit = async () => {
   // 表单验证
   const isAccountValid = validateAccount()
   const isPasswordValid = validatePassword()
-  
+
   if (!isAccountValid || !isPasswordValid) {
     showFailToast('请检查输入信息')
     return
   }
 
   isLoading.value = true
-  
+
   try {
     const input = {
       userAccount: userAccount.value,
@@ -159,15 +159,15 @@ const onSubmit = async () => {
       latitude: latitude.value,
       longitude: longitude.value
     }
-    
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
       },
     }
-    
+
     const res = await postUserLogin(input, config)
-    
+
     if (res.data.code === 0) {
       showSuccessToast('登录成功')
       await router.replace('/')
@@ -403,16 +403,16 @@ const showForgotPassword = () => {
   .app-title {
     font-size: 28px;
   }
-  
+
   .app-subtitle {
     font-size: 14px;
   }
-  
+
   .login-btn {
     height: 46px;
     font-size: 16px;
   }
-  
+
   .register-btn {
     height: 40px;
   }
@@ -423,7 +423,7 @@ const showForgotPassword = () => {
   .form-group {
     background: rgba(0, 0, 0, 0.8);
   }
-  
+
   .form-group :deep(.van-cell) {
     color: white;
   }
