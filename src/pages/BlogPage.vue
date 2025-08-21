@@ -21,7 +21,7 @@
       type="primary"
       class="round-button"
       round
-      style="position: fixed; right: 20px; bottom: 70px; z-index: 999999999"
+      style="position: fixed; right: 20px; bottom: 120px; z-index: 999;"
       @click="handleAddBlog"
     >
     </van-button>
@@ -52,7 +52,7 @@ const handleAddBlog = () => {
 </script>
 <style scoped>
 #blank{
-  padding-bottom: 50px;
+  /* 底部间距已在全局设置，无需重复设置 */
 }
 .van-card {
   border-radius: 12px;

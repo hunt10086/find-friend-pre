@@ -26,7 +26,7 @@
       type="primary"
       class="round-button"
       round
-      style="position: fixed; right: 20px; bottom: 70px; z-index: 999999999"
+      style="position: fixed; right: 20px; bottom: 120px; z-index: 999;"
       @click="handleAddBlog"
     >
     </van-button>

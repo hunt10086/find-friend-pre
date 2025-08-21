@@ -58,7 +58,7 @@
       type="primary"
       class="round-button"
       round
-      style="position: fixed; right: 20px; bottom: 70px; z-index: 999999999"
+      style="position: fixed; right: 20px; bottom: 120px; z-index: 999;"
       @click="createTeam"
     >
     </van-button>
@@ -171,7 +171,7 @@ const inTeam = (team) => {
 }
 
 #button-css{
-  padding-bottom: 50px;
+  /* 底部间距已在全局设置，无需重复设置 */
 }
 
 .bottom-button {

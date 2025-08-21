@@ -165,6 +165,6 @@ const submit = async () => {
 }
 
 #divbo{
-  padding-bottom: 50px;
+  /* 底部间距已在全局设置，无需重复设置 */
 }
 </style>

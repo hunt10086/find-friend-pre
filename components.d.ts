@@ -22,8 +22,6 @@ declare module 'vue' {
     VanCellGroup: typeof import('vant/es')['CellGroup']
     VanCol: typeof import('vant/es')['Col']
     VanDivider: typeof import('vant/es')['Divider']
-    VanDropdownItem: typeof import('vant/es')['DropdownItem']
-    VanDropdownMenu: typeof import('vant/es')['DropdownMenu']
     VanEmpty: typeof import('vant/es')['Empty']
     VanField: typeof import('vant/es')['Field']
     VanForm: typeof import('vant/es')['Form']
@@ -43,7 +41,6 @@ declare module 'vue' {
     VanTabbar: typeof import('vant/es')['Tabbar']
     VanTabbarItem: typeof import('vant/es')['TabbarItem']
     VanTag: typeof import('vant/es')['Tag']
-    VanTextEllipsis: typeof import('vant/es')['TextEllipsis']
     VanTreeSelect: typeof import('vant/es')['TreeSelect']
     WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
   }
