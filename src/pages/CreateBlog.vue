@@ -302,7 +302,8 @@ const submitBlog = async () => {
       showSuccessToast('博客发布成功！')
       // 清除草稿
       localStorage.removeItem('blog_draft')
-      router.push('/blog')
+      // 添加时间戳参数强制刷新列表
+      router.push({ path: '/blog', query: { refresh: Date.now() } })
     } else {
       showFailToast('发布失败，请重试')
     }

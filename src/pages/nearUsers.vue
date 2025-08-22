@@ -28,29 +28,43 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onActivated } from 'vue'
 import { getUserNearUser } from '@/api/controller/YongHuJieKou/getUserNearUser.js'
 import { showFailToast, showSuccessToast } from 'vant'
 
+// 为组件设置名称，确保 keep-alive 能正确缓存
+defineOptions({
+  name: 'NearUsers'
+})
+
 const userList = ref()
 const flag = ref(false)
-onMounted(async () => {
-  const res=await  getUserNearUser()
+
+const loadNearUsersData = async () => {
+  const res = await getUserNearUser()
   res.data.data.forEach((user) => {
     user.tags = JSON.parse(user.tags)
   })
-  if(res.data.code==0){
-    userList.value=res.data.data||[];
-    if(userList.value.length>0){
-      flag.value=true;
+  if(res.data.code == 0){
+    userList.value = res.data.data || [];
+    if(userList.value.length > 0){
+      flag.value = true;
       showSuccessToast('获取成功');
     }else{
       showFailToast('附近没有用户');
-
     }
   }else{
     showSuccessToast('获取失败');
   }
+}
+
+onMounted(async () => {
+  await loadNearUsersData()
+})
+
+// 当页面从缓存中激活时重新获取数据
+onActivated(async () => {
+  await loadNearUsersData()
 })
 
 </script>

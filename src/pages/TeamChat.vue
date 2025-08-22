@@ -38,14 +38,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch, onActivated } from 'vue'
 import { useRoute } from 'vue-router'
 import { showFailToast, showSuccessToast } from 'vant'
 import myAxios from '@/plugins/myAxios.js'
 import dayjs from 'dayjs'
 
 const route = useRoute()
-const teamId = route.params.teamId
+const teamId = ref(route.params.teamId)
 const messageList = ref<any[]>([])
 const newMessage = ref('')
 const currentUserId = ref<number>()
@@ -55,7 +55,7 @@ let fetchTimer: NodeJS.Timeout | null = null
 
 const fetchMessages = async () => {
   try {
-    const res = await myAxios.get('/api/teamChat/list', { params: { teamId } })
+    const res = await myAxios.get('/api/teamChat/list', { params: { teamId: teamId.value } })
     if (res.data.code === 0) {
       // 过滤掉内容为check--only的消息
       messageList.value = (res.data.data || []).filter(msg => msg.content !== '__check_only__')
@@ -74,7 +74,7 @@ const sendMessage = async () => {
   }
   try {
     const res = await myAxios.post('/api/teamChat/send', {
-      teamId,
+      teamId: teamId.value,
       content: newMessage.value
     })
     if (res.data.code === 0) {
@@ -143,6 +143,37 @@ onMounted(() => {
   fetchMessages()
   // 启动定时器
   startFetchTimer()
+})
+
+// 监听路由参数变化，当团队ID改变时重新获取数据
+watch(() => route.params.teamId, async (newTeamId) => {
+  if (newTeamId) {
+    teamId.value = newTeamId
+    // 停止旧的定时器
+    stopFetchTimer()
+    // 清空消息列表
+    messageList.value = []
+    // 重新获取消息
+    await fetchMessages()
+    // 启动新的定时器
+    startFetchTimer()
+  }
+}, { immediate: false })
+
+// 当页面从缓存中激活时，检查路由参数是否变化
+onActivated(async () => {
+  const currentTeamId = route.params.teamId
+  if (currentTeamId !== teamId.value) {
+    teamId.value = currentTeamId
+    // 停止旧的定时器
+    stopFetchTimer()
+    // 清空消息列表
+    messageList.value = []
+    // 重新获取消息
+    await fetchMessages()
+    // 启动新的定时器
+    startFetchTimer()
+  }
 })
 
 // 组件卸载时清理定时器

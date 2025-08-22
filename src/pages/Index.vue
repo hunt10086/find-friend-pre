@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onActivated } from 'vue'
 import { getUserListLike } from '@/api/controller'
 import router from '@/config/router.ts'
 
@@ -54,7 +54,8 @@ const cont = ref(1)
 const max = ref(100)
 const flag = ref(true)
 const flagPre = ref(false)
-onMounted(async () => {
+
+const loadUserData = async () => {
   const res = await getUserListLike({
     count: cont.value,
   })
@@ -64,7 +65,21 @@ onMounted(async () => {
   userList.value = res.data.data || []
   if (res.data.code < 8) {
     flag.value = false
+  } else {
+    flag.value = true
   }
+}
+
+onMounted(async () => {
+  await loadUserData()
+})
+
+// 当页面从缓存中激活时重新获取数据
+onActivated(async () => {
+  // 重置到第一页并重新加载数据
+  cont.value = 1
+  flagPre.value = false
+  await loadUserData()
 })
 
 const loadMore = async () => {

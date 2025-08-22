@@ -151,6 +151,7 @@ const submit = async () => {
   const res=await postUserUpdate(input);
   if(res.data.code===0){
     showSuccessToast('修改成功');
+    // 直接返回用户页面，由UserPage.vue的路由监听器处理数据刷新
     router.push('/user')
   }else{
     showSuccessToast('修改失败');

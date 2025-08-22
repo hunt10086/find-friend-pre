@@ -34,20 +34,37 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onActivated } from 'vue'
 import { getBlogMyList } from '@/api/controller'
 import { useRouter } from 'vue-router'
+
+// 为组件设置名称，确保 keep-alive 能正确缓存
+defineOptions({
+  name: 'MyBlog'
+})
 
 const blogList = ref()||[]
 const user = ref()
 const router = useRouter()
 const flag=ref(false)
-onMounted(async () => {
+
+const loadMyBlogData = async () => {
   const response = await getBlogMyList();
   blogList.value = response.data.data || []
-  if(response.data.code===0){
+  if(response.data.code===0 && blogList.value.length > 0){
     flag.value=true
+  } else {
+    flag.value=false
   }
+}
+
+onMounted(async () => {
+  await loadMyBlogData()
+})
+
+// 当页面从缓存中激活时重新获取数据
+onActivated(async () => {
+  await loadMyBlogData()
 })
 
 const goToBlog = (id) => {

@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onActivated } from 'vue'
 import { getTeamJoinTeam, postTeamQuit } from '@/api/controller'
 import { useRouter } from 'vue-router'
 import { showSuccessToast } from 'vant'
@@ -40,12 +40,23 @@ const flag = ref(false)
 const teamList = ref()
 const router = useRouter()
 
-onMounted(async () => {
+const loadTeamData = async () => {
   const res = await getTeamJoinTeam()
   teamList.value = res.data.data || []
   if (teamList.value.length > 0) {
     flag.value = true
+  } else {
+    flag.value = false
   }
+}
+
+onMounted(async () => {
+  await loadTeamData()
+})
+
+// 当页面从缓存中激活时重新获取数据
+onActivated(async () => {
+  await loadTeamData()
 })
 
 const inTeam = (team) => {

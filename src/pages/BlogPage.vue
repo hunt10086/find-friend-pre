@@ -29,16 +29,31 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onActivated } from 'vue'
 import { getBlogList, getUserCurrent } from '@/api/controller'
 import { useRouter } from 'vue-router'
+
+// 为组件设置名称，确保 keep-alive 能正确缓存
+defineOptions({
+  name: 'BlogPage'
+})
 
 const blogList = ref()
 const user = ref()
 const router = useRouter()
-onMounted(async () => {
+
+const loadBlogData = async () => {
   const response = await getBlogList()
   blogList.value = response.data.data || []
+}
+
+onMounted(async () => {
+  await loadBlogData()
+})
+
+// 当页面从缓存中激活时重新获取数据
+onActivated(async () => {
+  await loadBlogData()
 })
 
 const goToBlog = (id) => {

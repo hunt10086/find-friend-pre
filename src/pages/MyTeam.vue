@@ -45,8 +45,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { onMounted, ref, onActivated, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { getTeamMyTeam, postTeamDelete, postTeamQuit } from '@/api/controller'
 import { showSuccessToast } from 'vant'
 
@@ -58,12 +58,24 @@ import relativeTime from 'dayjs/plugin/relativeTime' // 可选插件
 dayjs.extend(relativeTime)
 
 const teamList = ref()
-onMounted(async () => {
+
+const loadMyTeamData = async () => {
   const res = await getTeamMyTeam()
   teamList.value = res.data.data || []
   if (teamList.value.length > 0) {
     flag.value = true
+  } else {
+    flag.value = false
   }
+}
+
+onMounted(async () => {
+  await loadMyTeamData()
+})
+
+// 当页面从缓存中激活时重新获取数据
+onActivated(async () => {
+  await loadMyTeamData()
 })
 const inTeam = (team) => {
   router.push(`/showMembers/${team.id}`)

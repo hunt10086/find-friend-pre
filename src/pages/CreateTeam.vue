@@ -89,7 +89,8 @@ const onSubmit = async () => {
   const res = await postTeamCreate(input)
   if (res.data.code === 0) {
     showSuccessToast('创建队伍成功')
-    await router.replace('/myTeam')
+    // 添加时间戳参数强制刷新列表
+    await router.replace({ path: '/myTeam', query: { refresh: Date.now() } })
   } else {
     showFailToast('创建失败')
   }

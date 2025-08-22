@@ -101,15 +101,17 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { getUserCurrent } from '@/api/controller'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onActivated, watch } from 'vue'
 import { showSuccessToast } from 'vant'
 import dayjs from 'dayjs'
 
 const router = useRouter()
+const route = useRoute()
 const user = ref()
-onMounted(async () => {
+
+const loadUserData = async () => {
   const res = await getUserCurrent()
   user.value = res.data.data
   user.value.tags = JSON.parse(user.value.tags)
@@ -117,6 +119,26 @@ onMounted(async () => {
     showSuccessToast('获取用户信息成功')
   } else {
     showSuccessToast('获取用户信息失败')
+  }
+}
+
+onMounted(async () => {
+  await loadUserData()
+})
+
+// 当页面从缓存中激活时重新获取数据
+onActivated(async () => {
+  await loadUserData()
+})
+
+// 监听路由变化，当从编辑页面返回时重新获取数据
+watch(() => route.fullPath, async (newPath, oldPath) => {
+  // 如果是从编辑页面返回到用户页面，重新加载数据
+  if (newPath === '/user' && oldPath?.includes('/user/edit')) {
+    await loadUserData()
+  }
+  if (newPath === '/user' && oldPath?.includes('/edit/tags')) {
+    await loadUserData()
   }
 })
 

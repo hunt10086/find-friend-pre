@@ -1,5 +1,13 @@
 <template>
-  <div class="blog-page">
+  <!-- Loading状态 -->
+  <div v-if="loading" class="loading-container">
+    <van-loading type="spinner" color="#1989fa" size="24px">
+      加载博客内容中...
+    </van-loading>
+  </div>
+  
+  <!-- 博客内容 -->
+  <div v-else class="blog-page">
     <!-- 文章头部区域 -->
     <div class="article-header">
       <div class="article-container">
@@ -162,7 +170,7 @@
 
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch, onActivated } from 'vue'
 import { useRoute } from 'vue-router'
 import { getBlogDelete, getBlogGetOne, getBlogLike, getUserCurrent } from '@/api/controller'
 import myAxios from '@/plugins/myAxios'
@@ -185,32 +193,51 @@ const userName = ref('')
 const userProfile = ref('')
 const id = ref(0)
 const userId = ref(0)
+const loading = ref(false)
+
 const getBlogData = async () => {
-  const response = await getBlogGetOne({ blogId: blogId.value })
-  blog.value = response.data.data
-  title.value = blog.value.title
-  passage.value = blog.value.passage
-  kind.value = blog.value.kind
-  praise.value = blog.value.praise
-  userId.value = blog.value.userId
+  loading.value = true
+  try {
+    // 清空旧数据，防止显示上一篇博客的内容
+    blog.value = null
+    title.value = ''
+    passage.value = ''
+    kind.value = ''
+    praise.value = 0
+    userId.value = 0
+    userAvatar.value = ''
+    userName.value = ''
+    userProfile.value = ''
+    comments.value = []
 
-  // 获取当前用户信息（根据博客中的 userId）
-  const userResponse = await myAxios.get(`/user/search/one`, {
-    params: {
-      id: blog.value.userId
-    }
-  })
-  const userData = userResponse.data.data
-  userAvatar.value = userData.avatarUrl
-  userName.value = userData.userName
-  userProfile.value = userData.profile
+    const response = await getBlogGetOne({ blogId: blogId.value })
+    blog.value = response.data.data
+    title.value = blog.value.title
+    passage.value = blog.value.passage
+    kind.value = blog.value.kind
+    praise.value = blog.value.praise
+    userId.value = blog.value.userId
 
-  const commentResponse = await myAxios.get(`/comment/list`, {
-    params: {
-      blogId: blogId.value
-    }
-  })
-  comments.value = commentResponse.data.data || []
+    // 获取当前用户信息（根据博客中的 userId）
+    const userResponse = await myAxios.get(`/user/search/one`, {
+      params: {
+        id: blog.value.userId
+      }
+    })
+    const userData = userResponse.data.data
+    userAvatar.value = userData.avatarUrl
+    userName.value = userData.userName
+    userProfile.value = userData.profile
+
+    const commentResponse = await myAxios.get(`/comment/list`, {
+      params: {
+        blogId: blogId.value
+      }
+    })
+    comments.value = commentResponse.data.data || []
+  } finally {
+    loading.value = false
+  }
 }
 
 const newCommentContent = ref('')
@@ -279,10 +306,34 @@ onMounted(async () => {
   await getBlogData()
 })
 
+// 监听路由参数变化，当博客ID改变时重新获取数据
+watch(() => route.params.id, async (newId) => {
+  if (newId) {
+    blogId.value = Number(newId)
+    await getBlogData()
+  }
+}, { immediate: false })
+
+// 当页面从缓存中激活时，检查路由参数是否变化
+onActivated(async () => {
+  const currentBlogId = Number(route.params.id)
+  if (currentBlogId !== blogId.value) {
+    blogId.value = currentBlogId
+    await getBlogData()
+  }
+})
+
 </script>
 
 
 <style scoped>
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+}
 /* 整体页面布局 */
 .blog-page {
   background-color: #f5f6f7;

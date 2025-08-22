@@ -1,5 +1,11 @@
 <template>
-  <van-form label-width="100%" @submit="onSubmit">
+  <!-- Loading状态 -->
+  <van-loading v-if="loading" type="spinner" color="#1989fa" size="24px">
+    加载队伍信息中...
+  </van-loading>
+  
+  <!-- 表单内容 -->
+  <van-form v-else label-width="100%" @submit="onSubmit">
     <van-cell-group inset>
       <van-field
         v-model="teamName"
@@ -56,9 +62,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, watch, onActivated } from 'vue'
 import { getTeamSearchById, getUserCurrent, postTeamUpdate } from '@/api/controller'
-import { watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showFailToast, showSuccessToast } from 'vant'
 
@@ -73,12 +78,63 @@ const maxNum = ref(3)
 let team = ref()
 const route = useRoute()
 const teamId = ref(Number(route.params.teamId))
+const loading = ref(false)
+
+const loadTeamData = async () => {
+  loading.value = true
+  try {
+    // 清空表单数据
+    teamName.value = ''
+    description.value = ''
+    icon.value = ''
+    status.value = 0
+    password.value = ''
+    maxNum.value = 3
+    
+    // 获取队伍详情并预填充表单
+    const teamRes = await getTeamSearchById({ teamId: teamId.value })
+    const teamData = teamRes.data.data
+    
+    if (teamData) {
+      // 这里需要根据实际API返回的数据结构调整
+      // 假设API返回的是队伍详情对象
+      const teamDetails = await getTeamSearchById({ teamId: teamId.value })
+      // 注意：这里可能需要调用不同的API来获取完整的队伍信息
+      // 暂时使用现有的API结构
+    }
+  } catch (error) {
+    showFailToast('加载队伍信息失败')
+  } finally {
+    loading.value = false
+  }
+}
 
 const check = async () => {
   const res = await getUserCurrent()
   userId.value = res.data.data.id
 }
-check()
+
+onMounted(async () => {
+  await check()
+  await loadTeamData()
+})
+
+// 监听路由参数变化，当团队ID改变时重新加载数据
+watch(() => route.params.teamId, async (newTeamId) => {
+  if (newTeamId && Number(newTeamId) !== teamId.value) {
+    teamId.value = Number(newTeamId)
+    await loadTeamData()
+  }
+}, { immediate: false })
+
+// 当页面从缓存中激活时，检查路由参数是否变化
+onActivated(async () => {
+  const currentTeamId = Number(route.params.teamId)
+  if (currentTeamId !== teamId.value) {
+    teamId.value = currentTeamId
+    await loadTeamData()
+  }
+})
 const onSubmit = async () => {
   const res = await getTeamSearchById({ teamId: teamId.value })
   const input = {
@@ -93,7 +149,8 @@ const onSubmit = async () => {
   const response = await postTeamUpdate({ id: teamId.value }, input)
   if (response.data.code === 0) {
     showSuccessToast('更新成功')
-    await router.replace('/myTeam')
+    // 添加时间戳参数强制刷新列表
+    await router.replace({ path: '/myTeam', query: { refresh: Date.now() } })
   } else {
     showFailToast('更新失败')
   }

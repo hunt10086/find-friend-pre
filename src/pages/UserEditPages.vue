@@ -34,11 +34,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, onActivated, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { postUserUpdate } from '@/api/controller'
 import { showFailToast, showSuccessToast } from 'vant'
 import router from '@/config/router.ts'
+
+// 为组件设置名称，确保 keep-alive 能正确缓存
+defineOptions({
+  name: 'UserEditPages'
+})
 
 const route = useRoute()
 const editUser = ref({
@@ -47,7 +52,7 @@ const editUser = ref({
   editName: route.query.editName,
 })
 
-// 展示用的当前值（转换为“男/女/未知”）
+// 展示用的当前值（转换为"男/女/未知"）
 const displayValue = ref('')
 
 // 性别映射函数：数字 → 中文
@@ -64,14 +69,41 @@ const genderToNumber = (val: string): number | null => {
   return null
 }
 
-// 页面加载时初始化展示值
-onMounted(() => {
+// 初始化编辑数据的函数
+const initEditData = () => {
+  console.log('初始化编辑数据:', route.query)
+  editUser.value = {
+    editKey: route.query.editKey,
+    currentValue: route.query.currentValue,
+    editName: route.query.editName,
+  }
+  
   if (editUser.value.editKey === 'gender') {
     displayValue.value = numberToGender(editUser.value.currentValue)
   } else {
     displayValue.value = editUser.value.currentValue as string
   }
+}
+
+// 页面加载时初始化展示值
+onMounted(() => {
+  initEditData()
 })
+
+// 当页面从缓存中激活时重新初始化数据
+onActivated(async () => {
+  await nextTick() // 确保路由参数已更新
+  initEditData()
+})
+
+// 监听路由查询参数变化
+watch(() => route.query, async (newQuery, oldQuery) => {
+  console.log('路由查询参数变化:', { newQuery, oldQuery })
+  if (JSON.stringify(newQuery) !== JSON.stringify(oldQuery)) {
+    await nextTick()
+    initEditData()
+  }
+}, { deep: true })
 
 const onSubmit = async (values) => {
   let submitValue = values[editUser.value.editKey]
@@ -96,7 +128,8 @@ const onSubmit = async (values) => {
   const res = await postUserUpdate(input, config)
   if (res.data.code === 0) {
     showSuccessToast('修改成功')
-    router.back()
+    // 直接返回用户页面，由UserPage.vue的路由监听器处理数据刷新
+    router.push('/user')
   } else {
     showSuccessToast('修改失败')
   }
