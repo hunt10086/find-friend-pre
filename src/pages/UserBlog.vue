@@ -47,7 +47,7 @@
     <div class="article-content">
       <div class="article-container">
         <div class="content-body">
-          <EnhancedMarkdown :source="passage" />
+          <VueMarkdown :source="passage" />
         </div>
       </div>
     </div>
@@ -170,14 +170,14 @@
 
 
 <script setup lang="ts">
-import { onMounted, ref, watch, onActivated } from 'vue'
+import { onMounted, ref, watch, onActivated, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { getBlogDelete, getBlogGetOne, getBlogLike, getUserCurrent } from '@/api/controller'
 import myAxios from '@/plugins/myAxios'
 import router from '@/config/router.ts'
 import dayjs from 'dayjs'
-import { showSuccessToast } from 'vant'
-import EnhancedMarkdown from '@/components/EnhancedMarkdown.vue'
+import { showSuccessToast, showFailToast } from 'vant'
+import VueMarkdown from 'vue-markdown-render'
 
 const route = useRoute()
 const blogId = ref(Number(route.params.id))
@@ -217,6 +217,10 @@ const getBlogData = async () => {
     kind.value = blog.value.kind
     praise.value = blog.value.praise
     userId.value = blog.value.userId
+    
+    // 初始化点赞状态（如果API返回了点赞状态）
+    // 注意：这里需要根据你的API实际返回的字段来调整
+    isLiked.value = blog.value.isLiked || false
 
     // 获取当前用户信息（根据博客中的 userId）
     const userResponse = await myAxios.get(`/user/search/one`, {
@@ -235,6 +239,12 @@ const getBlogData = async () => {
       }
     })
     comments.value = commentResponse.data.data || []
+    
+    // 延迟初始化代码块复制按钮，确保DOM完全渲染
+    setTimeout(() => {
+      initCodeCopyButtons()
+      setupCodeCopyObserver()
+    }, 1000)
   } finally {
     loading.value = false
   }
@@ -274,11 +284,33 @@ const submitComment = async () => {
 }
 
 const like = async () => {
-  const params = {
-    blogId: blogId.value
+  try {
+    const params = {
+      blogId: blogId.value
+    }
+    const res = await getBlogLike(params)
+    
+    // 只更新点赞数，不重新加载整个页面
+    if (res.data.code === 0) {
+      // 切换点赞状态
+      isLiked.value = !isLiked.value
+      
+      // 更新点赞数（根据API返回的数据或本地计算）
+      if (res.data.data !== undefined) {
+        praise.value = res.data.data
+      } else {
+        // 如果API没有返回新的点赞数，本地计算
+        praise.value = isLiked.value ? praise.value + 1 : praise.value - 1
+      }
+      
+      showSuccessToast(isLiked.value ? '点赞成功' : '取消点赞')
+    } else {
+      showFailToast('操作失败，请重试')
+    }
+  } catch (error) {
+    console.error('点赞操作失败:', error)
+    showFailToast('网络错误，请重试')
   }
-  const res = await getBlogLike(params)
-  await getBlogData()
 }
 
 const getId = async () => {
@@ -302,8 +334,140 @@ const handleImageError = (event: Event) => {
   img.src = '/ava.jpg'
 }
 
+// 复制代码功能
+const copyCode = async (code: string) => {
+  if (!code) return
+  
+  try {
+    await navigator.clipboard.writeText(code)
+    showSuccessToast('代码已复制到剪贴板')
+  } catch (err) {
+    // 降级方案
+    const textArea = document.createElement('textarea')
+    textArea.value = code
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      showSuccessToast('代码已复制到剪贴板')
+    } catch (fallbackErr) {
+      showFailToast('复制失败，请手动复制')
+    }
+    document.body.removeChild(textArea)
+  }
+}
+
+// 初始化代码块复制按钮
+const initCodeCopyButtons = () => {
+  console.log('🔍 开始初始化复制按钮...')
+  
+  nextTick(() => {
+    // 尝试多个选择器
+    let codeBlocks = document.querySelectorAll('.content-body pre')
+    if (codeBlocks.length === 0) {
+      codeBlocks = document.querySelectorAll('pre')
+    }
+    if (codeBlocks.length === 0) {
+      codeBlocks = document.querySelectorAll('.article-content pre')
+    }
+    
+    console.log('📊 找到的代码块数量:', codeBlocks.length)
+    console.log('📋 代码块元素:', codeBlocks)
+    
+    codeBlocks.forEach((block, index) => {
+      console.log(`🔧 处理第 ${index + 1} 个代码块:`, block)
+      // 检查是否已经添加了复制按钮
+      if (block.querySelector('.copy-code-btn')) return
+      
+      const codeElement = block.querySelector('code')
+      if (!codeElement) return
+      
+      const code = codeElement.textContent || ''
+      
+      // 创建复制按钮
+      const copyBtn = document.createElement('button')
+      copyBtn.className = 'copy-code-btn'
+      copyBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z" fill="currentColor"/>
+        </svg>
+        <span>复制</span>
+      `
+      copyBtn.title = '复制代码'
+      
+      // 添加点击事件
+      copyBtn.addEventListener('click', () => {
+        copyCode(code)
+      })
+      
+      // 设置代码块容器为相对定位
+      ;(block as HTMLElement).style.position = 'relative'
+      
+      // 添加按钮到代码块
+      block.appendChild(copyBtn)
+    })
+  })
+}
+
 onMounted(async () => {
   await getBlogData()
+})
+
+// 使用 MutationObserver 监听 DOM 变化
+let observer: MutationObserver | null = null
+
+const setupCodeCopyObserver = () => {
+  // 清理之前的观察器
+  if (observer) {
+    observer.disconnect()
+  }
+  
+  const targetNode = document.querySelector('.content-body')
+  if (!targetNode) {
+    console.log('❌ 未找到 .content-body 元素')
+    return
+  }
+  
+  observer = new MutationObserver((mutations) => {
+    let shouldInit = false
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+        // 检查是否有新的 pre 元素被添加
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const element = node as Element
+            if (element.tagName === 'PRE' || element.querySelector('pre')) {
+              shouldInit = true
+            }
+          }
+        })
+      }
+    })
+    
+    if (shouldInit) {
+      console.log('🔄 检测到新的代码块，重新初始化复制按钮')
+      setTimeout(() => {
+        initCodeCopyButtons()
+      }, 100)
+    }
+  })
+  
+  observer.observe(targetNode, {
+    childList: true,
+    subtree: true
+  })
+  
+  console.log('👀 已设置 DOM 变化监听器')
+}
+
+// 监听 passage 变化，重新初始化复制按钮
+watch(() => passage.value, () => {
+  if (passage.value) {
+    setTimeout(() => {
+      initCodeCopyButtons()
+      setupCodeCopyObserver()
+    }, 500)
+  }
 })
 
 // 监听路由参数变化，当博客ID改变时重新获取数据
@@ -922,6 +1086,101 @@ onActivated(async () => {
 
   .comment-input-wrapper {
     padding: 12px;
+  }
+}
+
+/* 代码块复制按钮样式 */
+.content-body :deep(pre) {
+  position: relative;
+}
+
+.content-body :deep(.copy-code-btn) {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.content-body :deep(.copy-code-btn:hover) {
+  background: rgba(255, 255, 255, 1);
+  color: #333;
+  border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.content-body :deep(.copy-code-btn:active) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.content-body :deep(.copy-code-btn svg) {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+.content-body :deep(.copy-code-btn:hover svg) {
+  opacity: 1;
+}
+
+.content-body :deep(.copy-code-btn span) {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* 暗色主题的代码块样式优化 */
+.content-body :deep(pre) {
+  background: #2d3748;
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  margin: 16px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.content-body :deep(pre code) {
+  background: none;
+  color: inherit;
+  font-family: 'Fira Code', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .content-body :deep(.copy-code-btn) {
+    padding: 4px 8px;
+    font-size: 11px;
+    top: 6px;
+    right: 6px;
+  }
+  
+  .content-body :deep(.copy-code-btn svg) {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .content-body :deep(pre) {
+    padding: 12px;
+    margin: 12px 0;
+  }
+  
+  .content-body :deep(pre code) {
+    font-size: 13px;
   }
 }
 

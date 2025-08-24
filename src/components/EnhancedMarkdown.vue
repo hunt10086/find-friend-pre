@@ -5,6 +5,9 @@
       <div v-if="block.type === 'code'" class="code-highlight-wrapper">
         <div class="code-container">
           <div class="code-header">
+            <div class="code-language" v-if="block.language">
+              <span class="language-tag">{{ block.language }}</span>
+            </div>
             <div class="code-actions">
               <button class="copy-btn" @click="copyCode(block.code)">
                 <span class="copy-icon">📋</span>
@@ -34,20 +37,43 @@ const props = defineProps<Props>()
 // 解析Markdown内容为块
 const parsedBlocks = computed(() => {
   const content = props.source || ''
-  const blocks: Array<{type: string, content?: string, code?: string}> = []
+  const blocks: Array<{type: string, content?: string, code?: string, language?: string}> = []
   
-  // 分割代码块和普通内容
+  // 改进的代码块分割正则，支持更多格式
   const parts = content.split(/(```[\s\S]*?```)/g)
   
   parts.forEach(part => {
     if (part.startsWith('```')) {
-      // 代码块
-      const match = part.match(/```[\s\S]*?\n([\s\S]*?)```/)
+      // 代码块处理 - 支持多种格式
+      let code = ''
+      let language = ''
+      
+      // 尝试匹配带语言标识的代码块: ```language\ncode```
+      let match = part.match(/```(\w+)?\s*\n([\s\S]*?)```/)
       if (match) {
-        const code = match[1].trim()
+        language = match[1] || ''
+        code = match[2]
+      } else {
+        // 尝试匹配简单代码块: ```code``` (无换行)
+        match = part.match(/```([\s\S]*?)```/)
+        if (match) {
+          const content = match[1]
+          // 检查第一行是否是语言标识
+          const lines = content.split('\n')
+          if (lines.length > 1 && lines[0].trim().match(/^\w+$/)) {
+            language = lines[0].trim()
+            code = lines.slice(1).join('\n')
+          } else {
+            code = content
+          }
+        }
+      }
+      
+      if (code !== undefined) {
         blocks.push({
           type: 'code',
-          code
+          code: code.trim(),
+          language
         })
       }
     } else if (part.trim()) {
@@ -304,11 +330,27 @@ const copyCode = async (code: string) => {
 
 .enhanced-markdown :deep(.code-header) {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
   background: #2c3e50;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.enhanced-markdown :deep(.code-language) {
+  display: flex;
+  align-items: center;
+}
+
+.enhanced-markdown :deep(.language-tag) {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ecf0f1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 

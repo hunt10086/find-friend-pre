@@ -178,7 +178,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, watch } from 'vue'
 import VueMarkdown from 'vue-markdown-render'
 import { useRouter } from 'vue-router'
 import myAxios from '@/plugins/myAxios'
@@ -332,6 +332,138 @@ const loadDraft = () => {
     console.error('加载草稿失败:', error)
   }
 }
+
+// 复制代码功能
+const copyCode = async (code: string) => {
+  if (!code) return
+  
+  try {
+    await navigator.clipboard.writeText(code)
+    showSuccessToast('代码已复制到剪贴板')
+  } catch (err) {
+    // 降级方案
+    const textArea = document.createElement('textarea')
+    textArea.value = code
+    document.body.appendChild(textArea)
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      showSuccessToast('代码已复制到剪贴板')
+    } catch (fallbackErr) {
+      showFailToast('复制失败，请手动复制')
+    }
+    document.body.removeChild(textArea)
+  }
+}
+
+// 初始化代码块复制按钮
+const initCodeCopyButtons = () => {
+  console.log('🔍 CreateBlog: 开始初始化复制按钮...')
+  
+  nextTick(() => {
+    // 尝试多个选择器
+    let codeBlocks = document.querySelectorAll('.preview-content pre')
+    if (codeBlocks.length === 0) {
+      codeBlocks = document.querySelectorAll('.preview-container pre')
+    }
+    if (codeBlocks.length === 0) {
+      codeBlocks = document.querySelectorAll('pre')
+    }
+    
+    console.log('📊 CreateBlog: 找到的代码块数量:', codeBlocks.length)
+    console.log('📋 CreateBlog: 代码块元素:', codeBlocks)
+    
+    codeBlocks.forEach((block, index) => {
+      console.log(`🔧 CreateBlog: 处理第 ${index + 1} 个代码块:`, block)
+      // 检查是否已经添加了复制按钮
+      if (block.querySelector('.copy-code-btn')) return
+      
+      const codeElement = block.querySelector('code')
+      if (!codeElement) return
+      
+      const code = codeElement.textContent || ''
+      
+      // 创建复制按钮
+      const copyBtn = document.createElement('button')
+      copyBtn.className = 'copy-code-btn'
+      copyBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z" fill="currentColor"/>
+        </svg>
+        <span>复制</span>
+      `
+      copyBtn.title = '复制代码'
+      
+      // 添加点击事件
+      copyBtn.addEventListener('click', () => {
+        copyCode(code)
+      })
+      
+      // 设置代码块容器为相对定位
+      ;(block as HTMLElement).style.position = 'relative'
+      
+      // 添加按钮到代码块
+      block.appendChild(copyBtn)
+    })
+  })
+}
+
+// 使用 MutationObserver 监听预览区 DOM 变化
+let previewObserver: MutationObserver | null = null
+
+const setupPreviewCopyObserver = () => {
+  // 清理之前的观察器
+  if (previewObserver) {
+    previewObserver.disconnect()
+  }
+  
+  const targetNode = document.querySelector('.preview-content')
+  if (!targetNode) {
+    console.log('❌ CreateBlog: 未找到 .preview-content 元素')
+    return
+  }
+  
+  previewObserver = new MutationObserver((mutations) => {
+    let shouldInit = false
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+        // 检查是否有新的 pre 元素被添加
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const element = node as Element
+            if (element.tagName === 'PRE' || element.querySelector('pre')) {
+              shouldInit = true
+            }
+          }
+        })
+      }
+    })
+    
+    if (shouldInit) {
+      console.log('🔄 CreateBlog: 检测到新的代码块，重新初始化复制按钮')
+      setTimeout(() => {
+        initCodeCopyButtons()
+      }, 100)
+    }
+  })
+  
+  previewObserver.observe(targetNode, {
+    childList: true,
+    subtree: true
+  })
+  
+  console.log('👀 CreateBlog: 已设置预览区 DOM 变化监听器')
+}
+
+// 监听内容变化，重新初始化复制按钮
+watch(() => content.value, () => {
+  if (content.value) {
+    setTimeout(() => {
+      initCodeCopyButtons()
+      setupPreviewCopyObserver()
+    }, 500)
+  }
+})
 
 // 组件挂载时加载草稿
 loadDraft()
@@ -946,6 +1078,73 @@ loadDraft()
   .preview-content :deep(th),
   .preview-content :deep(td) {
     padding: 6px 8px;
+  }
+}
+
+/* 代码块复制按钮样式 */
+.preview-content :deep(pre) {
+  position: relative;
+}
+
+.preview-content :deep(.copy-code-btn) {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.preview-content :deep(.copy-code-btn:hover) {
+  background: rgba(255, 255, 255, 1);
+  color: #333;
+  border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.preview-content :deep(.copy-code-btn:active) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.preview-content :deep(.copy-code-btn svg) {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+.preview-content :deep(.copy-code-btn:hover svg) {
+  opacity: 1;
+}
+
+.preview-content :deep(.copy-code-btn span) {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .preview-content :deep(.copy-code-btn) {
+    padding: 4px 8px;
+    font-size: 11px;
+    top: 6px;
+    right: 6px;
+  }
+  
+  .preview-content :deep(.copy-code-btn svg) {
+    width: 12px;
+    height: 12px;
   }
 }
 </style>
