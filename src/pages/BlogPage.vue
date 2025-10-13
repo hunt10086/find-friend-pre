@@ -1,15 +1,65 @@
 <template>
-  <van-card
-    v-for="blog in blogList"
-    :title="blog.title"
-    :desc="blog.kind"
-    :thumb="blog.avatarUrl || '/ava.jpg'"
-    @click="goToBlog(blog.id)"
-  >
-    <template #footer>
-      <van-button icon="like" size="mini">{{ blog.praise }}</van-button>
-    </template>
-  </van-card>
+  <div class="blog-cards-container">
+    <div
+      class="blog-card"
+      v-for="(blog, index) in blogList"
+      :key="blog.id"
+      :style="{ animationDelay: `${index * 0.1}s` }"
+      @click="goToBlog(blog.id)"
+    >
+      <div class="blog-header">
+        <div class="blog-author">
+          <img
+            :src="blog.avatarUrl || '/ava.jpg'"
+            :alt="blog.author || '作者'"
+            class="author-avatar"
+          />
+          <div class="author-info">
+            <span class="author-name">{{ blog.author || '匿名用户' }}</span>
+            <span class="post-time">{{ blog.createTime ? formatTime(blog.createTime) : '刚刚' }}</span>
+          </div>
+        </div>
+        <div class="blog-category">
+          <van-tag type="primary" size="small">{{ blog.kind || '未分类' }}</van-tag>
+        </div>
+      </div>
+
+      <div class="blog-content">
+        <h3 class="blog-title">{{ blog.title }}</h3>
+        <p class="blog-excerpt" v-if="blog.content">
+          {{ getExcerpt(blog.content) }}
+        </p>
+      </div>
+
+      <div class="blog-footer">
+        <div class="blog-stats">
+          <div class="stat-item">
+            <van-icon name="like-o" />
+            <span>{{ blog.praise || 0 }}</span>
+          </div>
+          <div class="stat-item">
+            <van-icon name="comment-o" />
+            <span>{{ blog.commentCount || 0 }}</span>
+          </div>
+          <div class="stat-item">
+            <van-icon name="eye-o" />
+            <span>{{ blog.viewCount || 0 }}</span>
+          </div>
+        </div>
+        <div class="blog-actions">
+          <van-button size="mini" plain icon="like-o" @click.stop="likeBlog(blog)">
+            点赞
+          </van-button>
+          <van-button size="mini" plain icon="star-o" @click.stop="collectBlog(blog)">
+            收藏
+          </van-button>
+        </div>
+      </div>
+
+      <div class="blog-card-bg"></div>
+    </div>
+  </div>
+
   <div id="blank">
     <van-divider />
   </div>
@@ -30,8 +80,10 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getBlogList, getUserCurrent } from '@/api/controller'
+import { getBlogList, getUserCurrent, getUserSearchOne } from '@/api/controller'
 import { useRouter } from 'vue-router'
+import dayjs from 'dayjs'
+import { showSuccessToast } from 'vant'
 
 // 为组件设置名称，确保 keep-alive 能正确缓存
 defineOptions({
@@ -44,7 +96,36 @@ const router = useRouter()
 
 const loadBlogData = async () => {
   const response = await getBlogList()
-  blogList.value = response.data.data || []
+  const blogs = response.data.data || []
+
+  // 为每个博客添加作者信息
+  const blogsWithAuthors = await Promise.all(
+    blogs.map(async (blog) => {
+      try {
+        if (blog.userId) {
+          // 通过userId获取用户信息
+          const userRes = await getUserSearchOne({ id: blog.userId })
+          if (userRes.data.code === 0 && userRes.data.data) {
+            const userData = userRes.data.data
+            blog.author = userData.userName || `用户${blog.userId}`
+            // 如果用户有头像，使用用户头像，否则使用默认头像
+            blog.avatarUrl = userData.avatarUrl || blog.avatarUrl || '/ava.jpg'
+          } else {
+            blog.author = `用户${blog.userId}`
+          }
+        } else {
+          blog.author = '匿名用户'
+        }
+        return blog
+      } catch (error) {
+        console.error('获取作者信息失败:', error)
+        blog.author = '匿名用户'
+        return blog
+      }
+    })
+  )
+
+  blogList.value = blogsWithAuthors
 }
 
 onMounted(async () => {
@@ -64,25 +145,256 @@ const handleAddBlog = () => {
   router.push('/blog/create')
 }
 
+// 格式化时间
+const formatTime = (time: string) => {
+  return dayjs(time).format('MM-DD HH:mm')
+}
+
+// 获取内容摘要
+const getExcerpt = (content: string, maxLength: number = 100) => {
+  if (!content) return ''
+  return content.length > maxLength ? content.substring(0, maxLength) + '...' : content
+}
+
+// 点赞博客
+const likeBlog = (blog: any) => {
+  showSuccessToast('点赞成功')
+  if (blog.praise !== undefined) {
+    blog.praise++
+  } else {
+    blog.praise = 1
+  }
+}
+
+// 收藏博客
+const collectBlog = (blog: any) => {
+  showSuccessToast('收藏成功')
+}
+
 </script>
 <style scoped>
-#blank{
+#blank {
   /* 底部间距已在全局设置，无需重复设置 */
 }
-.van-card {
-  border-radius: 12px;
+
+/* 博客卡片容器 */
+.blog-cards-container {
+  padding: 0 16px;
+  margin-bottom: 20px;
+}
+
+/* 博客卡片样式 */
+.blog-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f4ff 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+  animation: slideInUp 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.blog-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ff6b6b 0%, #ffa502 100%);
+}
+
+.blog-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.blog-card-bg {
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.05) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+/* 博客头部 */
+.blog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.blog-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.author-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin: 10px;
-  background-color: #F5F5DC;
 }
 
-.van-card__title {
-  font-size: 24px;
-  color: #333333;
+.author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.van-card__desc {
-  font-size: 20px;
-  color: #666666;
+.author-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.post-time {
+  font-size: 12px;
+  color: #95a5a6;
+}
+
+/* 博客内容 */
+.blog-content {
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.blog-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.blog-excerpt {
+  font-size: 14px;
+  color: #7f8c8d;
+  line-height: 1.6;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 博客底部 */
+.blog-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.blog-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #95a5a6;
+}
+
+.stat-item .van-icon {
+  font-size: 14px;
+}
+
+.blog-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.blog-actions .van-button {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 16px;
+  border-color: rgba(255, 107, 107, 0.3);
+  color: #ff6b6b;
+  transition: all 0.2s ease;
+}
+
+.blog-actions .van-button:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+  transform: translateY(-1px);
+}
+
+/* 动画效果 */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .blog-cards-container {
+    padding: 0 12px;
+  }
+
+  .blog-card {
+    padding: 16px;
+  }
+
+  .blog-title {
+    font-size: 16px;
+  }
+
+  .blog-excerpt {
+    font-size: 13px;
+  }
+
+  .blog-footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .blog-actions {
+    align-self: stretch;
+    justify-content: space-around;
+  }
+}
+
+@media (max-width: 480px) {
+  .blog-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .blog-stats {
+    gap: 12px;
+  }
+
+  .stat-item {
+    font-size: 12px;
+  }
 }
 </style>
