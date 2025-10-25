@@ -109,6 +109,12 @@
   <div id="blank">
     <van-divider />
   </div>
+
+  <!-- 用户资料模态框 -->
+  <UserProfileModal
+    v-model="showProfileModal"
+    :userId="selectedUserId"
+  />
 </template>
 
 <script setup lang="ts">
@@ -116,6 +122,7 @@ import { onMounted, ref, onActivated } from 'vue'
 import { getUserNearUser } from '@/api/controller/YongHuJieKou/getUserNearUser.js'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'
+import UserProfileModal from '@/components/UserProfileModal.vue'
 
 // 为组件设置名称，确保 keep-alive 能正确缓存
 defineOptions({
@@ -125,6 +132,8 @@ defineOptions({
 const router = useRouter()
 const userList = ref()
 const flag = ref(false)
+const showProfileModal = ref(false)
+const selectedUserId = ref(null)
 
 const loadNearUsersData = async () => {
   try {
@@ -199,7 +208,8 @@ const addFriend = (user: any) => {
 
 // 查看资料
 const viewProfile = (user: any) => {
-  router.push(`/user/profile/${user.id}`)
+  selectedUserId.value = user.id
+  showProfileModal.value = true
 }
 
 // 获取要显示的标签

@@ -28,3 +28,5 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+CLAUDE.md
+src/docs/SWIPE_USAGE.md

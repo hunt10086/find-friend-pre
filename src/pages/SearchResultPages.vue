@@ -127,6 +127,12 @@
   >
     搜索中...
   </van-loading>
+
+  <!-- 用户资料模态框 -->
+  <UserProfileModal
+    v-model="showProfileModal"
+    :userId="selectedUserId"
+  />
 </template>
 
 <script setup>
@@ -135,6 +141,7 @@ import { onMounted, ref, onActivated, watch, nextTick } from 'vue'
 import myAxios from '../plugins/myAxios'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'
+import UserProfileModal from '@/components/UserProfileModal.vue'
 
 // 为组件设置名称，确保 keep-alive 能正确缓存
 defineOptions({
@@ -146,6 +153,8 @@ const router = useRouter()
 const flag = ref(true)
 const userList = ref([])
 const isLoading = ref(false)
+const showProfileModal = ref(false)
+const selectedUserId = ref(null)
 
 const loadSearchData = async () => {
   if (isLoading.value) return // 防止重复请求
@@ -259,7 +268,8 @@ const contactUser = (user) => {
 
 // 查看资料
 const viewProfile = (user) => {
-  router.push(`/user/profile/${user.id}`)
+  selectedUserId.value = user.id
+  showProfileModal.value = true
 }
 
 // 重新搜索

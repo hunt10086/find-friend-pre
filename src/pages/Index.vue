@@ -77,6 +77,15 @@
           >
             关注
           </van-button>
+          <van-button
+            type="success"
+            size="small"
+            round
+            icon="guide-o"
+            @click="viewProfile(user)"
+          >
+            查看资料
+          </van-button>
         </div>
       </div>
     </div>
@@ -87,12 +96,19 @@
     <van-button v-if="flagPre" type="primary" @click="GoPre">上一页</van-button>
     <van-button v-if="flag" type="primary" @click="loadMore">下一页</van-button>
   </div>
+
+  <!-- 用户资料模态框 -->
+  <UserProfileModal
+    v-model="showProfileModal"
+    :userId="selectedUserId"
+  />
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
 import { getUserListLike } from '@/api/controller'
 import router from '@/config/router.ts'
+import UserProfileModal from '@/components/UserProfileModal.vue'
 
 const userList = ref()
 const size = ref(8)
@@ -100,6 +116,8 @@ const cont = ref(1)
 const max = ref(100)
 const flag = ref(true)
 const flagPre = ref(false)
+const showProfileModal = ref(false)
+const selectedUserId = ref(null)
 
 const loadUserData = async () => {
   const res = await getUserListLike({
@@ -169,6 +187,12 @@ const findMore = () => {
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement
   img.src = '/ava.jpg'
+}
+
+// 查看资料
+const viewProfile = (user) => {
+  selectedUserId.value = user.id
+  showProfileModal.value = true
 }
 
 // 获取要显示的标签
