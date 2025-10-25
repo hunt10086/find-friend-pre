@@ -2,7 +2,7 @@
   <div v-if="flag" class="search-results-container">
     <div class="search-results-header">
       <van-icon name="search" />
-      <span>找到 {{ userList.length }} 位匹配用户</span>
+      <span>找到 {{ total }} 位匹配用户</span>
     </div>
 
     <div class="search-cards-container">
@@ -63,31 +63,13 @@
         </div>
 
         <div class="search-actions">
-          <van-button
-            type="primary"
-            size="small"
-            round
-            icon="chat-o"
-            @click="contactUser(user)"
-          >
+          <van-button type="primary" size="small" round icon="chat-o" @click="contactUser(user)">
             打招呼
           </van-button>
-          <van-button
-            type="default"
-            size="small"
-            round
-            icon="plus"
-            @click="addUser"
-          >
+          <van-button type="default" size="small" round icon="plus" @click="addUser">
             联系我
           </van-button>
-          <van-button
-            type="success"
-            size="small"
-            round
-            icon="guide-o"
-            @click="viewProfile(user)"
-          >
+          <van-button type="success" size="small" round icon="guide-o" @click="viewProfile(user)">
             查看资料
           </van-button>
         </div>
@@ -97,6 +79,16 @@
     </div>
 
     <div id="blank">
+      <div class="pagination-container" v-if="total > pageSize">
+        <van-pagination
+          v-model="currentPage"
+          :total-items="total"
+          :items-per-page="pageSize"
+          :page-count="totalPages"
+          mode="simple"
+          @change="onPageChange"
+        />
+      </div>
       <van-divider />
     </div>
   </div>
@@ -106,33 +98,19 @@
       image="https://fastly.jsdelivr.net/npm/@vant/assets/custom-empty-image.png"
       description="未找到匹配用户"
     >
-      <van-button
-        round
-        type="primary"
-        class="search-button"
-        @click="goSearch"
-      >
+      <van-button round type="primary" class="search-button" @click="goSearch">
         重新搜索
       </van-button>
     </van-empty>
   </div>
 
   <!-- Loading状态 -->
-  <van-loading
-    v-if="isLoading"
-    type="spinner"
-    color="#1989fa"
-    size="24px"
-    class="loading-state"
-  >
+  <van-loading v-if="isLoading" type="spinner" color="#1989fa" size="24px" class="loading-state">
     搜索中...
   </van-loading>
 
   <!-- 用户资料模态框 -->
-  <UserProfileModal
-    v-model="showProfileModal"
-    :userId="selectedUserId"
-  />
+  <UserProfileModal v-model="showProfileModal" :userId="selectedUserId" />
 </template>
 
 <script setup>
@@ -145,69 +123,148 @@ import UserProfileModal from '@/components/UserProfileModal.vue'
 
 // 为组件设置名称，确保 keep-alive 能正确缓存
 defineOptions({
-  name: 'SearchResultPages'
+  name: 'SearchResultPages',
 })
 
 const route = useRoute()
+
 const router = useRouter()
+
 const flag = ref(true)
+
 const userList = ref([])
+
 const isLoading = ref(false)
+
 const showProfileModal = ref(false)
+
 const selectedUserId = ref(null)
+
+// 分页相关状态
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const totalPages = ref(0)
+const allUsers = ref([])
+const isServerPaged = ref(false)
 
 const loadSearchData = async () => {
   if (isLoading.value) return // 防止重复请求
 
   try {
     isLoading.value = true
+
     const currentTags = route.query
 
     // 确保有查询参数
+
     if (!currentTags.tag || (Array.isArray(currentTags.tag) && currentTags.tag.length === 0)) {
       userList.value = []
+
+      allUsers.value = []
+      total.value = 0
+      totalPages.value = 0
       flag.value = false
+
       return
     }
 
-    console.log('Loading search data with tags:', currentTags.tag)
+    console.log(
+      'Loading search data with tags:',
+      currentTags.tag,
+      'page:',
+      currentPage.value,
+      'size:',
+      pageSize.value,
+    )
 
     const response = await myAxios.get('user/search/tags', {
       params: {
         tagsList: currentTags.tag, // 假设 currentTags.tag 是数组 ['女', '大二']
+
+        current: currentPage.value,
+        pageSize: pageSize.value,
       },
       paramsSerializer: (params) => {
+        const parts = []
         const tagValues = params.tagsList
+
         if (Array.isArray(tagValues)) {
-          return tagValues.map((value) => `tagsList=${encodeURIComponent(value)}`).join('&')
+          parts.push(...tagValues.map((value) => `tagsList=${encodeURIComponent(value)}`))
+        } else if (tagValues !== undefined) {
+          parts.push(`tagsList=${encodeURIComponent(tagValues)}`)
         }
-        return `tagsList=${encodeURIComponent(tagValues)}`
+        if (params.current != null) {
+          parts.push(`current=${encodeURIComponent(params.current)}`)
+        }
+        if (params.pageSize != null) {
+          parts.push(`pageSize=${encodeURIComponent(params.pageSize)}`)
+        }
+        return parts.join('&')
       },
     })
 
-    if (response.data && response.data.data) {
-      response.data.data.forEach((user) => {
+    if (response.data && response.data.data != null) {
+      const data = response.data.data
+      // 判断是否为分页结构
+      const pageItems = Array.isArray(data) ? data : data.records || data.items || data.list || []
+      isServerPaged.value = !Array.isArray(data)
+
+      // 解析 tags
+      pageItems.forEach((user) => {
         try {
           user.tags = JSON.parse(user.tags)
         } catch (e) {
-          user.tags = []
+          user.tags = Array.isArray(user.tags) ? user.tags : []
         }
       })
 
-      userList.value = response.data.data || []
-      if (userList.value.length === 0) {
-        flag.value = false
+      if (isServerPaged.value) {
+        userList.value = pageItems
+
+        const totalFromData = data.total ?? pageItems.length
+        total.value = Number(totalFromData) || 0
+
+        const sizeFromData = data.size ?? pageSize.value
+        const numericSize = Number(sizeFromData) || pageSize.value
+        pageSize.value = numericSize
+
+        const currentFromData = data.current ?? currentPage.value
+        currentPage.value = Number(currentFromData) || currentPage.value
+
+        const pagesFromData = data.pages
+        const calcPages = Math.ceil(total.value / pageSize.value)
+        const pagesValue = pagesFromData ?? calcPages
+        totalPages.value = Number(pagesValue) || 0
       } else {
-        flag.value = true
+        // 后端未分页，前端分页
+        allUsers.value = pageItems
+        total.value = allUsers.value.length
+        totalPages.value = Math.ceil(total.value / pageSize.value)
+        const start = (currentPage.value - 1) * pageSize.value
+        const end = start + pageSize.value
+        userList.value = allUsers.value.slice(start, end)
       }
+
+      flag.value = total.value > 0
     } else {
       userList.value = []
+
+      allUsers.value = []
+      total.value = 0
+      totalPages.value = 0
       flag.value = false
     }
   } catch (error) {
     flag.value = false
+
     userList.value = []
+
+    allUsers.value = []
+    total.value = 0
+    totalPages.value = 0
     console.error('Failed to fetch data:', error)
+
     showFailToast('搜索失败，请重试')
   } finally {
     isLoading.value = false
@@ -226,28 +283,39 @@ onActivated(async () => {
 })
 
 // 监听路由查询参数变化，当查询参数改变时重新获取数据
-watch(() => route.query, async (newQuery, oldQuery) => {
-  console.log('Route query changed:', { newQuery, oldQuery })
-  // 更严格的比较，确保真的发生了变化
-  const newQueryStr = JSON.stringify(newQuery)
-  const oldQueryStr = JSON.stringify(oldQuery)
+watch(
+  () => route.query,
+  async (newQuery, oldQuery) => {
+    console.log('Route query changed:', { newQuery, oldQuery })
+    // 更严格的比较，确保真的发生了变化
+    const newQueryStr = JSON.stringify(newQuery)
+    const oldQueryStr = JSON.stringify(oldQuery)
 
-  if (newQueryStr !== oldQueryStr) {
-    console.log('Query parameters changed, reloading data...')
-    // 清空当前数据，显示加载状态
-    userList.value = []
-    await loadSearchData()
-  }
-}, { deep: true, immediate: false })
+    if (newQueryStr !== oldQueryStr) {
+      console.log('Query parameters changed, reloading data...')
+
+      // 清空当前数据，显示加载状态
+
+      userList.value = []
+
+      currentPage.value = 1
+      await loadSearchData()
+    }
+  },
+  { deep: true, immediate: false },
+)
 
 // 监听路由路径变化，确保在路由切换时也能正确刷新
-watch(() => route.fullPath, async (newPath, oldPath) => {
-  console.log('Route path changed:', { newPath, oldPath })
-  if (newPath.includes('/user/list') && newPath !== oldPath) {
-    await nextTick()
-    await loadSearchData()
-  }
-})
+watch(
+  () => route.fullPath,
+  async (newPath, oldPath) => {
+    console.log('Route path changed:', { newPath, oldPath })
+    if (newPath.includes('/user/list') && newPath !== oldPath) {
+      await nextTick()
+      await loadSearchData()
+    }
+  },
+)
 
 // 图片加载失败处理
 const handleImageError = (event) => {
@@ -290,22 +358,40 @@ const getDisplayTags = (user) => {
   return user.tags.slice(0, 6)
 }
 
-// 切换标签展开状态
 const toggleTagsExpand = (user) => {
   // 使用 Vue 的响应式系统
+
   if (user.tagsExpanded === undefined) {
     user.tagsExpanded = false
   }
+
   user.tagsExpanded = !user.tagsExpanded
+}
+
+// 分页变更
+const onPageChange = async (page) => {
+  currentPage.value = Number(page) || 1
+  if (isServerPaged.value) {
+    await loadSearchData()
+  } else {
+    // 前端分页
+    const start = (currentPage.value - 1) * pageSize.value
+    const end = start + pageSize.value
+    userList.value = allUsers.value.slice(start, end)
+    flag.value = total.value > 0
+  }
 }
 </script>
 
 <style scoped>
-#blank {
-  /* 底部间距已在全局设置，无需重复设置 */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  padding: 8px 16px;
 }
 
 /* 搜索结果容器 */
+
 .search-results-container {
   padding-bottom: 20px;
 }
@@ -456,12 +542,20 @@ const toggleTagsExpand = (user) => {
 
 .search-profile {
   font-size: 14px;
+
   color: #7f8c8d;
+
   line-height: 1.5;
+
   margin: 0 0 12px 0;
+
   display: -webkit-box;
+
   -webkit-line-clamp: 2;
+
+  line-clamp: 2;
   -webkit-box-orient: vertical;
+
   overflow: hidden;
 }
 
