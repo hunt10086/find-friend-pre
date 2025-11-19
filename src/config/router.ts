@@ -1,33 +1,41 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import Index from '@/pages/Index.vue'
-import Team from '@/pages/Team.vue'
-import User from '@/pages/UserPage.vue'
-import SearchPages from '@/pages/SearchPages.vue'
-import UserEditPages from '@/pages/UserEditPages.vue'
-import SearchResultPages from '@/pages/SearchResultPages.vue'
-import UserLogin from '@/pages/UserLogin.vue'
-import UserRegister from '@/pages/UserRegister.vue'
-import JoinTeam from '@/pages/JoinTeam.vue'
-import I from '@/pages/I.vue'
-import MyTeam from '@/pages/MyTeam.vue'
-import CreateTeam from '@/pages/CreateTeam.vue'
-import TeamMembers from '@/pages/TeamMembers.vue'
-import UpdateTeam from '@/pages/UpdateTeam.vue'
-import checkPassword from '@/pages/checkPassword.vue'
-import NearUsers from '@/pages/nearUsers.vue'
-import BlogPage from '@/pages/BlogPage.vue'
-import UserBlog from '@/pages/UserBlog.vue'
-import CreateBlog from '@/pages/CreateBlog.vue'
-import MyBlog from '@/pages/MyBlog.vue'
-import Talk from '@/pages/Talk.vue'
-import TagEditPage from '@/pages/TagEditPage.vue'
-import TeamChat from '@/pages/TeamChat.vue'
+import Index from '@/pages/home/Index.vue'
+import Team from '@/pages/team/Team.vue'
+import User from '@/pages/user/UserPage.vue'
+import SearchPages from '@/pages/search/SearchPages.vue'
+import UserEditPages from '@/pages/user/UserEditPages.vue'
+import SearchResultPages from '@/pages/search/SearchResultPages.vue'
+import UserLogin from '@/pages/auth/UserLogin.vue'
+import UserRegister from '@/pages/auth/UserRegister.vue'
+import JoinTeam from '@/pages/team/JoinTeam.vue'
+import I from '@/pages/user/I.vue'
+import MyTeam from '@/pages/team/MyTeam.vue'
+import CreateTeam from '@/pages/team/CreateTeam.vue'
+import TeamMembers from '@/pages/team/TeamMembers.vue'
+import UpdateTeam from '@/pages/team/UpdateTeam.vue'
+import checkPassword from '@/pages/auth/checkPassword.vue'
+import NearUsers from '@/pages/user/nearUsers.vue'
+import BlogPage from '@/pages/blog/BlogPage.vue'
+import UserBlog from '@/pages/blog/UserBlog.vue'
+import CreateBlog from '@/pages/blog/CreateBlog.vue'
+import MyBlog from '@/pages/blog/MyBlog.vue'
+import Talk from '@/pages/chat/Talk.vue'
+import TagEditPage from '@/pages/user/TagEditPage.vue'
+import TeamChat from '@/pages/chat/TeamChat.vue'
+import FriendsList from '@/pages/chat/FriendsList.vue'
+import TeamChats from '@/pages/chat/TeamChats.vue'
+import FriendChat from '@/pages/chat/FriendChat.vue'
 
 const routes = [
   {
     path: '/',
     component: Index,
+    meta: { keepAlive: true, showNavBar: true },
+  },
+  {
+    path: '/friends',
+    component: FriendsList,
     meta: { keepAlive: true, showNavBar: true },
   },
   {
@@ -117,29 +125,39 @@ const routes = [
   },
   {
     path: '/blog/create',
-    component: CreateBlog ,
+    component: CreateBlog,
     meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/my/blog',
-    component: MyBlog ,
+    component: MyBlog,
     meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/talk',
-    component: Talk ,
+    component: Talk,
     meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/edit/tags',
-    component: TagEditPage ,
+    component: TagEditPage,
     meta: { keepAlive: true, showNavBar: true },
   },
   {
     path: '/teamChat/:teamId',
     component: TeamChat,
     meta: { keepAlive: true, showNavBar: true },
-  }
+  },
+  {
+    path: '/teamChats',
+    component: TeamChats,
+    meta: { keepAlive: true, showNavBar: true },
+  },
+  {
+    path: '/friendChat/:friendId',
+    component: FriendChat,
+    meta: { keepAlive: false, showNavBar: true },
+  },
 ]
 
 const router = createRouter({

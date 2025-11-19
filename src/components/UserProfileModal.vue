@@ -9,19 +9,11 @@
   >
     <div class="modal-header">
       <h3 class="modal-title">用户资料</h3>
-      <van-icon
-        name="cross"
-        size="20"
-        color="#666"
-        class="close-btn"
-        @click="closeModal"
-      />
+      <van-icon name="cross" size="20" color="#666" class="close-btn" @click="closeModal" />
     </div>
 
     <div v-if="loading" class="loading-container">
-      <van-loading type="spinner" color="#1989fa" size="24px">
-        加载中...
-      </van-loading>
+      <van-loading type="spinner" color="#1989fa" size="24px"> 加载中... </van-loading>
     </div>
 
     <div v-else-if="userInfo" class="profile-content">
@@ -109,33 +101,25 @@
       </div>
 
       <!-- 操作按钮 -->
-      <div class="action-buttons">
-        <van-button
-          type="primary"
-          round
-          icon="chat-o"
-          @click="startChat"
-          class="action-btn"
-        >
-          打招呼
-        </van-button>
+      <div class="action-buttons" v-if="!isFriend">
         <van-button
           type="success"
           round
           icon="plus"
           @click="addFriend"
           class="action-btn"
+          :loading="isAddingFriend"
         >
-          添加好友
+          {{ hasSentRequest ? '已发送好友申请，请勿重复点击' : '添加好友' }}
         </van-button>
+      </div>
+      <div class="action-buttons" v-else>
+        <van-button type="success" round disabled class="action-btn"> 已是好友 </van-button>
       </div>
     </div>
 
-    <div v-else class="error-container">
-      <van-empty
-        image="error"
-        description="用户信息加载失败"
-      >
+    <div v-else class="error-container" v-if="show">
+      <van-empty image="error" description="用户信息加载失败">
         <van-button type="primary" @click="retryLoad">重试</van-button>
       </van-empty>
     </div>
@@ -146,6 +130,7 @@
 import { ref, watch } from 'vue'
 import { getUserSearchOne } from '@/api/controller/YongHuJieKou/getUserSearchOne.js'
 import { showFailToast, showSuccessToast } from 'vant'
+import { useFriendStore } from '@/stores/friendStore'
 
 interface UserInfo {
   id: number
@@ -176,14 +161,22 @@ const emit = defineEmits<{
 const show = ref(props.modelValue)
 const loading = ref(false)
 const userInfo = ref<UserInfo | null>(null)
+const isFriend = ref(false)
+const hasSentRequest = ref(false)
+const isAddingFriend = ref(false)
+
+const friendStore = useFriendStore()
 
 // 监听父组件的显示状态变化
-watch(() => props.modelValue, (newVal) => {
-  show.value = newVal
-  if (newVal && props.userId) {
-    loadUserInfo()
-  }
-})
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    show.value = newVal
+    if (newVal && props.userId) {
+      loadUserInfo()
+    }
+  },
+)
 
 // 监听内部显示状态变化，同步到父组件
 watch(show, (newVal) => {
@@ -191,11 +184,14 @@ watch(show, (newVal) => {
 })
 
 // 监听用户ID变化
-watch(() => props.userId, (newUserId) => {
-  if (newUserId && show.value) {
-    loadUserInfo()
-  }
-})
+watch(
+  () => props.userId,
+  (newUserId) => {
+    if (newUserId && show.value) {
+      loadUserInfo()
+    }
+  },
+)
 
 // 加载用户信息
 const loadUserInfo = async () => {
@@ -218,16 +214,57 @@ const loadUserInfo = async () => {
       }
 
       userInfo.value = userData
+
+      // 检查是否为好友
+      await checkFriendStatus()
     } else {
       showFailToast('获取用户信息失败')
       userInfo.value = null
     }
   } catch (error) {
-    console.error('获取用户信息失败:', error)
+    /* log removed: 获取用户信息失败 */
     showFailToast('网络错误，请重试')
     userInfo.value = null
   } finally {
     loading.value = false
+  }
+}
+
+// 检查好友状态
+const checkFriendStatus = async () => {
+  if (!props.userId) return
+  // 确保好友列表已加载
+  await friendStore.ensureLoaded()
+  if (friendStore.isFriend(props.userId)) {
+    isFriend.value = true
+  } else {
+    isFriend.value = false
+    await checkFriendRequestStatus()
+  }
+}
+
+// 检查好友申请状态
+const checkFriendRequestStatus = async () => {
+  if (!props.userId) return
+
+  try {
+    // 导入好友申请列表API
+    const { getFriendRequestsList } = await import(
+      '@/api/controller/HaoYouShenQingJieKou/getFriendRequestsList.js'
+    )
+    const response = await getFriendRequestsList()
+
+    if (response.data.code === 0 && response.data.data) {
+      // 检查是否有发送给该用户的好友申请
+      // 注意：根据接口定义，字段可能是toUserId而不是receiverId
+      const requests = response.data.data
+      const hasRequest = requests.some(
+        (request: any) => request.toUserId === props.userId && request.status === 0,
+      )
+      hasSentRequest.value = hasRequest
+    }
+  } catch (error) {
+    /* log removed: 检查好友申请状态失败 */
   }
 }
 
@@ -238,8 +275,14 @@ const retryLoad = () => {
 
 // 关闭模态框
 const closeModal = () => {
+  // 先关闭弹窗，避免在关闭动画期间因为 userInfo 被置空而进入错误分支造成闪烁
   show.value = false
-  userInfo.value = null
+  // 使用微任务/异步延迟清理数据，等待 Popup 已经从 DOM 中移除
+  setTimeout(() => {
+    userInfo.value = null
+    isFriend.value = false
+    hasSentRequest.value = false
+  }, 0)
 }
 
 // 图片加载失败处理
@@ -248,17 +291,26 @@ const handleImageError = (event: Event) => {
   img.src = '/ava.jpg'
 }
 
-// 打招呼
-const startChat = () => {
-  if (userInfo.value) {
-    showSuccessToast(`向 ${userInfo.value.userName} 打招呼`)
-  }
-}
-
 // 添加好友
-const addFriend = () => {
-  if (userInfo.value) {
-    showSuccessToast(`已向 ${userInfo.value.userName} 发送好友请求`)
+const addFriend = async () => {
+  if (!userInfo.value || hasSentRequest.value || isFriend.value) return
+  try {
+    isAddingFriend.value = true
+    const result = await friendStore.addFriendRequest(
+      userInfo.value.id,
+      `你好，我是${userInfo.value.userName}，希望能和你成为好友！`,
+    )
+    if (result.success) {
+      showSuccessToast('好友申请已发送')
+      hasSentRequest.value = true
+    } else {
+      showFailToast(result.message || '发送好友申请失败')
+    }
+  } catch (error) {
+    /* log removed: 发送好友申请失败 */
+    showFailToast('网络错误，请重试')
+  } finally {
+    isAddingFriend.value = false
   }
 }
 </script>

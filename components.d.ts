@@ -17,6 +17,7 @@ declare module 'vue' {
     ThemeSelector: typeof import('./src/components/ThemeSelector.vue')['default']
     TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
     UserProfileModal: typeof import('./src/components/UserProfileModal.vue')['default']
+    VanBadge: typeof import('vant/es')['Badge']
     VanButton: typeof import('vant/es')['Button']
     VanCell: typeof import('vant/es')['Cell']
     VanCellGroup: typeof import('vant/es')['CellGroup']

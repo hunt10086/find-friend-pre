@@ -333,6 +333,162 @@
         }
       }
     },
+    "/friends/disagree": {
+      "post": {
+        "tags": [
+          "好友关系接口"
+        ],
+        "summary": "拒绝好友申请",
+        "operationId": "disAgreeFriendRequest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FriendRequests"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friends/delete": {
+      "post": {
+        "tags": [
+          "好友关系接口"
+        ],
+        "summary": "删除好友",
+        "operationId": "deleteFriend",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "integer",
+                "format": "int64"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friends/agree": {
+      "post": {
+        "tags": [
+          "好友关系接口"
+        ],
+        "summary": "同意好友申请",
+        "operationId": "agreeFriendRequest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FriendRequests"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friendRequests/send": {
+      "post": {
+        "tags": [
+          "好友申请接口"
+        ],
+        "summary": "发送好友申请",
+        "operationId": "sendFriendRequest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FriendRequestsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friendMessage/markAsRead": {
+      "post": {
+        "tags": [
+          "friend-message-controller"
+        ],
+        "operationId": "markMessagesAsRead",
+        "parameters": [
+          {
+            "name": "friendId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/blog/update": {
       "post": {
         "tags": [
@@ -544,6 +700,60 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/BaseResponseListUser"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/search/tags/page": {
+      "get": {
+        "tags": [
+          "用户接口"
+        ],
+        "summary": "根据标签分页查询用户",
+        "operationId": "searchUsersByTagsWithPagination",
+        "parameters": [
+          {
+            "name": "tagsList",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "currentPage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 15
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseIPageUser"
                 }
               }
             }
@@ -834,12 +1044,137 @@
         }
       }
     },
+    "/friends/list": {
+      "get": {
+        "tags": [
+          "好友关系接口"
+        ],
+        "summary": "获取好友列表",
+        "operationId": "getFriendList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListUserVo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friends/check": {
+      "get": {
+        "tags": [
+          "好友关系接口"
+        ],
+        "summary": "检查是否为好友",
+        "operationId": "checkFriend",
+        "parameters": [
+          {
+            "name": "friendUserId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseUserVo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friendRequests/list": {
+      "get": {
+        "tags": [
+          "好友申请接口"
+        ],
+        "summary": "获取好友申请列表",
+        "operationId": "getFriendRequests",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListFriendRequests"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friendMessage/unreadCount": {
+      "get": {
+        "tags": [
+          "friend-message-controller"
+        ],
+        "operationId": "getUnreadMessageCount",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseInteger"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/friendMessage/list": {
+      "get": {
+        "tags": [
+          "friend-message-controller"
+        ],
+        "operationId": "getFriendMessages",
+        "parameters": [
+          {
+            "name": "friendId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseListFriendMessages"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/comment/list": {
       "get": {
         "tags": [
           "comment-controller"
         ],
-        "operationId": "list_1",
+        "operationId": "list",
         "parameters": [
           {
             "name": "blogId",
@@ -1235,54 +1570,43 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           },
           "teamName": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "maxNum": {
             "type": "integer",
-            "format": "int32",
-            "refType": null
+            "format": "int32"
           },
           "userId": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           },
           "status": {
             "type": "integer",
-            "format": "int32",
-            "refType": null
+            "format": "int32"
           },
           "createTime": {
             "type": "string",
-            "format": "date-time",
-            "refType": null
+            "format": "date-time"
           },
           "updateTime": {
             "type": "string",
-            "format": "date-time",
-            "refType": null
+            "format": "date-time"
           },
           "password": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "icon": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "nowNum": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           }
         }
       },
@@ -1311,6 +1635,57 @@
             "type": "string"
           },
           "icon": {
+            "type": "string"
+          }
+        }
+      },
+      "FriendRequests": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "refType": null
+          },
+          "fromUserId": {
+            "type": "integer",
+            "format": "int64",
+            "refType": null
+          },
+          "toUserId": {
+            "type": "integer",
+            "format": "int64",
+            "refType": null
+          },
+          "message": {
+            "type": "string",
+            "refType": null
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "refType": null
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time",
+            "refType": null
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time",
+            "refType": null
+          }
+        }
+      },
+      "FriendRequestsRequest": {
+        "type": "object",
+        "properties": {
+          "friendUserId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
             "type": "string"
           }
         }
@@ -1380,6 +1755,52 @@
           }
         }
       },
+      "BaseResponseIPageUser": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/IPageUser"
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "IPageUser": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "current": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int64",
+            "deprecated": true
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "BaseResponseListUserVo": {
         "type": "object",
         "properties": {
@@ -1406,23 +1827,29 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "refType": null
           },
           "userName": {
-            "type": "string"
+            "type": "string",
+            "refType": null
           },
           "avatarUrl": {
-            "type": "string"
+            "type": "string",
+            "refType": null
           },
           "tags": {
-            "type": "string"
+            "type": "string",
+            "refType": null
           },
           "profile": {
-            "type": "string"
+            "type": "string",
+            "refType": null
           },
           "distance": {
             "type": "number",
-            "format": "double"
+            "format": "double",
+            "refType": null
           }
         }
       },
@@ -1444,6 +1871,113 @@
           },
           "description": {
             "type": "string"
+          }
+        }
+      },
+      "BaseResponseUserVo": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "$ref": "#/components/schemas/UserVo"
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "BaseResponseListFriendRequests": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FriendRequests"
+            }
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "BaseResponseInteger": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "BaseResponseListFriendMessages": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FriendMessages"
+            }
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "FriendMessages": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "senderId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "receiverId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "messageContent": {
+            "type": "string"
+          },
+          "sendTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -1694,5 +2228,32 @@
         }
       }
     }
+  },
+  "x-openapi": {
+    "x-setting": {
+      "customCode": 200,
+      "language": "zh-CN",
+      "enableSwaggerModels": true,
+      "swaggerModelName": "Swagger Models",
+      "enableReloadCacheParameter": false,
+      "enableAfterScript": true,
+      "enableDocumentManage": true,
+      "enableVersion": false,
+      "enableRequestCache": true,
+      "enableFilterMultipartApis": false,
+      "enableFilterMultipartApiMethodType": "POST",
+      "enableHost": false,
+      "enableHostText": "",
+      "enableDynamicParameter": false,
+      "enableDebug": true,
+      "enableFooter": true,
+      "enableFooterCustom": false,
+      "enableSearch": true,
+      "enableOpenApi": true,
+      "enableHomeCustom": false,
+      "enableGroup": true,
+      "enableResponseCode": true
+    },
+    "x-markdownFiles": []
   }
 }
