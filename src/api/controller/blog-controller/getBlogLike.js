@@ -1,5 +1,6 @@
 import request from "@/plugins/myAxios.js";
 /**
+ * 点赞博客
  * /blog/like
  */
 export function getBlogLike(params, config) {

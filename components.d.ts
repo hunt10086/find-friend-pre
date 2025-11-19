@@ -46,6 +46,7 @@ declare module 'vue' {
     VanTabbarItem: typeof import('vant/es')['TabbarItem']
     VanTag: typeof import('vant/es')['Tag']
     VanTreeSelect: typeof import('vant/es')['TreeSelect']
+    VanUploader: typeof import('vant/es')['Uploader']
     WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
   }
 }

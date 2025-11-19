@@ -1,5 +1,6 @@
 import request from "@/plugins/myAxios.js";
 /**
+ * 标记消息为已读
  * /friendMessage/markAsRead
  */
 export function postFriendMessageMarkAsRead(params, config) {

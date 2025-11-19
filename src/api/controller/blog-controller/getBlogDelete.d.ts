@@ -1,5 +1,6 @@
 import { type AxiosRequestConfig } from "axios";
 /**
+ * 删除博客
  * /blog/delete
  */
 export declare function getBlogDelete(params: GetBlogDeleteParams, config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{

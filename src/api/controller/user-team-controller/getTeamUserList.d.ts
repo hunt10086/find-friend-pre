@@ -1,5 +1,6 @@
 import { type AxiosRequestConfig } from "axios";
 /**
+ * 获取队伍成员列表
  * /teamUser/list
  */
 export declare function getTeamUserList(params: GetTeamUserListParams, config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{

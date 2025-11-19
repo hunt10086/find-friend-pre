@@ -65,19 +65,26 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getFriendsList } from '@/api/controller/HaoYouGuanXiJieKou/getFriendsList.js'
+import { getFriendsList } from '@/api/controller/friends-controller/getFriendsList.js'
 import { useRouter } from 'vue-router'
 import { showFailToast } from 'vant'
 import UserProfileModal from '@/components/UserProfileModal.vue'
 import { useFriendStore } from '@/stores/friendStore'
 
+interface Friend {
+  id: number
+  userName: string
+  avatarUrl?: string
+  profile?: string
+}
+
 const friendStore = useFriendStore()
 
 const router = useRouter()
-const loading = ref(true)
-const friendsList = ref([])
-const showProfileModal = ref(false)
-const selectedUserId = ref(null)
+const loading = ref<boolean>(true)
+const friendsList = ref<Friend[]>([])
+const showProfileModal = ref<boolean>(false)
+const selectedUserId = ref<number | null>(null)
 
 // 返回上一页
 const goBack = () => {

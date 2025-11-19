@@ -1,5 +1,6 @@
 import { type AxiosRequestConfig } from "axios";
 /**
+ * 获取评论列表
  * /comment/list
  */
 export declare function getCommentList(params: GetCommentListParams, config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{

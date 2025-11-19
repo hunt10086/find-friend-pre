@@ -113,7 +113,8 @@
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
-import myAxios, { BASE_URL } from '@/plugins/myAxios.js'
+import myAxios from '@/plugins/myAxios.js'
+import { buildWsUrl } from '@/plugins/websocket'
 import { getFriendMessageList } from '@/api/controller/friend-message-controller/getFriendMessageList.js'
 import { postFriendMessageMarkAsRead } from '@/api/controller/friend-message-controller/postFriendMessageMarkAsRead.js'
 import { showFailToast, showSuccessToast } from 'vant'
@@ -228,7 +229,9 @@ const loadCurrentUser = async () => {
 const loadFriendInfo = async () => {
   if (!friendId.value) return
   try {
-    const { getUserSearchOne } = await import('@/api/controller/YongHuJieKou/getUserSearchOne.js')
+    const { getUserSearchOne } = await import(
+      '@/api/controller/user-controller/getUserSearchOne.js'
+    )
     const res = await getUserSearchOne({ id: friendId.value })
     if (res.data.code === 0 && res.data.data) {
       friendName.value = res.data.data.userName
@@ -279,20 +282,13 @@ const markAsRead = async () => {
   }
 }
 
-// WebSocket URL builder
-const buildWsUrl = () => {
-  // BASE_URL example: http://localhost:7777/api
-  // Handler path: /api/ws/friend
-  // Replace http -> ws
-  const base = BASE_URL.replace(/^http/, 'ws')
-  return `${base}/ws/friend`
-}
-
-// Initialize WebSocket
 const initWebSocket = () => {
   if (!friendId.value) return
+
   cleanupWebSocket()
-  const url = buildWsUrl()
+
+  const url = buildWsUrl('/ws/friend')
+
   try {
     ws.value = new WebSocket(url)
     ws.value.onopen = () => {

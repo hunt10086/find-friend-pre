@@ -224,7 +224,18 @@ const avatarLoading = ref(true)
 const profileExpanded = ref(false)
 const activeNavItem = ref(-1)
 const screenWidth = ref(window.innerWidth)
-const friendRequests = ref([])
+
+interface FriendRequest {
+  id: number
+  fromUserId: number
+  toUserId: number
+  message: string
+  status: number
+  createTime: string
+  updateTime: string
+}
+
+const friendRequests = ref<FriendRequest[]>([])
 const friendRequestsLoading = ref(false)
 
 // 响应式图标大小
@@ -245,7 +256,7 @@ const loadFriendRequests = async () => {
     friendRequestsLoading.value = true
     // 动态导入API
     const { getFriendRequestsList } = await import(
-      '@/api/controller/HaoYouShenQingJieKou/getFriendRequestsList.js'
+      '@/api/controller/friend-requests-controller/getFriendRequestsList.js'
     )
     const response = await getFriendRequestsList()
 
@@ -279,7 +290,7 @@ const acceptFriendRequest = async (requestId: number) => {
   try {
     // 动态导入API
     const { postFriendsAgree } = await import(
-      '@/api/controller/HaoYouGuanXiJieKou/postFriendsAgree.js'
+      '@/api/controller/friends-controller/postFriendsAgree.js'
     )
     const response = await postFriendsAgree({ id: requestId })
 
@@ -301,7 +312,7 @@ const rejectFriendRequest = async (requestId: number) => {
   try {
     // 动态导入API
     const { postFriendsDisagree } = await import(
-      '@/api/controller/HaoYouGuanXiJieKou/postFriendsDisagree.js'
+      '@/api/controller/friends-controller/postFriendsDisagree.js'
     )
     const response = await postFriendsDisagree({ id: requestId })
 

@@ -1,5 +1,6 @@
 import { type AxiosRequestConfig } from "axios";
 /**
+ * 获取与指定好友的聊天记录
  * /friendMessage/list
  */
 export declare function getFriendMessageList(params: GetFriendMessageListParams, config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{

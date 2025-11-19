@@ -1,6 +1,7 @@
 import { type AxiosRequestConfig } from "axios";
 import { type BlogRequest } from "../../interface";
 /**
+ * 更新博客
  * /blog/update
  */
 export declare function postBlogUpdate(params: PostBlogUpdateParams, input: BlogRequest, config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{

@@ -1,5 +1,6 @@
 import request from "@/plugins/myAxios.js";
 /**
+ * 获取队伍成员列表
  * /teamUser/list
  */
 export function getTeamUserList(params, config) {

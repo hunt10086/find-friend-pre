@@ -1,5 +1,6 @@
 import request from "@/plugins/myAxios.js";
 /**
+ * 更新博客
  * /blog/update
  */
 export function postBlogUpdate(params, input, config) {

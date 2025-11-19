@@ -19,6 +19,7 @@
         placeholder="请输入队伍描述"
         show-word-limit
       />
+
       <van-field
         v-model="icon"
         name="icon"
@@ -27,7 +28,20 @@
         maxlength="256"
         :rules="[{ required: false, message: '请输入队伍头像链接' }]"
       />
+      <van-field name="uploader" label="上传队伍头像">
+        <template #input>
+          <van-uploader
+            :before-read="beforeRead"
+            v-model="fileList"
+            :max-count="1"
+            :after-read="handleUpload"
+            :disabled="uploading"
+            accept="image/*"
+          />
+        </template>
+      </van-field>
       <br />
+
       <div>
         <p>选择队伍人数</p>
         <van-stepper v-model="maxNum" min="3" max="15" />
@@ -57,7 +71,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { getUserCurrent, postTeamCreate } from '@/api/controller'
+import { getUserCurrent, postTeamCreate, postUpload } from '@/api/controller'
 import { watch } from 'vue'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'
@@ -71,11 +85,67 @@ const status = ref(0)
 const password = ref('')
 const router = useRouter()
 
+const fileList = ref<any[]>([])
+const uploading = ref(false)
+
+const MAX_UPLOAD_SIZE = 4 * 1024 * 1024
+const ALLOWED_EXTS = ['jpeg', 'jpg', 'png', 'webp']
+const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp']
+
+const beforeRead = (input: any) => {
+  const toFile = (it: any): File => (it && (it.file as File)) || (it as File)
+
+  const validate = (file: File): boolean => {
+    const name = (file?.name || '').toLowerCase()
+    const ext = name.includes('.') ? name.split('.').pop() || '' : ''
+    if (file.size > MAX_UPLOAD_SIZE) {
+      showFailToast('图片大小不能超过 4MB')
+      return false
+    }
+    if (!ALLOWED_EXTS.includes(ext) || !ALLOWED_MIME.includes(file.type)) {
+      showFailToast('仅支持 jpeg / jpg / png / webp 格式')
+      return false
+    }
+    return true
+  }
+
+  if (Array.isArray(input)) {
+    return input.every((it) => validate(toFile(it)))
+  }
+  return validate(toFile(input))
+}
+
 const check = async () => {
   const res = await getUserCurrent()
   userId.value = res.data.data.id
 }
 check()
+
+const handleUpload = async (item: any) => {
+  try {
+    uploading.value = true
+    const file = Array.isArray(item) ? item[0].file : item.file
+    if (!file) {
+      showFailToast('未选择文件')
+      return
+    }
+    const res = await postUpload(
+      { file: file as File },
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    )
+    if (res?.data?.code === 0 && res?.data?.data) {
+      icon.value = res.data.data
+      fileList.value = [{ url: res.data.data } as any]
+      showSuccessToast('上传成功')
+    } else {
+      showFailToast(res?.data?.message || '上传失败')
+    }
+  } catch (e) {
+    showFailToast('上传失败')
+  } finally {
+    uploading.value = false
+  }
+}
 const onSubmit = async () => {
   const input = {
     teamName: teamName.value,

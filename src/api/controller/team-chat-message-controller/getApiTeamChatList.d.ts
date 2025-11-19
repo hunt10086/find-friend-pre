@@ -1,5 +1,6 @@
 import { type AxiosRequestConfig } from "axios";
 /**
+ * 获取队伍消息列表
  * /api/teamChat/list
  */
 export declare function getApiTeamChatList(params: GetApiTeamChatListParams, config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{

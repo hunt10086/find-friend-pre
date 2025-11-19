@@ -1,5 +1,6 @@
 import { type AxiosRequestConfig } from "axios";
 /**
+ * 获取博客列表
  * /blog/list
  */
 export declare function getBlogList(config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{

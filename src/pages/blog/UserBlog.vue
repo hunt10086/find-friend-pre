@@ -1,11 +1,9 @@
 <template>
   <!-- Loading状态 -->
   <div v-if="loading" class="loading-container">
-    <van-loading type="spinner" color="#1989fa" size="24px">
-      加载博客内容中...
-    </van-loading>
+    <van-loading type="spinner" color="#1989fa" size="24px"> 加载博客内容中... </van-loading>
   </div>
-  
+
   <!-- 博客内容 -->
   <div v-else class="blog-page">
     <!-- 文章头部区域 -->
@@ -41,7 +39,6 @@
         </div>
       </div>
     </div>
-
 
     <!-- 文章内容区域 -->
     <div class="article-content">
@@ -86,7 +83,6 @@
       </div>
     </div>
 
-
     <!-- 评论区域 -->
     <div class="comments-section">
       <div class="article-container">
@@ -130,8 +126,11 @@
           <div v-if="comments.length > 0">
             <div v-for="comment in comments" :key="comment.id" class="comment-item">
               <div class="comment-avatar">
-                <img :src="comment.avatarUrl || '/ava.jpg'" alt="用户头像"
-                     @error="handleImageError" />
+                <img
+                  :src="comment.avatarUrl || '/ava.jpg'"
+                  alt="用户头像"
+                  @error="handleImageError"
+                />
               </div>
               <div class="comment-main">
                 <div class="comment-header">
@@ -161,13 +160,9 @@
       </div>
     </div>
 
-    <div>
-    </div>
+    <div></div>
   </div>
-
-
 </template>
-
 
 <script setup lang="ts">
 import { onMounted, ref, watch, onActivated, nextTick } from 'vue'
@@ -217,7 +212,7 @@ const getBlogData = async () => {
     kind.value = blog.value.kind
     praise.value = blog.value.praise
     userId.value = blog.value.userId
-    
+
     // 初始化点赞状态（如果API返回了点赞状态）
     // 注意：这里需要根据你的API实际返回的字段来调整
     isLiked.value = blog.value.isLiked || false
@@ -225,8 +220,8 @@ const getBlogData = async () => {
     // 获取当前用户信息（根据博客中的 userId）
     const userResponse = await myAxios.get(`/user/search/one`, {
       params: {
-        id: blog.value.userId
-      }
+        id: blog.value.userId,
+      },
     })
     const userData = userResponse.data.data
     userAvatar.value = userData.avatarUrl
@@ -235,11 +230,11 @@ const getBlogData = async () => {
 
     const commentResponse = await myAxios.get(`/comment/list`, {
       params: {
-        blogId: blogId.value
-      }
+        blogId: blogId.value,
+      },
     })
     comments.value = commentResponse.data.data || []
-    
+
     // 延迟初始化代码块复制按钮，确保DOM完全渲染
     setTimeout(() => {
       initCodeCopyButtons()
@@ -260,7 +255,6 @@ const formatTime = (time: string) => {
   return dayjs(time).format('YYYY-MM-DD HH:mm')
 }
 
-
 const submitComment = async () => {
   if (!newCommentContent.value.trim()) return
 
@@ -269,14 +263,15 @@ const submitComment = async () => {
     await myAxios.get('/comment/create', {
       params: {
         blogId: blogId.value,
-        comment: newCommentContent.value
-      }
+        comment: newCommentContent.value,
+      },
     })
     newCommentContent.value = ''
     await getBlogData()
     showSuccessToast('评论发表成功')
   } catch (error) {
-    console.error('提交评论失败:', error)
+    /* console.error('提交评论失败:', error) */
+
     showSuccessToast('评论发表失败，请重试')
   } finally {
     isSubmittingComment.value = false
@@ -286,15 +281,15 @@ const submitComment = async () => {
 const like = async () => {
   try {
     const params = {
-      blogId: blogId.value
+      blogId: blogId.value,
     }
     const res = await getBlogLike(params)
-    
+
     // 只更新点赞数，不重新加载整个页面
     if (res.data.code === 0) {
       // 切换点赞状态
       isLiked.value = !isLiked.value
-      
+
       // 更新点赞数（根据API返回的数据或本地计算）
       if (res.data.data !== undefined) {
         praise.value = res.data.data
@@ -302,13 +297,14 @@ const like = async () => {
         // 如果API没有返回新的点赞数，本地计算
         praise.value = isLiked.value ? praise.value + 1 : praise.value - 1
       }
-      
+
       showSuccessToast(isLiked.value ? '点赞成功' : '取消点赞')
     } else {
       showFailToast('操作失败，请重试')
     }
   } catch (error) {
-    console.error('点赞操作失败:', error)
+    /* console.error('点赞操作失败:', error) */
+
     showFailToast('网络错误，请重试')
   }
 }
@@ -337,7 +333,7 @@ const handleImageError = (event: Event) => {
 // 复制代码功能
 const copyCode = async (code: string) => {
   if (!code) return
-  
+
   try {
     await navigator.clipboard.writeText(code)
     showSuccessToast('代码已复制到剪贴板')
@@ -360,7 +356,7 @@ const copyCode = async (code: string) => {
 // 初始化代码块复制按钮
 const initCodeCopyButtons = () => {
   console.log('🔍 开始初始化复制按钮...')
-  
+
   nextTick(() => {
     // 尝试多个选择器
     let codeBlocks = document.querySelectorAll('.content-body pre')
@@ -370,20 +366,21 @@ const initCodeCopyButtons = () => {
     if (codeBlocks.length === 0) {
       codeBlocks = document.querySelectorAll('.article-content pre')
     }
-    
-    console.log('📊 找到的代码块数量:', codeBlocks.length)
-    console.log('📋 代码块元素:', codeBlocks)
-    
+
+    /* console.log('📊 找到的代码块数量:', codeBlocks.length) */
+
+    /* console.log('📋 代码块元素:', codeBlocks) */
+
     codeBlocks.forEach((block, index) => {
       console.log(`🔧 处理第 ${index + 1} 个代码块:`, block)
       // 检查是否已经添加了复制按钮
       if (block.querySelector('.copy-code-btn')) return
-      
+
       const codeElement = block.querySelector('code')
       if (!codeElement) return
-      
+
       const code = codeElement.textContent || ''
-      
+
       // 创建复制按钮
       const copyBtn = document.createElement('button')
       copyBtn.className = 'copy-code-btn'
@@ -394,15 +391,15 @@ const initCodeCopyButtons = () => {
         <span>复制</span>
       `
       copyBtn.title = '复制代码'
-      
+
       // 添加点击事件
       copyBtn.addEventListener('click', () => {
         copyCode(code)
       })
-      
+
       // 设置代码块容器为相对定位
       ;(block as HTMLElement).style.position = 'relative'
-      
+
       // 添加按钮到代码块
       block.appendChild(copyBtn)
     })
@@ -421,13 +418,13 @@ const setupCodeCopyObserver = () => {
   if (observer) {
     observer.disconnect()
   }
-  
+
   const targetNode = document.querySelector('.content-body')
   if (!targetNode) {
     console.log('❌ 未找到 .content-body 元素')
     return
   }
-  
+
   observer = new MutationObserver((mutations) => {
     let shouldInit = false
     mutations.forEach((mutation) => {
@@ -443,7 +440,7 @@ const setupCodeCopyObserver = () => {
         })
       }
     })
-    
+
     if (shouldInit) {
       console.log('🔄 检测到新的代码块，重新初始化复制按钮')
       setTimeout(() => {
@@ -451,32 +448,39 @@ const setupCodeCopyObserver = () => {
       }, 100)
     }
   })
-  
+
   observer.observe(targetNode, {
     childList: true,
-    subtree: true
+    subtree: true,
   })
-  
-  console.log('👀 已设置 DOM 变化监听器')
+
+  /* console.log('👀 已设置 DOM 变化监听器') */
 }
 
 // 监听 passage 变化，重新初始化复制按钮
-watch(() => passage.value, () => {
-  if (passage.value) {
-    setTimeout(() => {
-      initCodeCopyButtons()
-      setupCodeCopyObserver()
-    }, 500)
-  }
-})
+watch(
+  () => passage.value,
+  () => {
+    if (passage.value) {
+      setTimeout(() => {
+        initCodeCopyButtons()
+        setupCodeCopyObserver()
+      }, 500)
+    }
+  },
+)
 
 // 监听路由参数变化，当博客ID改变时重新获取数据
-watch(() => route.params.id, async (newId) => {
-  if (newId) {
-    blogId.value = Number(newId)
-    await getBlogData()
-  }
-}, { immediate: false })
+watch(
+  () => route.params.id,
+  async (newId) => {
+    if (newId) {
+      blogId.value = Number(newId)
+      await getBlogData()
+    }
+  },
+  { immediate: false },
+)
 
 // 当页面从缓存中激活时，检查路由参数是否变化
 onActivated(async () => {
@@ -486,9 +490,7 @@ onActivated(async () => {
     await getBlogData()
   }
 })
-
 </script>
-
 
 <style scoped>
 .loading-container {
@@ -635,8 +637,8 @@ onActivated(async () => {
   line-height: 1.3;
 }
 
-.content-body :deep(h1) { 
-  font-size: 36px; 
+.content-body :deep(h1) {
+  font-size: 36px;
   color: #0066cc;
   border-bottom: 3px solid #e6f3ff;
   padding-bottom: 12px;
@@ -645,26 +647,26 @@ onActivated(async () => {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.content-body :deep(h2) { 
-  font-size: 30px; 
+.content-body :deep(h2) {
+  font-size: 30px;
   color: #0080ff;
   border-bottom: 2px solid #f0f8ff;
   padding-bottom: 10px;
 }
-.content-body :deep(h3) { 
-  font-size: 26px; 
+.content-body :deep(h3) {
+  font-size: 26px;
   color: #1a73e8;
 }
-.content-body :deep(h4) { 
-  font-size: 22px; 
+.content-body :deep(h4) {
+  font-size: 22px;
   color: #2196f3;
 }
-.content-body :deep(h5) { 
-  font-size: 20px; 
+.content-body :deep(h5) {
+  font-size: 20px;
   color: #42a5f5;
 }
-.content-body :deep(h6) { 
-  font-size: 18px; 
+.content-body :deep(h6) {
+  font-size: 18px;
   color: #64b5f6;
 }
 
@@ -703,14 +705,35 @@ onActivated(async () => {
 }
 
 /* 增强的代码高亮样式 */
-.content-body :deep(pre code .keyword) { color: #ff6b6b; font-weight: 600; }
-.content-body :deep(pre code .string) { color: #4ecdc4; }
-.content-body :deep(pre code .comment) { color: #95a5a6; font-style: italic; opacity: 0.8; }
-.content-body :deep(pre code .number) { color: #f39c12; font-weight: 600; }
-.content-body :deep(pre code .function) { color: #74b9ff; font-weight: 600; }
-.content-body :deep(pre code .variable) { color: #a29bfe; }
-.content-body :deep(pre code .operator) { color: #fd79a8; }
-.content-body :deep(pre code .punctuation) { color: #ddd; }
+.content-body :deep(pre code .keyword) {
+  color: #ff6b6b;
+  font-weight: 600;
+}
+.content-body :deep(pre code .string) {
+  color: #4ecdc4;
+}
+.content-body :deep(pre code .comment) {
+  color: #95a5a6;
+  font-style: italic;
+  opacity: 0.8;
+}
+.content-body :deep(pre code .number) {
+  color: #f39c12;
+  font-weight: 600;
+}
+.content-body :deep(pre code .function) {
+  color: #74b9ff;
+  font-weight: 600;
+}
+.content-body :deep(pre code .variable) {
+  color: #a29bfe;
+}
+.content-body :deep(pre code .operator) {
+  color: #fd79a8;
+}
+.content-body :deep(pre code .punctuation) {
+  color: #ddd;
+}
 
 .content-body :deep(blockquote) {
   border-left: 4px solid #ff6b6b;
@@ -985,28 +1008,28 @@ onActivated(async () => {
   }
 
   /* 移动端Markdown样式优化 */
-  .content-body :deep(h1) { 
-    font-size: 28px; 
+  .content-body :deep(h1) {
+    font-size: 28px;
     margin: 24px 0 16px 0;
   }
-  .content-body :deep(h2) { 
-    font-size: 24px; 
+  .content-body :deep(h2) {
+    font-size: 24px;
     margin: 20px 0 14px 0;
   }
-  .content-body :deep(h3) { 
-    font-size: 22px; 
+  .content-body :deep(h3) {
+    font-size: 22px;
     margin: 18px 0 12px 0;
   }
-  .content-body :deep(h4) { 
-    font-size: 20px; 
+  .content-body :deep(h4) {
+    font-size: 20px;
     margin: 16px 0 10px 0;
   }
-  .content-body :deep(h5) { 
-    font-size: 18px; 
+  .content-body :deep(h5) {
+    font-size: 18px;
     margin: 14px 0 8px 0;
   }
-  .content-body :deep(h6) { 
-    font-size: 16px; 
+  .content-body :deep(h6) {
+    font-size: 16px;
     margin: 12px 0 6px 0;
   }
 
@@ -1168,21 +1191,19 @@ onActivated(async () => {
     top: 6px;
     right: 6px;
   }
-  
+
   .content-body :deep(.copy-code-btn svg) {
     width: 12px;
     height: 12px;
   }
-  
+
   .content-body :deep(pre) {
     padding: 12px;
     margin: 12px 0;
   }
-  
+
   .content-body :deep(pre code) {
     font-size: 13px;
   }
 }
-
-
 </style>

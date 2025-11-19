@@ -8,11 +8,7 @@
     >
       <div class="nearby-header">
         <div class="nearby-avatar">
-          <img
-            :src="user.avatarUrl || '/ava.jpg'"
-            :alt="user.userName"
-            @error="handleImageError"
-          />
+          <img :src="user.avatarUrl || '/ava.jpg'" :alt="user.userName" @error="handleImageError" />
           <div class="distance-badge">
             <van-icon name="location-o" />
             {{ formatDistance(user.distance) }}
@@ -38,12 +34,12 @@
             class="nearby-tag"
             plain
             type="primary"
-            size="small"
             v-for="tag in getDisplayTags(user)"
             :key="tag"
           >
             {{ tag }}
           </van-tag>
+
           <van-button
             v-if="user.tags.length > 5"
             class="expand-tags-btn"
@@ -57,13 +53,7 @@
       </div>
 
       <div class="nearby-actions">
-        <van-button
-          type="success"
-          size="small"
-          round
-          icon="guide-o"
-          @click="viewProfile(user)"
-        >
+        <van-button type="success" size="small" round icon="guide-o" @click="viewProfile(user)">
           查看资料
         </van-button>
       </div>
@@ -77,12 +67,7 @@
       image="https://fastly.jsdelivr.net/npm/@vant/assets/custom-empty-image.png"
       description="附近没有用户"
     >
-      <van-button
-        round
-        type="primary"
-        class="refresh-button"
-        @click="refreshData"
-      >
+      <van-button round type="primary" class="refresh-button" @click="refreshData">
         刷新位置
       </van-button>
     </van-empty>
@@ -93,22 +78,19 @@
   </div>
 
   <!-- 用户资料模态框 -->
-  <UserProfileModal
-    v-model="showProfileModal"
-    :userId="selectedUserId"
-  />
+  <UserProfileModal v-model="showProfileModal" :userId="selectedUserId" />
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getUserNearUser } from '@/api/controller/YongHuJieKou/getUserNearUser.js'
+import { getUserNearUser } from '@/api/controller/user-controller/getUserNearUser.js'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'
 import UserProfileModal from '@/components/UserProfileModal.vue'
 
 // 为组件设置名称，确保 keep-alive 能正确缓存
 defineOptions({
-  name: 'NearUsers'
+  name: 'NearUsers',
 })
 
 const router = useRouter()
@@ -176,7 +158,6 @@ const refreshData = async () => {
   await loadNearUsersData()
 }
 
-
 // 查看资料
 const viewProfile = (user: any) => {
   selectedUserId.value = user.id
@@ -204,7 +185,6 @@ const toggleTagsExpand = (user: any) => {
   }
   user.tagsExpanded = !user.tagsExpanded
 }
-
 </script>
 
 <style scoped>

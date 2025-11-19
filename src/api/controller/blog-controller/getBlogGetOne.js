@@ -1,5 +1,6 @@
 import request from "@/plugins/myAxios.js";
 /**
+ * 获取单个博客
  * /blog/getOne
  */
 export function getBlogGetOne(params, config) {

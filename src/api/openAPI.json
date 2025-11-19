@@ -14,7 +14,7 @@
     "/user/update": {
       "post": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "用户更新",
         "operationId": "userUpdate",
@@ -45,7 +45,7 @@
     "/user/register": {
       "post": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "注册请求",
         "operationId": "userRegister",
@@ -76,7 +76,7 @@
     "/user/logout": {
       "post": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "用户注销",
         "operationId": "userLogout",
@@ -97,7 +97,7 @@
     "/user/login": {
       "post": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "登录请求",
         "operationId": "userLogin",
@@ -128,7 +128,7 @@
     "/user/delete": {
       "post": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "删除用户",
         "operationId": "userDelete",
@@ -157,10 +157,52 @@
         }
       }
     },
+    "/upload": {
+      "post": {
+        "tags": [
+          "upload-controller"
+        ],
+        "summary": "上传图片",
+        "description": "上传图片文件到指定空间",
+        "operationId": "uploadPicture",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "name": "file",
+                    "in": "query"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseString"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/team/update": {
       "post": {
         "tags": [
-          "队伍接口"
+          "team-controller"
         ],
         "summary": "更新队伍",
         "operationId": "updateTeam",
@@ -202,7 +244,7 @@
     "/team/quit": {
       "post": {
         "tags": [
-          "队伍接口"
+          "team-controller"
         ],
         "summary": "退出队伍",
         "operationId": "quitTeam",
@@ -233,7 +275,7 @@
     "/team/join": {
       "post": {
         "tags": [
-          "队伍接口"
+          "team-controller"
         ],
         "summary": "加入队伍",
         "operationId": "joinTeam",
@@ -274,7 +316,7 @@
     "/team/delete": {
       "post": {
         "tags": [
-          "队伍接口"
+          "team-controller"
         ],
         "summary": "删除队伍",
         "operationId": "deleteTeam",
@@ -305,7 +347,7 @@
     "/team/create": {
       "post": {
         "tags": [
-          "队伍接口"
+          "team-controller"
         ],
         "summary": "创建队伍",
         "operationId": "addTeam",
@@ -336,7 +378,7 @@
     "/friends/disagree": {
       "post": {
         "tags": [
-          "好友关系接口"
+          "friends-controller"
         ],
         "summary": "拒绝好友申请",
         "operationId": "disAgreeFriendRequest",
@@ -367,7 +409,7 @@
     "/friends/delete": {
       "post": {
         "tags": [
-          "好友关系接口"
+          "friends-controller"
         ],
         "summary": "删除好友",
         "operationId": "deleteFriend",
@@ -399,7 +441,7 @@
     "/friends/agree": {
       "post": {
         "tags": [
-          "好友关系接口"
+          "friends-controller"
         ],
         "summary": "同意好友申请",
         "operationId": "agreeFriendRequest",
@@ -430,7 +472,7 @@
     "/friendRequests/send": {
       "post": {
         "tags": [
-          "好友申请接口"
+          "friend-requests-controller"
         ],
         "summary": "发送好友申请",
         "operationId": "sendFriendRequest",
@@ -463,6 +505,7 @@
         "tags": [
           "friend-message-controller"
         ],
+        "summary": "标记消息为已读",
         "operationId": "markMessagesAsRead",
         "parameters": [
           {
@@ -494,6 +537,7 @@
         "tags": [
           "blog-controller"
         ],
+        "summary": "更新博客",
         "operationId": "updateBlog",
         "parameters": [
           {
@@ -535,6 +579,7 @@
         "tags": [
           "blog-controller"
         ],
+        "summary": "创建博客",
         "operationId": "createBlog",
         "requestBody": {
           "content": {
@@ -565,6 +610,7 @@
         "tags": [
           "team-chat-message-controller"
         ],
+        "summary": "发送队伍聊天消息",
         "operationId": "sendMessage",
         "requestBody": {
           "content": {
@@ -593,7 +639,7 @@
     "/user/sendCode": {
       "get": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "发送验证码",
         "operationId": "sendCode",
@@ -624,7 +670,7 @@
     "/user/search": {
       "get": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "查询所有用户",
         "operationId": "getUser",
@@ -655,7 +701,7 @@
     "/user/searchOne": {
       "get": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "查询单个用户",
         "operationId": "updateMassage",
@@ -676,7 +722,7 @@
     "/user/search/tags": {
       "get": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "根据标签名查询用户",
         "operationId": "searchUsersByTags",
@@ -710,7 +756,7 @@
     "/user/search/tags/page": {
       "get": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "根据标签分页查询用户",
         "operationId": "searchUsersByTagsWithPagination",
@@ -764,7 +810,7 @@
     "/user/search/one": {
       "get": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "根据id查询",
         "operationId": "searchUserById",
@@ -796,7 +842,7 @@
     "/user/nearUser": {
       "get": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "附近用户",
         "operationId": "nearUser",
@@ -817,7 +863,7 @@
     "/user/listLike": {
       "get": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "主页用户推荐",
         "operationId": "userListLike",
@@ -849,7 +895,7 @@
     "/user/current": {
       "get": {
         "tags": [
-          "用户接口"
+          "user-controller"
         ],
         "summary": "展示当前用户信息",
         "operationId": "getCurrentUser",
@@ -870,8 +916,9 @@
     "/teamUser/list": {
       "get": {
         "tags": [
-          "展示队伍成员信息"
+          "user-team-controller"
         ],
+        "summary": "获取队伍成员列表",
         "operationId": "list",
         "parameters": [
           {
@@ -901,7 +948,7 @@
     "/team/search": {
       "get": {
         "tags": [
-          "队伍接口"
+          "team-controller"
         ],
         "summary": "根据队伍名搜索队伍",
         "operationId": "searchTeam",
@@ -932,7 +979,7 @@
     "/team/searchByID": {
       "get": {
         "tags": [
-          "队伍接口"
+          "team-controller"
         ],
         "summary": "根据id查找队伍",
         "operationId": "searchTeamByID",
@@ -964,7 +1011,7 @@
     "/team/myTeam": {
       "get": {
         "tags": [
-          "队伍接口"
+          "team-controller"
         ],
         "summary": "展示创建的队伍列表",
         "operationId": "getMyTeam",
@@ -985,7 +1032,7 @@
     "/team/list": {
       "get": {
         "tags": [
-          "队伍接口"
+          "team-controller"
         ],
         "summary": "获取队伍列表",
         "operationId": "listTeam",
@@ -1006,7 +1053,7 @@
     "/team/joinTeam": {
       "get": {
         "tags": [
-          "队伍接口"
+          "team-controller"
         ],
         "summary": "展示加入队伍列表",
         "operationId": "getJoinTeam",
@@ -1027,8 +1074,9 @@
     "/team/get/team": {
       "get": {
         "tags": [
-          "队伍接口"
+          "team-controller"
         ],
+        "summary": "获取队伍信息",
         "operationId": "getTeam",
         "responses": {
           "200": {
@@ -1047,7 +1095,7 @@
     "/friends/list": {
       "get": {
         "tags": [
-          "好友关系接口"
+          "friends-controller"
         ],
         "summary": "获取好友列表",
         "operationId": "getFriendList",
@@ -1068,7 +1116,7 @@
     "/friends/check": {
       "get": {
         "tags": [
-          "好友关系接口"
+          "friends-controller"
         ],
         "summary": "检查是否为好友",
         "operationId": "checkFriend",
@@ -1100,7 +1148,7 @@
     "/friendRequests/list": {
       "get": {
         "tags": [
-          "好友申请接口"
+          "friend-requests-controller"
         ],
         "summary": "获取好友申请列表",
         "operationId": "getFriendRequests",
@@ -1123,6 +1171,7 @@
         "tags": [
           "friend-message-controller"
         ],
+        "summary": "获取未读消息数量",
         "operationId": "getUnreadMessageCount",
         "responses": {
           "200": {
@@ -1143,6 +1192,7 @@
         "tags": [
           "friend-message-controller"
         ],
+        "summary": "获取与指定好友的聊天记录",
         "operationId": "getFriendMessages",
         "parameters": [
           {
@@ -1174,6 +1224,7 @@
         "tags": [
           "comment-controller"
         ],
+        "summary": "获取评论列表",
         "operationId": "list",
         "parameters": [
           {
@@ -1205,6 +1256,7 @@
         "tags": [
           "comment-controller"
         ],
+        "summary": "创建评论",
         "operationId": "create",
         "parameters": [
           {
@@ -1244,6 +1296,7 @@
         "tags": [
           "blog-controller"
         ],
+        "summary": "获取我的博客列表",
         "operationId": "getMyBlogList",
         "responses": {
           "200": {
@@ -1264,6 +1317,7 @@
         "tags": [
           "blog-controller"
         ],
+        "summary": "获取博客列表",
         "operationId": "getBlogList",
         "responses": {
           "200": {
@@ -1284,6 +1338,7 @@
         "tags": [
           "blog-controller"
         ],
+        "summary": "点赞博客",
         "operationId": "getBlogLike",
         "parameters": [
           {
@@ -1315,6 +1370,7 @@
         "tags": [
           "blog-controller"
         ],
+        "summary": "获取单个博客",
         "operationId": "getBlog",
         "parameters": [
           {
@@ -1346,6 +1402,7 @@
         "tags": [
           "blog-controller"
         ],
+        "summary": "删除博客",
         "operationId": "deleteBlog",
         "parameters": [
           {
@@ -1377,6 +1434,7 @@
         "tags": [
           "team-chat-message-controller"
         ],
+        "summary": "获取队伍消息列表",
         "operationId": "getMessageList",
         "parameters": [
           {
@@ -1565,6 +1623,24 @@
           }
         }
       },
+      "BaseResponseString": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "data": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
       "TeamDTO": {
         "type": "object",
         "properties": {
@@ -1644,37 +1720,30 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           },
           "fromUserId": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           },
           "toUserId": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           },
           "message": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "status": {
             "type": "integer",
-            "format": "int32",
-            "refType": null
+            "format": "int32"
           },
           "createTime": {
             "type": "string",
-            "format": "date-time",
-            "refType": null
+            "format": "date-time"
           },
           "updateTime": {
             "type": "string",
-            "format": "date-time",
-            "refType": null
+            "format": "date-time"
           }
         }
       },
@@ -1700,24 +1769,6 @@
             "type": "string"
           },
           "kind": {
-            "type": "string"
-          }
-        }
-      },
-      "BaseResponseString": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "data": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          },
-          "description": {
             "type": "string"
           }
         }
@@ -1827,29 +1878,23 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           },
           "userName": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "avatarUrl": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "tags": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "profile": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "distance": {
             "type": "number",
-            "format": "double",
-            "refType": null
+            "format": "double"
           }
         }
       },

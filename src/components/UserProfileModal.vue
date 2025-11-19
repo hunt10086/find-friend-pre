@@ -128,7 +128,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { getUserSearchOne } from '@/api/controller/YongHuJieKou/getUserSearchOne.js'
+import { getUserSearchOne } from '@/api/controller/user-controller/getUserSearchOne.js'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useFriendStore } from '@/stores/friendStore'
 
@@ -204,16 +204,25 @@ const loadUserInfo = async () => {
     if (response.data.code === 0 && response.data.data) {
       const userData = response.data.data
 
-      // 解析标签
-      if (userData.tags && typeof userData.tags === 'string') {
-        try {
-          userData.tags = JSON.parse(userData.tags)
-        } catch (e) {
-          userData.tags = []
+      // 解析并规范化标签为 string[]
+
+      {
+        let tags: string[] = []
+        if (Array.isArray(userData.tags)) {
+          tags = userData.tags as string[]
+        } else if (typeof userData.tags === 'string') {
+          try {
+            const parsed = JSON.parse(userData.tags)
+
+            tags = Array.isArray(parsed) ? (parsed as string[]) : []
+          } catch {
+            tags = []
+          }
         }
+        ;(userData as any).tags = tags
       }
 
-      userInfo.value = userData
+      userInfo.value = userData as unknown as UserInfo
 
       // 检查是否为好友
       await checkFriendStatus()
@@ -250,7 +259,7 @@ const checkFriendRequestStatus = async () => {
   try {
     // 导入好友申请列表API
     const { getFriendRequestsList } = await import(
-      '@/api/controller/HaoYouShenQingJieKou/getFriendRequestsList.js'
+      '@/api/controller/friend-requests-controller/getFriendRequestsList.js'
     )
     const response = await getFriendRequestsList()
 

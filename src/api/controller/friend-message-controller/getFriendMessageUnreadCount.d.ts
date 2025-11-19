@@ -1,5 +1,6 @@
 import { type AxiosRequestConfig } from "axios";
 /**
+ * 获取未读消息数量
  * /friendMessage/unreadCount
  */
 export declare function getFriendMessageUnreadCount(config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{

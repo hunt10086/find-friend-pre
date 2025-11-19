@@ -1,5 +1,6 @@
 import { type AxiosRequestConfig } from "axios";
 /**
+ * 获取队伍信息
  * /team/get/team
  */
 export declare function getTeamGetTeam(config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{

@@ -1,5 +1,6 @@
 import { type AxiosRequestConfig } from "axios";
 /**
+ * 创建评论
  * /comment/create
  */
 export declare function getCommentCreate(params: GetCommentCreateParams, config?: AxiosRequestConfig): Promise<import("axios").AxiosResponse<{

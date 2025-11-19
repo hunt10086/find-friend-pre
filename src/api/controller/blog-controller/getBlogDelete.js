@@ -1,5 +1,6 @@
 import request from "@/plugins/myAxios.js";
 /**
+ * 删除博客
  * /blog/delete
  */
 export function getBlogDelete(params, config) {

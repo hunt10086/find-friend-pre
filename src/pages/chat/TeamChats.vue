@@ -42,7 +42,7 @@
               />
             </div>
             <div class="team-name">{{ team.teamName }}</div>
-            <van-tag v-if="team.status !== undefined" size="small" type="primary" plain>{{
+            <van-tag v-if="team.status !== undefined" type="primary" plain>{{
               team.status === 1 ? '加密' : '公开'
             }}</van-tag>
           </div>
@@ -66,7 +66,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
-import { getTeamGetTeam } from '@/api/controller/DuiWuJieKou/getTeamGetTeam.js'
+import { getTeamGetTeam } from '@/api/controller/team-controller/getTeamGetTeam.js'
 import { showFailToast } from 'vant'
 import dayjs from 'dayjs'
 
