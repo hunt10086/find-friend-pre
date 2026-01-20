@@ -19,7 +19,7 @@
 export const API_BASE_URL =
   import.meta.env.MODE === 'development'
     ? 'http://localhost:7777/api'
-    : 'http://www.seestars.top:7777/api'
+    : 'http://bc.seestars.top/api'
 export const BASE_URL = API_BASE_URL
 
 // 基于 API_BASE_URL 推导 WebSocket 基址

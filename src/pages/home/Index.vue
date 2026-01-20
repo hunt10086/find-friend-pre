@@ -82,6 +82,18 @@
   <p class="pages">{{ cont }}</p>
   <div id="index-button-css" style="display: flex; justify-content: center; gap: 20px; margin-top: 16px">
     <van-button v-if="flagPre" type="primary" @click="GoPre">上一页</van-button>
+    <div class="page-jump-controls">
+      <span class="jump-label">跳至</span>
+      <van-field
+        v-model="jumpPageInput"
+        type="number"
+        placeholder="页数"
+        class="page-input"
+        @keyup.enter="goToPage"
+      />
+      <van-button size="small" @click="goToPage">跳转</van-button>
+      <span class="total-pages">共 {{ max }} 页</span>
+    </div>
     <van-button v-if="flag" type="primary" @click="loadMore">下一页</van-button>
   </div>
 
@@ -106,6 +118,7 @@ const flag = ref(true)
 const flagPre = ref(false)
 const showProfileModal = ref(false)
 const selectedUserId = ref(null)
+const jumpPageInput = ref('')
 
 const loadUserData = async () => {
   const res = await getUserListLike({
@@ -207,6 +220,40 @@ const toggleTagsExpand = (user) => {
     user.tagsExpanded = false
   }
   user.tagsExpanded = !user.tagsExpanded
+}
+
+// 页面跳转功能
+const goToPage = async () => {
+  if (!jumpPageInput.value) return
+
+  let targetPage = parseInt(jumpPageInput.value)
+
+  // 验证输入的页码
+  if (isNaN(targetPage) || targetPage < 1) {
+    targetPage = 1
+  } else if (targetPage > max.value) {
+    targetPage = max.value
+  }
+
+  cont.value = targetPage
+  jumpPageInput.value = '' // 清空输入框
+
+  // 加载指定页的数据
+  const res = await getUserListLike({
+    count: cont.value,
+  })
+  res.data.data.forEach((user) => {
+    user.tags = JSON.parse(user.tags)
+  })
+  userList.value = res.data.data || []
+
+  // 更新按钮状态
+  if (res.data.code < 8) {
+    flag.value = false
+  } else {
+    flag.value = true
+  }
+  flagPre.value = cont.value > 1
 }
 
 </script>
@@ -412,6 +459,35 @@ const toggleTagsExpand = (user) => {
   margin-bottom: 30px;
 }
 
+.page-jump-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.jump-label {
+  font-size: 14px;
+  color: #646566;
+}
+
+.page-input {
+  width: 80px;
+  margin: 0 4px;
+}
+
+.page-input .van-field__control {
+  text-align: center;
+  font-size: 14px;
+}
+
+.total-pages {
+  font-size: 14px;
+  color: #646566;
+  white-space: nowrap;
+  margin-left: 8px;
+}
+
 /* 动画效果 */
 @keyframes fadeInUp {
   from {
@@ -468,6 +544,21 @@ const toggleTagsExpand = (user) => {
     padding: 5px 12px;
     font-size: 12px;
   }
+
+  #index-button-css {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .page-jump-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .page-input {
+    width: 70px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -480,6 +571,22 @@ const toggleTagsExpand = (user) => {
   .user-header {
     flex-direction: column;
     gap: 4px;
+  }
+
+  .page-jump-controls {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .page-input {
+    width: 100%;
+    max-width: 120px;
+  }
+
+  .total-pages {
+    margin-left: 0;
+    text-align: center;
   }
 
   .user-actions {

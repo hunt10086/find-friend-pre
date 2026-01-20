@@ -19,10 +19,6 @@
               :alt="user.userName"
               @error="handleImageError"
             />
-            <div class="match-badge">
-              <van-icon name="like-o" />
-              匹配用户
-            </div>
           </div>
           <div class="search-info">
             <h3 class="search-name">{{ user.userName }}</h3>
@@ -74,14 +70,28 @@
 
     <div id="blank">
       <div class="pagination-container" v-if="total > pageSize">
-        <van-pagination
-          v-model="currentPage"
-          :total-items="total"
-          :items-per-page="pageSize"
-          :page-count="totalPages"
-          mode="simple"
-          @change="onPageChange"
-        />
+        <div class="pagination-wrapper">
+          <van-pagination
+            v-model="currentPage"
+            :total-items="total"
+            :items-per-page="pageSize"
+            :page-count="totalPages"
+            mode="simple"
+            @change="onPageChange"
+          />
+          <div class="page-jump-controls">
+            <span class="jump-label">跳至</span>
+            <van-field
+              v-model="jumpPageInput"
+              type="number"
+              placeholder="页数"
+              class="page-input"
+              @keyup.enter="goToPage"
+            />
+            <van-button size="small" @click="goToPage">跳转</van-button>
+            <span class="total-pages">共 {{ totalPages }} 页</span>
+          </div>
+        </div>
       </div>
       <van-divider />
     </div>
@@ -141,6 +151,7 @@ const total = ref(0)
 const totalPages = ref(0)
 const allUsers = ref([])
 const isServerPaged = ref(false)
+const jumpPageInput = ref('')
 
 const loadSearchData = async () => {
   if (isLoading.value) return // 防止重复请求
@@ -364,6 +375,33 @@ const onPageChange = async (page) => {
     flag.value = total.value > 0
   }
 }
+
+// 页面跳转功能
+const goToPage = async () => {
+  if (!jumpPageInput.value) return
+
+  let targetPage = parseInt(jumpPageInput.value)
+
+  // 验证输入的页码
+  if (isNaN(targetPage) || targetPage < 1) {
+    targetPage = 1
+  } else if (targetPage > totalPages.value) {
+    targetPage = totalPages.value
+  }
+
+  currentPage.value = targetPage
+  jumpPageInput.value = '' // 清空输入框
+
+  if (isServerPaged.value) {
+    await loadSearchData()
+  } else {
+    // 前端分页
+    const start = (currentPage.value - 1) * pageSize.value
+    const end = start + pageSize.value
+    userList.value = allUsers.value.slice(start, end)
+    flag.value = total.value > 0
+  }
+}
 </script>
 
 <style scoped>
@@ -371,6 +409,43 @@ const onPageChange = async (page) => {
   display: flex;
   justify-content: center;
   padding: 8px 16px;
+}
+
+.pagination-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+.page-jump-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.jump-label {
+  font-size: 14px;
+  color: #646566;
+}
+
+.page-input {
+  width: 80px;
+  margin: 0 4px;
+}
+
+.page-input .van-field__control {
+  text-align: center;
+  font-size: 14px;
+}
+
+.total-pages {
+  font-size: 14px;
+  color: #646566;
+  white-space: nowrap;
+  margin-left: 8px;
 }
 
 /* 搜索结果容器 */
@@ -439,6 +514,7 @@ const onPageChange = async (page) => {
   background: radial-gradient(circle, rgba(255, 107, 107, 0.05) 0%, transparent 70%);
   border-radius: 50%;
   z-index: 0;
+  pointer-events: none; /* Ensure background doesn't interfere with interactions */
 }
 
 /* 搜索用户头部 */
@@ -448,12 +524,13 @@ const onPageChange = async (page) => {
   gap: 16px;
   margin-bottom: 16px;
   position: relative;
-  z-index: 1;
+  z-index: 2; /* Higher than background */
 }
 
 .search-avatar {
   position: relative;
   flex-shrink: 0;
+  z-index: 2; /* Ensure avatar stays above other elements */
 }
 
 .search-avatar img {
@@ -465,25 +542,6 @@ const onPageChange = async (page) => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.match-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: linear-gradient(135deg, #ff6b6b 0%, #ffa502 100%);
-  color: white;
-  border-radius: 12px;
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.match-badge .van-icon {
-  font-size: 10px;
-}
 
 .search-info {
   flex: 1;
@@ -661,6 +719,20 @@ const onPageChange = async (page) => {
     height: 56px;
   }
 
+  .pagination-wrapper {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .page-jump-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .page-input {
+    width: 70px;
+  }
+
   .search-name {
     font-size: 16px;
   }
@@ -688,6 +760,26 @@ const onPageChange = async (page) => {
     flex-direction: column;
     align-items: center;
     gap: 4px;
+  }
+
+  .pagination-wrapper {
+    align-items: stretch;
+  }
+
+  .page-jump-controls {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .page-input {
+    width: 100%;
+    max-width: 120px;
+  }
+
+  .total-pages {
+    margin-left: 0;
+    text-align: center;
   }
 
   .search-tags {

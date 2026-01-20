@@ -2,10 +2,10 @@ import axios from 'axios'
 import router from '@/config/router.js'
 // 创建实例时配置默认值
 
-
-export const BASE_URL = import.meta.env.MODE === 'development'
-  ? "http://localhost:7777/api"
-  : "http://www.seestars.top:7777/api";
+export const BASE_URL =
+  import.meta.env.MODE === 'development'
+    ? 'http://localhost:7777/api'
+    : 'http://bc.seestars.top/api'
 
 const myAxios = axios.create({
   baseURL: BASE_URL,
@@ -40,6 +40,5 @@ myAxios.interceptors.response.use(
     return Promise.reject(error)
   },
 )
-
 
 export default myAxios

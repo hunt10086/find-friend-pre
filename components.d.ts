@@ -10,12 +10,10 @@ declare module 'vue' {
   export interface GlobalComponents {
     CodeHighlight: typeof import('./src/components/CodeHighlight.vue')['default']
     EnhancedMarkdown: typeof import('./src/components/EnhancedMarkdown.vue')['default']
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SwipeEnhancer: typeof import('./src/components/SwipeEnhancer.vue')['default']
     ThemeSelector: typeof import('./src/components/ThemeSelector.vue')['default']
-    TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
     UserProfileModal: typeof import('./src/components/UserProfileModal.vue')['default']
     VanBadge: typeof import('vant/es')['Badge']
     VanButton: typeof import('vant/es')['Button']
@@ -47,6 +45,5 @@ declare module 'vue' {
     VanTag: typeof import('vant/es')['Tag']
     VanTreeSelect: typeof import('vant/es')['TreeSelect']
     VanUploader: typeof import('vant/es')['Uploader']
-    WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
   }
 }

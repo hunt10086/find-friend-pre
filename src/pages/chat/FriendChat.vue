@@ -329,7 +329,21 @@ const handleWsMessage = (raw: string) => {
         local.sending = false
         local.failed = false
         local.messageContent = (sentData.messageContent || '').replace(/\s+$/, '')
-        local.sendTime = sentData.sendTime
+        // Use the original client time to maintain consistent UX
+        // Only update if server time is reasonably close to client time (within 5 seconds)
+        const serverTime = new Date(sentData.sendTime)
+        const clientTime = new Date(local.sendTime)
+        const timeDiff = Math.abs(serverTime.getTime() - clientTime.getTime())
+
+        // If the time difference is reasonable (< 5 seconds), keep the client time
+        // Otherwise, use server time (to handle major time sync issues)
+        if (timeDiff <= 5000) {
+          // Keep the client's initial timestamp for better UX
+          // The message appears immediately with the right time and just removes "sending" indicator
+        } else {
+          // Use server time if there's a significant difference
+          local.sendTime = sentData.sendTime
+        }
       }
       scrollToBottom()
       return
@@ -407,7 +421,7 @@ const httpSendMessage = async (content: string) => {
         success: true,
         data: {
           messageContent: content.replace(/\s+$/, ''),
-          sendTime: new Date().toISOString(),
+          sendTime: new Date().toISOString(), // Using client time as fallback
           senderId: currentUserId.value,
           receiverId: friendId.value,
         },
@@ -439,6 +453,7 @@ const sendMessage = async () => {
     senderId: currentUserId.value || 0,
     receiverId: friendId.value,
     messageContent: content.replace(/\s+$/, ''),
+    // Use a placeholder time that will be updated when server acknowledges
     sendTime: new Date().toISOString(),
     sending: true,
     failed: false,
@@ -457,7 +472,7 @@ const sendMessage = async () => {
           content: content.replace(/\s+$/, ''),
         }),
       )
-      // ack will update message
+      // Server will acknowledge with actual sendTime via websocket
       return
     } catch (e) {
       // fall through to http
@@ -467,6 +482,7 @@ const sendMessage = async () => {
   // Fallback HTTP
   const result = await httpSendMessage(content)
   if (result.success && result.data) {
+    // Use server's timestamp
     provisional.sending = false
     provisional.failed = false
     provisional.sendTime = result.data.sendTime
