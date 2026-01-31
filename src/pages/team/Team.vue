@@ -131,11 +131,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getTeamSearch, postTeamJoin } from '@/api/controller'
+import { getTeamSearch, postTeamJoin } from '@/api/dist/controller'
 import { showSuccessToast, showFailToast, showToast } from 'vant'
 import router from '@/config/router.ts'
 import dayjs from 'dayjs'
-import { getTeamList } from '@/api/controller'
+import { getTeamList } from '@/api/dist/controller'
 
 const currentPage = ref(1)
 const teamList = ref()

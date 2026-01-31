@@ -10,6 +10,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     CodeHighlight: typeof import('./src/components/CodeHighlight.vue')['default']
     EnhancedMarkdown: typeof import('./src/components/EnhancedMarkdown.vue')['default']
+    ModernChatInterface: typeof import('./src/components/ModernChatInterface.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SwipeEnhancer: typeof import('./src/components/SwipeEnhancer.vue')['default']

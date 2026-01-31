@@ -71,7 +71,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { getUserCurrent, postTeamCreate, postUpload } from '@/api/controller'
+import { getUserCurrent, postTeamCreate, postUpload } from '@/api/dist/controller'
 import { watch } from 'vue'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'

@@ -128,7 +128,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { getUserSearchOne } from '@/api/controller/user-controller/getUserSearchOne.js'
+import { getUserSearchOne } from '@/api/dist/controller/user-controller/getUserSearchOne.js'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useFriendStore } from '@/stores/friendStore'
 
@@ -259,7 +259,7 @@ const checkFriendRequestStatus = async () => {
   try {
     // 导入好友申请列表API
     const { getFriendRequestsList } = await import(
-      '@/api/controller/friend-requests-controller/getFriendRequestsList.js'
+      '@/api/dist/controller/friend-requests-controller/getFriendRequestsList.js'
     )
     const response = await getFriendRequestsList()
 

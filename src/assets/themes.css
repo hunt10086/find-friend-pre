@@ -1,0 +1,37 @@
+/* 在根元素上定义主题相关的CSS变量 */
+:root {
+  /* 默认主题 - 清新蓝 */
+  --primary-color: #1989fa;
+  --secondary-color: #969799;
+  --bg-color: #f5f5f5;
+  --card-bg: #ffffff;
+  --self-bubble-bg: #dcf8c6;
+  --other-bubble-bg: #ffffff;
+  --border-color: #ebedf0;
+  --text-color: #323233;
+  --text-secondary: #969799;
+}
+
+/* 清新蓝主题 */
+[data-theme="default"] {
+  --primary-color: #1989fa;
+  --self-bubble-bg: #dcf8c6;
+}
+
+/* 优雅紫主题 */
+[data-theme="purple"] {
+  --primary-color: #7232dd;
+  --self-bubble-bg: #e6d4fa;
+}
+
+/* 自然绿主题 */
+[data-theme="green"] {
+  --primary-color: #07c160;
+  --self-bubble-bg: #c6f8dc;
+}
+
+/* 温柔粉主题 */
+[data-theme="pink"] {
+  --primary-color: #ff6b9d;
+  --self-bubble-bg: #fad4e6;
+}

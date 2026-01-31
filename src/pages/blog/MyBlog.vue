@@ -82,7 +82,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getBlogMyList } from '@/api/controller'
+import { getBlogMyList } from '@/api/dist/controller'
 import { useRouter } from 'vue-router'
 
 // 为组件设置名称，确保 keep-alive 能正确缓存

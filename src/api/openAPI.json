@@ -173,9 +173,7 @@
                 "properties": {
                   "file": {
                     "type": "string",
-                    "format": "binary",
-                    "name": "file",
-                    "in": "query"
+                    "format": "binary"
                   }
                 },
                 "required": [
@@ -852,7 +850,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListUserVo"
+                  "$ref": "#/components/schemas/BaseResponseListUserVO"
                 }
               }
             }
@@ -1105,7 +1103,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListUserVo"
+                  "$ref": "#/components/schemas/BaseResponseListUserVO"
                 }
               }
             }
@@ -1137,7 +1135,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseUserVo"
+                  "$ref": "#/components/schemas/BaseResponseUserVO"
                 }
               }
             }
@@ -1243,7 +1241,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListCommentVo"
+                  "$ref": "#/components/schemas/BaseResponseListCommentVO"
                 }
               }
             }
@@ -1304,7 +1302,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListBlogVo"
+                  "$ref": "#/components/schemas/BaseResponseListBlogVO"
                 }
               }
             }
@@ -1325,7 +1323,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListBlogVo"
+                  "$ref": "#/components/schemas/BaseResponseListBlogVO"
                 }
               }
             }
@@ -1340,6 +1338,38 @@
         ],
         "summary": "点赞博客",
         "operationId": "getBlogLike",
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/blog/isLike": {
+      "get": {
+        "tags": [
+          "blog-controller"
+        ],
+        "summary": "判断博客是否点赞",
+        "operationId": "getBlogIsLike",
         "parameters": [
           {
             "name": "blogId",
@@ -1453,7 +1483,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListTeamChatMessageVo"
+                  "$ref": "#/components/schemas/BaseResponseListTeamChatMessageVO"
                 }
               }
             }
@@ -1778,10 +1808,12 @@
         "properties": {
           "teamId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "refType": null
           },
           "content": {
-            "type": "string"
+            "type": "string",
+            "refType": null
           }
         }
       },
@@ -1841,18 +1873,18 @@
             "type": "integer",
             "format": "int64"
           },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
           "pages": {
             "type": "integer",
             "format": "int64",
             "deprecated": true
-          },
-          "total": {
-            "type": "integer",
-            "format": "int64"
           }
         }
       },
-      "BaseResponseListUserVo": {
+      "BaseResponseListUserVO": {
         "type": "object",
         "properties": {
           "code": {
@@ -1862,7 +1894,7 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/UserVo"
+              "$ref": "#/components/schemas/UserVO"
             }
           },
           "message": {
@@ -1873,7 +1905,7 @@
           }
         }
       },
-      "UserVo": {
+      "UserVO": {
         "type": "object",
         "properties": {
           "id": {
@@ -1919,7 +1951,7 @@
           }
         }
       },
-      "BaseResponseUserVo": {
+      "BaseResponseUserVO": {
         "type": "object",
         "properties": {
           "code": {
@@ -1927,7 +1959,7 @@
             "format": "int32"
           },
           "data": {
-            "$ref": "#/components/schemas/UserVo"
+            "$ref": "#/components/schemas/UserVO"
           },
           "message": {
             "type": "string"
@@ -2026,7 +2058,7 @@
           }
         }
       },
-      "BaseResponseListCommentVo": {
+      "BaseResponseListCommentVO": {
         "type": "object",
         "properties": {
           "code": {
@@ -2036,7 +2068,7 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CommentVo"
+              "$ref": "#/components/schemas/CommentVO"
             }
           },
           "message": {
@@ -2047,7 +2079,7 @@
           }
         }
       },
-      "CommentVo": {
+      "CommentVO": {
         "type": "object",
         "properties": {
           "createTime": {
@@ -2107,7 +2139,7 @@
           }
         }
       },
-      "BaseResponseListBlogVo": {
+      "BaseResponseListBlogVO": {
         "type": "object",
         "properties": {
           "code": {
@@ -2117,7 +2149,7 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BlogVo"
+              "$ref": "#/components/schemas/BlogVO"
             }
           },
           "message": {
@@ -2128,7 +2160,7 @@
           }
         }
       },
-      "BlogVo": {
+      "BlogVO": {
         "type": "object",
         "properties": {
           "id": {
@@ -2221,7 +2253,7 @@
           }
         }
       },
-      "BaseResponseListTeamChatMessageVo": {
+      "BaseResponseListTeamChatMessageVO": {
         "type": "object",
         "properties": {
           "code": {
@@ -2231,7 +2263,7 @@
           "data": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TeamChatMessageVo"
+              "$ref": "#/components/schemas/TeamChatMessageVO"
             }
           },
           "message": {
@@ -2242,33 +2274,40 @@
           }
         }
       },
-      "TeamChatMessageVo": {
+      "TeamChatMessageVO": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "refType": null
           },
           "teamId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "refType": null
           },
           "userId": {
             "type": "integer",
-            "format": "int64"
+            "format": "int64",
+            "refType": null
           },
           "userName": {
-            "type": "string"
+            "type": "string",
+            "refType": null
           },
           "content": {
-            "type": "string"
+            "type": "string",
+            "refType": null
           },
           "createTime": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "refType": null
           },
           "avatarUrl": {
-            "type": "string"
+            "type": "string",
+            "refType": null
           }
         }
       }

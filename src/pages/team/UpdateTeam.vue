@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, onActivated } from 'vue'
-import { getTeamSearchById, getUserCurrent, postTeamUpdate } from '@/api/controller'
+import { getTeamSearchById, getUserCurrent, postTeamUpdate } from '@/api/dist/controller'
 import { useRoute, useRouter } from 'vue-router'
 import { showFailToast, showSuccessToast } from 'vant'
 

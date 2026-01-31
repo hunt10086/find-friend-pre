@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getFriendMessageUnreadCount } from '@/api/controller/friend-message-controller/getFriendMessageUnreadCount.js'
+import { getFriendMessageUnreadCount } from '@/api/dist/controller/friend-message-controller/getFriendMessageUnreadCount.js'
 
 const router = useRouter()
 const friendUnreadCount = ref(0)

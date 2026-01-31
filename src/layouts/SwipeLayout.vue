@@ -76,7 +76,7 @@
 import { ref, computed, watch, onMounted, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast, showFailToast, showSuccessToast } from 'vant'
-import { getUserCurrent } from '@/api/controller'
+import { getUserCurrent } from '@/api/dist/controller'
 
 const route = useRoute()
 const router = useRouter()
@@ -87,31 +87,31 @@ const pages = [
     path: '/',
     title: '主页',
     icon: 'home-o',
-    component: defineAsyncComponent(() => import('@/pages/Index.vue'))
+    component: defineAsyncComponent(() => import('@/pages/home/Index.vue'))
   },
   {
     path: '/blog',
     title: '分享',
     icon: 'description',
-    component: defineAsyncComponent(() => import('@/pages/BlogPage.vue'))
+    component: defineAsyncComponent(() => import('@/pages/blog/BlogPage.vue'))
   },
   {
     path: '/team',
     title: '队伍大厅',
     icon: 'search',
-    component: defineAsyncComponent(() => import('@/pages/Team.vue'))
+    component: defineAsyncComponent(() => import('@/pages/team/Team.vue'))
   },
   {
     path: '/talk',
     title: '交流',
     icon: 'envelop-o',
-    component: defineAsyncComponent(() => import('@/pages/Talk.vue'))
+    component: defineAsyncComponent(() => import('@/pages/chat/Talk.vue'))
   },
   {
     path: '/Person',
     title: '个人',
     icon: 'user-circle-o',
-    component: defineAsyncComponent(() => import('@/pages/I.vue'))
+    component: defineAsyncComponent(() => import('@/pages/user/I.vue'))
   }
 ]
 

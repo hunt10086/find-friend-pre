@@ -58,7 +58,7 @@ import { onMounted, ref, onActivated, watch, nextTick } from 'vue'
 
 import { useRoute } from 'vue-router'
 
-import { postUserUpdate, postUpload } from '@/api/controller'
+import { postUserUpdate, postUpload } from '@/api/dist/controller'
 
 import { showFailToast, showSuccessToast } from 'vant'
 

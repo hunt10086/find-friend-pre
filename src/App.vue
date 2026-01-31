@@ -21,8 +21,9 @@
 
 <script>
 import HeaderNav from '@/layouts/BasicLayout.vue';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useThemeStore } from '@/stores/themeStore';
 
 export default {
   components: {
@@ -30,14 +31,20 @@ export default {
   },
   setup() {
     const route = useRoute();
-    
+    const themeStore = useThemeStore();
+
     // 定义不需要容器样式的全屏页面
     const fullScreenPages = ['/user/login', '/user/register'];
-    
+
     const shouldUseContainer = computed(() => {
       return !fullScreenPages.includes(route.path);
     });
-    
+
+    // 初始化主题
+    onMounted(() => {
+      themeStore.initializeTheme();
+    });
+
     return {
       shouldUseContainer
     };

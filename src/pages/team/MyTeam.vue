@@ -131,7 +131,7 @@
 <script setup lang="ts">
 import { onMounted, ref, onActivated, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { getTeamMyTeam, postTeamDelete, postTeamQuit } from '@/api/controller'
+import { getTeamMyTeam, postTeamDelete, postTeamQuit } from '@/api/dist/controller'
 import { showSuccessToast } from 'vant'
 
 const flag = ref(false)

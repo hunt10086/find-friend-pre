@@ -115,8 +115,8 @@ import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import myAxios from '@/plugins/myAxios.js'
 import { buildWsUrl } from '@/plugins/websocket'
-import { getFriendMessageList } from '@/api/controller/friend-message-controller/getFriendMessageList.js'
-import { postFriendMessageMarkAsRead } from '@/api/controller/friend-message-controller/postFriendMessageMarkAsRead.js'
+import { getFriendMessageList } from '@/api/dist/controller/friend-message-controller/getFriendMessageList.js'
+import { postFriendMessageMarkAsRead } from '@/api/dist/controller/friend-message-controller/postFriendMessageMarkAsRead.js'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useFriendStore } from '@/stores/friendStore'
 
@@ -230,7 +230,7 @@ const loadFriendInfo = async () => {
   if (!friendId.value) return
   try {
     const { getUserSearchOne } = await import(
-      '@/api/controller/user-controller/getUserSearchOne.js'
+      '@/api/dist/controller/user-controller/getUserSearchOne.js'
     )
     const res = await getUserSearchOne({ id: friendId.value })
     if (res.data.code === 0 && res.data.data) {

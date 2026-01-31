@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getFriendsList } from '@/api/controller/friends-controller/getFriendsList.js'
-import { postFriendRequestsSend } from '@/api/controller/friend-requests-controller/postFriendRequestsSend.js'
+import { getFriendsList } from '@/api/dist/controller/friends-controller/getFriendsList.js'
+import { postFriendRequestsSend } from '@/api/dist/controller/friend-requests-controller/postFriendRequestsSend.js'
 
 /**
  * FriendStore

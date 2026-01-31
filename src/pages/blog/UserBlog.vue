@@ -167,7 +167,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, onActivated, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import { getBlogDelete, getBlogGetOne, getBlogLike, getUserCurrent } from '@/api/controller'
+import { getBlogDelete, getBlogGetOne, getBlogLike, getUserCurrent, getBlogIsLike } from '@/api/dist/controller'
 import myAxios from '@/plugins/myAxios'
 import router from '@/config/router.ts'
 import dayjs from 'dayjs'
@@ -181,6 +181,8 @@ const title = ref('')
 const passage = ref('')
 const kind = ref('')
 const praise = ref()
+const isLiked = ref(false)
+const isLiking = ref(false) // 添加防止重复点击的状态
 
 const comments = ref([])
 const userAvatar = ref('')
@@ -213,9 +215,18 @@ const getBlogData = async () => {
     praise.value = blog.value.praise
     userId.value = blog.value.userId
 
-    // 初始化点赞状态（如果API返回了点赞状态）
-    // 注意：这里需要根据你的API实际返回的字段来调整
-    isLiked.value = blog.value.isLiked || false
+    // 获取博客点赞状态
+    try {
+      const likeStatusRes = await getBlogIsLike({ blogId: blogId.value })
+      if (likeStatusRes.data.code === 0) {
+        isLiked.value = likeStatusRes.data.data // Boolean值，表示是否已点赞
+      } else {
+        isLiked.value = false // 默认为未点赞
+      }
+    } catch (error) {
+      console.error('获取博客点赞状态失败:', error)
+      isLiked.value = false
+    }
 
     // 获取当前用户信息（根据博客中的 userId）
     const userResponse = await myAxios.get(`/user/search/one`, {
@@ -247,7 +258,6 @@ const getBlogData = async () => {
 
 const newCommentContent = ref('')
 const isSubmittingComment = ref(false)
-const isLiked = ref(false)
 
 // 格式化时间
 const formatTime = (time: string) => {
@@ -278,34 +288,77 @@ const submitComment = async () => {
   }
 }
 
+// 在组件内部添加一个响应式变量来存储点击时间数组
+const blogClickTimes = ref<number[]>([]);
+
 const like = async () => {
+  // 防止重复点击
+  if (isLiking.value) {
+    showFailToast('正在处理中，请稍候...')
+    return
+  }
+
+  // 记录点击时间用于频率检测
+  const now = Date.now();
+
+  // 添加当前点击时间
+  blogClickTimes.value.push(now);
+
+  // 只保留最近5秒内的点击记录
+  blogClickTimes.value = blogClickTimes.value.filter(time => now - time < 5000);
+
+  // 检查是否频繁重复点击（5秒内超过3次）
+  if (blogClickTimes.value.length > 3) {
+    showFailToast('您点击得太快啦，请稍后再试~');
+    return;
+  }
+
+  isLiking.value = true
+
+  // 保存原始值用于回滚
+  const originalPraiseValue = praise.value || 0;
+  const originalLikedValue = isLiked.value;
+
   try {
     const params = {
       blogId: blogId.value,
     }
     const res = await getBlogLike(params)
 
-    // 只更新点赞数，不重新加载整个页面
     if (res.data.code === 0) {
-      // 切换点赞状态
-      isLiked.value = !isLiked.value
-
-      // 更新点赞数（根据API返回的数据或本地计算）
-      if (res.data.data !== undefined) {
-        praise.value = res.data.data
+      // 成功后，根据操作结果更新状态
+      // 如果API返回的是新点赞数，直接使用
+      if (typeof res.data.data === 'number') {
+        praise.value = Math.max(0, res.data.data);
       } else {
-        // 如果API没有返回新的点赞数，本地计算
-        praise.value = isLiked.value ? praise.value + 1 : praise.value - 1
+        // 如果API返回的是其他格式或无数据，使用状态翻转逻辑更新点赞数
+        // 如果原来是已点赞，现在变成未点赞，则减1；反之则加1
+        praise.value = originalLikedValue ? Math.max(0, originalPraiseValue - 1) : originalPraiseValue + 1;
+      }
+
+      // 重新获取当前博客的点赞状态来确保准确性
+      const likeStatusRes = await getBlogIsLike({ blogId: blogId.value });
+      if (likeStatusRes.data.code === 0) {
+        isLiked.value = likeStatusRes.data.data;
+      } else {
+        // 如果获取状态失败，根据原始状态进行翻转（这是备选方案）
+        isLiked.value = !originalLikedValue;
       }
 
       showSuccessToast(isLiked.value ? '点赞成功' : '取消点赞')
     } else {
+      // 操作失败，恢复原始值
+      praise.value = originalPraiseValue;
+      isLiked.value = originalLikedValue;
       showFailToast('操作失败，请重试')
     }
   } catch (error) {
-    /* console.error('点赞操作失败:', error) */
-
+    // 请求失败，恢复原始值
+    praise.value = originalPraiseValue;
+    isLiked.value = originalLikedValue;
     showFailToast('网络错误，请重试')
+  } finally {
+    isLiking.value = false
   }
 }
 

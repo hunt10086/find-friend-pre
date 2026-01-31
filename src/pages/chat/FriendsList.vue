@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getFriendsList } from '@/api/controller/friends-controller/getFriendsList.js'
+import { getFriendsList } from '@/api/dist/controller/friends-controller/getFriendsList.js'
 import { useRouter } from 'vue-router'
 import { showFailToast } from 'vant'
 import UserProfileModal from '@/components/UserProfileModal.vue'

@@ -66,7 +66,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
-import { getTeamGetTeam } from '@/api/controller/team-controller/getTeamGetTeam.js'
+import { getTeamGetTeam } from '@/api/dist/controller/team-controller/getTeamGetTeam.js'
 import { showFailToast } from 'vant'
 import dayjs from 'dayjs'
 

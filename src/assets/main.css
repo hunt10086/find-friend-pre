@@ -1,4 +1,5 @@
 @import './base.css';
+@import './themes.css';
 
 #app {
   font-weight: normal;
@@ -26,7 +27,7 @@ a,
 }
 
 @media (min-width: 1024px) {
-  body.desktop-layout {
+  body.Desktop-layout {
     display: flex;
     place-items: center;
   }

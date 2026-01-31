@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { postUserLogin } from '@/api/controller'
+import { postUserLogin } from '@/api/dist/controller'
 import { showSuccessToast, showFailToast, showToast } from 'vant'
 import { useRouter } from 'vue-router'
 

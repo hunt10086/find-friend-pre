@@ -83,7 +83,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getUserNearUser } from '@/api/controller/user-controller/getUserNearUser.js'
+import { getUserNearUser } from '@/api/dist/controller/user-controller/getUserNearUser.js'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'
 import UserProfileModal from '@/components/UserProfileModal.vue'

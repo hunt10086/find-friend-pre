@@ -122,7 +122,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, onActivated } from 'vue'
-import { getTeamSearchById, getTeamUserList, getUserCurrent } from '@/api/controller'
+import { getTeamSearchById, getTeamUserList, getUserCurrent } from '@/api/dist/controller'
 import { useRoute } from 'vue-router'
 import router from '@/config/router.ts'
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant'

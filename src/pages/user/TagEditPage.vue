@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getTeamMyTeam, getUserCurrent, postUserUpdate } from '@/api/controller'
+import { getTeamMyTeam, getUserCurrent, postUserUpdate } from '@/api/dist/controller'
 import { showSuccessToast } from 'vant'
 
 const router = useRouter()

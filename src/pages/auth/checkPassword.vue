@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onActivated } from 'vue'
-import { postTeamJoin } from '@/api/controller'
+import { postTeamJoin } from '@/api/dist/controller'
 import { useRoute } from 'vue-router'
 import { showFailToast, showSuccessToast } from 'vant'
 import router from '@/config/router.ts'

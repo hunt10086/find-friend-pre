@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-import { getUserCurrent } from '@/api/controller'
+import { getUserCurrent } from '@/api/dist/controller'
 import { onMounted, ref, onActivated, watch } from 'vue'
 import { showSuccessToast } from 'vant'
 import dayjs from 'dayjs'

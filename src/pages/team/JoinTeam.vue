@@ -99,7 +99,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getTeamJoinTeam, postTeamQuit } from '@/api/controller'
+import { getTeamJoinTeam, postTeamQuit } from '@/api/dist/controller'
 import { useRouter } from 'vue-router'
 import { showSuccessToast } from 'vant'
 import dayjs from 'dayjs'

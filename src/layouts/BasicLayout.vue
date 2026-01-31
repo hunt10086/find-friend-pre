@@ -76,7 +76,7 @@ const onClickRight = () => {
 }
 
 import { showFailToast, showSuccessToast, showToast } from 'vant'
-import { getUserCurrent } from '@/api/controller'
+import { getUserCurrent } from '@/api/dist/controller'
 
 const onChange = (index) => showToast(`${index}`)
 

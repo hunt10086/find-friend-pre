@@ -147,7 +147,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { getUserSendCode, postUserLogin, postUserRegister } from '@/api/controller'
+import { getUserSendCode, postUserLogin, postUserRegister } from '@/api/dist/controller'
 import { showFailToast, showSuccessToast, showToast, Toast } from 'vant'
 import { useRouter } from 'vue-router'
 

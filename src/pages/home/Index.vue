@@ -106,7 +106,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getUserListLike } from '@/api/controller'
+import { getUserListLike } from '@/api/dist/controller'
 import router from '@/config/router.ts'
 import UserProfileModal from '@/components/UserProfileModal.vue'
 

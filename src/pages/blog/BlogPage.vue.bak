@@ -10,12 +10,12 @@
       <div class="blog-header">
         <div class="blog-author">
           <img
-            :src="(blog as any).avatarUrl || '/ava.jpg'"
-            :alt="(blog as any).author || '作者'"
+            :src="blog.avatarUrl || '/ava.jpg'"
+            :alt="blog.author || '作者'"
             class="author-avatar"
           />
           <div class="author-info">
-            <span class="author-name">{{ (blog as any).author || '匿名用户' }}</span>
+            <span class="author-name">{{ blog.author || '匿名用户' }}</span>
             <span class="post-time">{{
               blog.createTime ? formatTime(blog.createTime) : '刚刚'
             }}</span>
@@ -52,10 +52,10 @@
           <van-button
             size="mini"
             plain
-            :icon="(blog as any)._liked ? 'good-job' : 'like-o'"
-            :type="(blog as any)._liked ? 'primary' : 'default'"
+            :icon="blog._liked ? 'good-job' : 'like-o'"
+            :type="blog._liked ? 'primary' : 'default'"
             @click.stop="likeBlog(blog)">
-            {{ (blog as any)._liked ? '已点赞' : '点赞' }}
+            {{ blog._liked ? '已点赞' : '点赞' }}
           </van-button>
           <van-button size="mini" plain icon="star-o" @click.stop="collectBlog(blog)">
             收藏
@@ -104,7 +104,7 @@ const router = useRouter()
 
 const loadBlogData = async () => {
   const response = await getBlogList()
-  const blogs: any[] = response.data.data || []
+  const blogs = response.data.data || []
 
   // 为每个博客添加作者信息和点赞状态
   const blogsWithInfo = await Promise.all(
@@ -177,7 +177,7 @@ const getExcerpt = (content: string, maxLength: number = 100) => {
   return content.length > maxLength ? content.substring(0, maxLength) + '...' : content
 }
 
-// 点赞 / 取消点赞（防抖 + 防止重复点击 + 点击频率限制 + 准确的状态更新）
+// 点赞 / 取消点赞（乐观更新 + 回滚 + 防止重复点击）
 const likeBlog = async (blog: any) => {
   if (!blog || !blog.id) return
 
@@ -187,63 +187,39 @@ const likeBlog = async (blog: any) => {
     return
   }
 
-  // 记录点击时间用于频率检测
-  const now = Date.now();
-  if (!blog.clickTimes) {
-    blog.clickTimes = [];
-  }
-
-  // 添加当前点击时间
-  blog.clickTimes.push(now);
-
-  // 只保留最近5秒内的点击记录
-  blog.clickTimes = blog.clickTimes.filter(time => now - time < 5000);
-
-  // 检查是否频繁重复点击（5秒内超过3次）
-  if (blog.clickTimes.length > 3) {
-    showFailToast('您点击得太快啦，请稍后再试~');
-    return;
-  }
-
   blog.isLiking = true
   const originalPraise = blog.praise || 0
-  const originalLiked = blog._liked
+  const likedInitially = blog._liked === true
+  const delta = likedInitially ? -1 : 1
+
+  // 乐观更新
+  blog.praise = originalPraise + delta
+  blog._liked = !likedInitially
 
   try {
-    // 执行点赞/取消点赞操作
     const res = await getBlogLike({ blogId: blog.id })
-
     if (res.data.code === 0) {
-      // 成功后，根据操作结果更新状态
-      // 如果API返回的是新点赞数，直接使用
+      // 优先使用后端返回的点赞数
       if (typeof res.data.data === 'number') {
-        blog.praise = Math.max(0, res.data.data);
+        blog.praise = res.data.data
+      } else if (typeof res.data.data === 'boolean') {
+        // 如果后端返回的是布尔值，则以此为准
+        blog._liked = res.data.data
       } else {
-        // 如果API返回的是其他格式或无数据，使用状态翻转逻辑更新点赞数
-        // 如果原来是已点赞，现在变成未点赞，则减1；反之则加1
-        blog.praise = originalLiked ? Math.max(0, originalPraise - 1) : originalPraise + 1;
+        // 如果后端没有返回明确的数据，则保持乐观更新的结果
+        blog._liked = !likedInitially
       }
-
-      // 重新获取当前博客的点赞状态来确保准确性
-      const likeStatusRes = await getBlogIsLike({ blogId: blog.id });
-      if (likeStatusRes.data.code === 0) {
-        blog._liked = likeStatusRes.data.data;
-      } else {
-        // 如果获取状态失败，根据原始状态进行翻转（这是备选方案）
-        blog._liked = !originalLiked;
-      }
-
       showSuccessToast(blog._liked ? '点赞成功' : '取消点赞')
     } else {
-      // 操作失败，恢复原始状态
+      // 回滚
       blog.praise = originalPraise
-      blog._liked = originalLiked
+      blog._liked = likedInitially
       showFailToast(res.data.message || '操作失败')
     }
   } catch (e) {
-    // 请求失败，恢复原始状态
+    // 回滚
     blog.praise = originalPraise
-    blog._liked = originalLiked
+    blog._liked = likedInitially
     showFailToast('网络错误，稍后再试')
   } finally {
     // 重置状态
