@@ -1,8 +1,6 @@
 <template>
   <!-- Loading状态 -->
-  <van-loading v-if="loading" type="spinner" color="#1989fa" size="24px">
-    加载中...
-  </van-loading>
+  <van-loading v-if="loading" type="spinner" color="#1989fa" size="24px"> 加载中... </van-loading>
 
   <!-- 正常内容 -->
   <div v-else class="team-members-container">
@@ -78,34 +76,16 @@
         </div>
 
         <div class="member-actions" v-if="captain === userId && user.id !== userId">
-          <van-button
-            type="warning"
-            size="small"
-            round
-            icon="cross"
-            @click="removeMember(user)"
-          >
+          <van-button type="warning" size="small" round icon="cross" @click="removeMember(user)">
             移除成员
           </van-button>
-          <van-button
-            type="success"
-            size="small"
-            round
-            icon="guide-o"
-            @click="viewProfile(user)"
-          >
+          <van-button type="success" size="small" round icon="guide-o" @click="viewProfile(user)">
             查看资料
           </van-button>
         </div>
 
         <div class="member-actions" v-else-if="user.id !== userId">
-          <van-button
-            type="primary"
-            size="small"
-            round
-            icon="chat-o"
-            @click="sendMessage(user)"
-          >
+          <van-button type="primary" size="small" round icon="chat-o" @click="sendMessage(user)">
             发送消息
           </van-button>
         </div>
@@ -122,14 +102,14 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, onActivated } from 'vue'
-import { getTeamSearchById, getTeamUserList, getUserCurrent } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { useRoute } from 'vue-router'
 import router from '@/config/router.ts'
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant'
 
 // 为组件设置名称，确保 keep-alive 能正确缓存
 defineOptions({
-  name: 'TeamMembers'
+  name: 'TeamMembers',
 })
 
 const userList = ref([])
@@ -146,16 +126,11 @@ const getTeamData = async () => {
     userList.value = []
     captain.value = null
 
-    const id = await getUserCurrent()
+    const id = await api.user.getCurrentUser()
     userId.value = id.data.data.id
-    const response = await getTeamSearchById({ teamId: teamId.value })
+    const response = await api.team.searchTeamById({ teamId: teamId.value })
     captain.value = response.data.data
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-    const res = await getTeamUserList({ teamId: teamId.value }, config)
+    const res = await api.teamUser.list({ teamId: teamId.value })
     res.data.data.forEach((user) => {
       try {
         user.tags = JSON.parse(user.tags)
@@ -174,12 +149,16 @@ onMounted(async () => {
 })
 
 // 监听路由参数变化，当团队ID改变时重新获取数据
-watch(() => route.params.teamId, async (newTeamId) => {
-  if (newTeamId && Number(newTeamId) !== teamId.value) {
-    teamId.value = Number(newTeamId)
-    await getTeamData()
-  }
-}, { immediate: false })
+watch(
+  () => route.params.teamId,
+  async (newTeamId) => {
+    if (newTeamId && Number(newTeamId) !== teamId.value) {
+      teamId.value = Number(newTeamId)
+      await getTeamData()
+    }
+  },
+  { immediate: false },
+)
 
 // 当页面从缓存中激活时，检查路由参数是否变化
 onActivated(async () => {
@@ -248,7 +227,6 @@ const toggleTagsExpand = (user: any) => {
   }
   user.tagsExpanded = !user.tagsExpanded
 }
-
 </script>
 
 <style scoped>

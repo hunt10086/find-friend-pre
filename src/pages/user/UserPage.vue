@@ -90,19 +90,23 @@
       value=""
       @click="toEditTags('tags', '标签', user.tags)"
     >
-    <template #value>
-      <van-tag  color="#D94F4F" type="primary" v-for="tag in user.tags">
-        {{ tag }}
-      </van-tag>
-    </template>
+      <template #value>
+        <van-tag color="#D94F4F" type="primary" v-for="tag in user.tags">
+          {{ tag }}
+        </van-tag>
+      </template>
     </van-cell>
-    <van-cell id="createTime" title="创建时间" :value="dayjs(user.createTime).format('YYYY-MM-DD HH:mm:ss')" />
+    <van-cell
+      id="createTime"
+      title="创建时间"
+      :value="dayjs(user.createTime).format('YYYY-MM-DD HH:mm:ss')"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-import { getUserCurrent } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { onMounted, ref, onActivated, watch } from 'vue'
 import { showSuccessToast } from 'vant'
 import dayjs from 'dayjs'
@@ -112,7 +116,7 @@ const route = useRoute()
 const user = ref()
 
 const loadUserData = async () => {
-  const res = await getUserCurrent()
+  const res = await api.user.getCurrentUser()
   user.value = res.data.data
   user.value.tags = JSON.parse(user.value.tags)
   if (user) {
@@ -132,15 +136,18 @@ onActivated(async () => {
 })
 
 // 监听路由变化，当从编辑页面返回时重新获取数据
-watch(() => route.fullPath, async (newPath, oldPath) => {
-  // 如果是从编辑页面返回到用户页面，重新加载数据
-  if (newPath === '/user' && oldPath?.includes('/user/edit')) {
-    await loadUserData()
-  }
-  if (newPath === '/user' && oldPath?.includes('/edit/tags')) {
-    await loadUserData()
-  }
-})
+watch(
+  () => route.fullPath,
+  async (newPath, oldPath) => {
+    // 如果是从编辑页面返回到用户页面，重新加载数据
+    if (newPath === '/user' && oldPath?.includes('/user/edit')) {
+      await loadUserData()
+    }
+    if (newPath === '/user' && oldPath?.includes('/edit/tags')) {
+      await loadUserData()
+    }
+  },
+)
 
 const toEdit = (editKey: string, editName: string, currentValue: string) => {
   router.push({ path: '/user/edit', query: { editKey, editName, currentValue } })

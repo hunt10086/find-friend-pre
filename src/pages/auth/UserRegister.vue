@@ -125,13 +125,7 @@
         <!-- 登录链接 -->
         <div class="login-section">
           <van-divider>已经是学习社区成员？</van-divider>
-          <van-button
-            round
-            block
-            type="default"
-            @click="goToLogin"
-            class="login-link-btn"
-          >
+          <van-button round block type="default" @click="goToLogin" class="login-link-btn">
             返回登录
           </van-button>
         </div>
@@ -147,7 +141,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { getUserSendCode, postUserLogin, postUserRegister } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { showFailToast, showSuccessToast, showToast, Toast } from 'vant'
 import { useRouter } from 'vue-router'
 
@@ -287,7 +281,7 @@ const SendCode = async () => {
     }
 
     // 发送请求
-    const res = await getUserSendCode({ email: email.value })
+    const res = await api.user.sendCode({ email: email.value })
 
     if (res.data.code === 0) {
       showSuccessToast('验证码已发送')
@@ -298,7 +292,6 @@ const SendCode = async () => {
       showFailToast(errorMessage)
     }
   } catch (error) {
-    console.error('发送验证码失败:', error)
     showFailToast('网络错误，请检查网络连接后重试')
   } finally {
     // 确保加载状态被清除
@@ -340,7 +333,7 @@ const onSubmit = async () => {
       },
     }
 
-    const res = await postUserRegister(input, config)
+    const res = await api.user.userRegister(input)
 
     if (res.data.code === 0) {
       showSuccessToast('注册成功！即将跳转到登录页面')
@@ -352,7 +345,6 @@ const onSubmit = async () => {
       showFailToast(errorMessage)
     }
   } catch (error) {
-    console.error('注册失败:', error)
     showFailToast('网络错误，请检查网络连接后重试')
   } finally {
     isRegistering.value = false
@@ -387,9 +379,16 @@ const goToLogin = () => {
 }
 
 @keyframes drift {
-  0%, 100% { transform: translateX(0px) translateY(0px) rotate(0deg); }
-  33% { transform: translateX(-30px) translateY(-30px) rotate(120deg); }
-  66% { transform: translateX(30px) translateY(-30px) rotate(240deg); }
+  0%,
+  100% {
+    transform: translateX(0px) translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateX(-30px) translateY(-30px) rotate(120deg);
+  }
+  66% {
+    transform: translateX(30px) translateY(-30px) rotate(240deg);
+  }
 }
 
 .header-section {

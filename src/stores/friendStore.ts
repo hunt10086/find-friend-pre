@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getFriendsList } from '@/api/dist/controller/friends-controller/getFriendsList.js'
-import { postFriendRequestsSend } from '@/api/dist/controller/friend-requests-controller/postFriendRequestsSend.js'
+import { api } from '@/api/apiClient'
 
 /**
  * FriendStore
@@ -46,7 +45,7 @@ export const useFriendStore = defineStore('friendStore', () => {
     loading.value = true
     error.value = null
     try {
-      const resp = await getFriendsList()
+      const resp = await api.friends.getFriendList()
       if (resp?.data?.code === 0 && Array.isArray(resp.data.data)) {
         friendIdsSet.value = new Set(
           resp.data.data.map((u: any) => u?.id).filter((id: any) => typeof id === 'number'),
@@ -101,7 +100,7 @@ export const useFriendStore = defineStore('friendStore', () => {
     }
 
     try {
-      const resp = await postFriendRequestsSend({
+      const resp = await api.friendRequests.sendFriendRequest({
         friendUserId: userId,
         message: message || '你好，想和你成为好友',
       })

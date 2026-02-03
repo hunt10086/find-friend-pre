@@ -58,7 +58,7 @@ import { onMounted, ref, onActivated, watch, nextTick } from 'vue'
 
 import { useRoute } from 'vue-router'
 
-import { postUserUpdate, postUpload } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 
 import { showFailToast, showSuccessToast } from 'vant'
 
@@ -133,7 +133,6 @@ const genderToNumber = (val: string): number | null => {
 
 // 初始化编辑数据的函数
 const initEditData = () => {
-  console.log('初始化编辑数据:', route.query)
   editUser.value = {
     editKey: normalizeQueryString(route.query.editKey),
     currentValue: normalizeQueryString(route.query.currentValue),
@@ -162,7 +161,6 @@ onActivated(async () => {
 watch(
   () => route.query,
   async (newQuery, oldQuery) => {
-    console.log('路由查询参数变化:', { newQuery, oldQuery })
     if (JSON.stringify(newQuery) !== JSON.stringify(oldQuery)) {
       await nextTick()
       initEditData()
@@ -179,10 +177,7 @@ const handleUpload = async (item: any) => {
       showFailToast('未选择文件')
       return
     }
-    const res = await postUpload(
-      { file: file as File },
-      { headers: { 'Content-Type': 'multipart/form-data' } },
-    )
+    const res = await api.upload.uploadPicture({ file: file as File })
     if (res?.data?.code === 0 && res?.data?.data) {
       editUser.value.currentValue = res.data.data
       fileList.value = [{ url: res.data.data } as any]
@@ -216,7 +211,7 @@ const onSubmit = async (values: any) => {
       'Content-Type': 'application/json',
     },
   }
-  const res = await postUserUpdate(input, config)
+  const res = await api.user.userUpdate(input)
   if (res.data.code === 0) {
     showSuccessToast('修改成功')
     // 直接返回用户页面，由UserPage.vue的路由监听器处理数据刷新

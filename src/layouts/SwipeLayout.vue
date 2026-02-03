@@ -1,10 +1,10 @@
 <template>
   <div class="swipe-layout">
     <!-- 头部导航栏 -->
-    <van-nav-bar 
+    <van-nav-bar
       :title="pageTitle"
-      left-arrow 
-      @click-left="onClickLeft" 
+      left-arrow
+      @click-left="onClickLeft"
       @click-right="onClickRight"
       v-if="showNavBar"
     >
@@ -12,17 +12,17 @@
         <van-icon name="search" size="18" />
       </template>
     </van-nav-bar>
-    
+
     <!-- 公告栏 -->
-    <van-notice-bar 
-      left-icon="volume-o" 
-      scrollable 
-      text="交友需谨慎，以防上当受骗,希望你能找到合适的伙伴" 
+    <van-notice-bar
+      left-icon="volume-o"
+      scrollable
+      text="交友需谨慎，以防上当受骗,希望你能找到合适的伙伴"
       v-if="showNavBar"
     />
-    
+
     <!-- 滑动容器 -->
-    <van-swipe 
+    <van-swipe
       ref="swipeRef"
       :initial-swipe="currentIndex"
       :show-indicators="false"
@@ -34,36 +34,27 @@
       @drag-end="onDragEnd"
       class="swipe-container"
     >
-      <van-swipe-item 
-        v-for="(page, index) in pages" 
-        :key="page.path"
-        class="swipe-item"
-      >
+      <van-swipe-item v-for="(page, index) in pages" :key="page.path" class="swipe-item">
         <div class="page-content" :class="{ 'page-transitioning': isTransitioning }">
-          <component 
-            :is="page.component" 
+          <component
+            :is="page.component"
             v-if="shouldRenderPage(index)"
-            :class="{ 
+            :class="{
               'active-page': index === currentIndex,
               'prev-page': index === currentIndex - 1,
-              'next-page': index === currentIndex + 1
+              'next-page': index === currentIndex + 1,
             }"
           />
         </div>
       </van-swipe-item>
     </van-swipe>
-    
+
     <!-- 底部标签栏 -->
-    <van-tabbar 
-      v-model="activeTab" 
-      @change="onTabChange"
-      class="footer-tabbar"
-      v-if="showNavBar"
-    >
-      <van-tabbar-item 
-        v-for="(page, index) in pages" 
+    <van-tabbar v-model="activeTab" @change="onTabChange" class="footer-tabbar" v-if="showNavBar">
+      <van-tabbar-item
+        v-for="(page, index) in pages"
         :key="page.path"
-        :icon="page.icon" 
+        :icon="page.icon"
         :name="index"
       >
         {{ page.title }}
@@ -76,7 +67,7 @@
 import { ref, computed, watch, onMounted, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast, showFailToast, showSuccessToast } from 'vant'
-import { getUserCurrent } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 
 const route = useRoute()
 const router = useRouter()
@@ -87,32 +78,32 @@ const pages = [
     path: '/',
     title: '主页',
     icon: 'home-o',
-    component: defineAsyncComponent(() => import('@/pages/home/Index.vue'))
+    component: defineAsyncComponent(() => import('@/pages/home/Index.vue')),
   },
   {
     path: '/blog',
     title: '分享',
     icon: 'description',
-    component: defineAsyncComponent(() => import('@/pages/blog/BlogPage.vue'))
+    component: defineAsyncComponent(() => import('@/pages/blog/BlogPage.vue')),
   },
   {
     path: '/team',
     title: '队伍大厅',
     icon: 'search',
-    component: defineAsyncComponent(() => import('@/pages/team/Team.vue'))
+    component: defineAsyncComponent(() => import('@/pages/team/Team.vue')),
   },
   {
     path: '/talk',
     title: '交流',
     icon: 'envelop-o',
-    component: defineAsyncComponent(() => import('@/pages/chat/Talk.vue'))
+    component: defineAsyncComponent(() => import('@/pages/chat/Talk.vue')),
   },
   {
     path: '/Person',
     title: '个人',
     icon: 'user-circle-o',
-    component: defineAsyncComponent(() => import('@/pages/user/I.vue'))
-  }
+    component: defineAsyncComponent(() => import('@/pages/user/I.vue')),
+  },
 ]
 
 const swipeRef = ref()
@@ -138,7 +129,7 @@ const shouldRenderPage = (index: number) => {
 // 根据当前路由设置初始页面
 const setInitialPage = () => {
   const currentPath = route.path
-  const pageIndex = pages.findIndex(page => page.path === currentPath)
+  const pageIndex = pages.findIndex((page) => page.path === currentPath)
   if (pageIndex !== -1) {
     currentIndex.value = pageIndex
     activeTab.value = pageIndex
@@ -161,7 +152,7 @@ const onDragEnd = () => {
 const onSwipeChange = (index: number) => {
   currentIndex.value = index
   activeTab.value = index
-  
+
   // 更新路由但不触发页面重新加载
   const targetPage = pages[index]
   if (targetPage && route.path !== targetPage.path) {
@@ -173,12 +164,12 @@ const onSwipeChange = (index: number) => {
 const onTabChange = (index: number) => {
   currentIndex.value = index
   activeTab.value = index
-  
+
   // 滑动到对应页面
   if (swipeRef.value) {
     swipeRef.value.swipeTo(index)
   }
-  
+
   // 更新路由
   const targetPage = pages[index]
   if (targetPage && route.path !== targetPage.path) {
@@ -199,7 +190,7 @@ const onClickRight = () => {
 watch(
   () => route.path,
   (newPath) => {
-    const pageIndex = pages.findIndex(page => page.path === newPath)
+    const pageIndex = pages.findIndex((page) => page.path === newPath)
     if (pageIndex !== -1 && pageIndex !== currentIndex.value) {
       currentIndex.value = pageIndex
       activeTab.value = pageIndex
@@ -207,21 +198,21 @@ watch(
         swipeRef.value.swipeTo(pageIndex)
       }
     }
-  }
+  },
 )
 
 // 用户登录检查
 const checkUserLogin = async () => {
   try {
-    const res = await getUserCurrent()
+    const res = await api.user.getCurrentUser()
     if (res.data.code === 40100) {
       await router.push('/user/login')
-      showFailToast("请先登录")
+      showFailToast('请先登录')
     } else {
-      showSuccessToast("登录成功")
+      showSuccessToast('登录成功')
     }
   } catch (error) {
-    console.error('登录检查失败:', error)
+    // 登录检查失败，静默处理
   }
 }
 

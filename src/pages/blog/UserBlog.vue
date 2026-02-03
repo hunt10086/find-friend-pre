@@ -167,7 +167,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, onActivated, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
-import { getBlogDelete, getBlogGetOne, getBlogLike, getUserCurrent, getBlogIsLike } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import myAxios from '@/plugins/myAxios'
 import router from '@/config/router.ts'
 import dayjs from 'dayjs'
@@ -207,7 +207,7 @@ const getBlogData = async () => {
     userProfile.value = ''
     comments.value = []
 
-    const response = await getBlogGetOne({ blogId: blogId.value })
+    const response = await api.blog.getBlog({ blogId: blogId.value })
     blog.value = response.data.data
     title.value = blog.value.title
     passage.value = blog.value.passage
@@ -217,14 +217,13 @@ const getBlogData = async () => {
 
     // 获取博客点赞状态
     try {
-      const likeStatusRes = await getBlogIsLike({ blogId: blogId.value })
+      const likeStatusRes = await api.blog.getBlogIsLike({ blogId: blogId.value })
       if (likeStatusRes.data.code === 0) {
         isLiked.value = likeStatusRes.data.data // Boolean值，表示是否已点赞
       } else {
         isLiked.value = false // 默认为未点赞
       }
     } catch (error) {
-      console.error('获取博客点赞状态失败:', error)
       isLiked.value = false
     }
 
@@ -280,8 +279,6 @@ const submitComment = async () => {
     await getBlogData()
     showSuccessToast('评论发表成功')
   } catch (error) {
-    /* console.error('提交评论失败:', error) */
-
     showSuccessToast('评论发表失败，请重试')
   } finally {
     isSubmittingComment.value = false
@@ -289,7 +286,7 @@ const submitComment = async () => {
 }
 
 // 在组件内部添加一个响应式变量来存储点击时间数组
-const blogClickTimes = ref<number[]>([]);
+const blogClickTimes = ref<number[]>([])
 
 const like = async () => {
   // 防止重复点击
@@ -299,63 +296,65 @@ const like = async () => {
   }
 
   // 记录点击时间用于频率检测
-  const now = Date.now();
+  const now = Date.now()
 
   // 添加当前点击时间
-  blogClickTimes.value.push(now);
+  blogClickTimes.value.push(now)
 
   // 只保留最近5秒内的点击记录
-  blogClickTimes.value = blogClickTimes.value.filter(time => now - time < 5000);
+  blogClickTimes.value = blogClickTimes.value.filter((time) => now - time < 5000)
 
   // 检查是否频繁重复点击（5秒内超过3次）
   if (blogClickTimes.value.length > 3) {
-    showFailToast('您点击得太快啦，请稍后再试~');
-    return;
+    showFailToast('您点击得太快啦，请稍后再试~')
+    return
   }
 
   isLiking.value = true
 
   // 保存原始值用于回滚
-  const originalPraiseValue = praise.value || 0;
-  const originalLikedValue = isLiked.value;
+  const originalPraiseValue = praise.value || 0
+  const originalLikedValue = isLiked.value
 
   try {
     const params = {
       blogId: blogId.value,
     }
-    const res = await getBlogLike(params)
+    const res = await api.blog.getBlogLike(params)
 
     if (res.data.code === 0) {
       // 成功后，根据操作结果更新状态
       // 如果API返回的是新点赞数，直接使用
       if (typeof res.data.data === 'number') {
-        praise.value = Math.max(0, res.data.data);
+        praise.value = Math.max(0, res.data.data)
       } else {
         // 如果API返回的是其他格式或无数据，使用状态翻转逻辑更新点赞数
         // 如果原来是已点赞，现在变成未点赞，则减1；反之则加1
-        praise.value = originalLikedValue ? Math.max(0, originalPraiseValue - 1) : originalPraiseValue + 1;
+        praise.value = originalLikedValue
+          ? Math.max(0, originalPraiseValue - 1)
+          : originalPraiseValue + 1
       }
 
       // 重新获取当前博客的点赞状态来确保准确性
-      const likeStatusRes = await getBlogIsLike({ blogId: blogId.value });
+      const likeStatusRes = await api.blog.getBlogIsLike({ blogId: blogId.value })
       if (likeStatusRes.data.code === 0) {
-        isLiked.value = likeStatusRes.data.data;
+        isLiked.value = likeStatusRes.data.data
       } else {
         // 如果获取状态失败，根据原始状态进行翻转（这是备选方案）
-        isLiked.value = !originalLikedValue;
+        isLiked.value = !originalLikedValue
       }
 
       showSuccessToast(isLiked.value ? '点赞成功' : '取消点赞')
     } else {
       // 操作失败，恢复原始值
-      praise.value = originalPraiseValue;
-      isLiked.value = originalLikedValue;
+      praise.value = originalPraiseValue
+      isLiked.value = originalLikedValue
       showFailToast('操作失败，请重试')
     }
   } catch (error) {
     // 请求失败，恢复原始值
-    praise.value = originalPraiseValue;
-    isLiked.value = originalLikedValue;
+    praise.value = originalPraiseValue
+    isLiked.value = originalLikedValue
     showFailToast('网络错误，请重试')
   } finally {
     isLiking.value = false
@@ -369,7 +368,7 @@ const getId = async () => {
 getId()
 
 const DeleteBlog = async () => {
-  const res = await getBlogDelete({ id: blogId.value })
+  const res = await api.blog.deleteBlog({ id: blogId.value })
   if (res.data.code === 0) {
     showSuccessToast('删除成功')
     router.push('/Blog')
@@ -408,8 +407,6 @@ const copyCode = async (code: string) => {
 
 // 初始化代码块复制按钮
 const initCodeCopyButtons = () => {
-  console.log('🔍 开始初始化复制按钮...')
-
   nextTick(() => {
     // 尝试多个选择器
     let codeBlocks = document.querySelectorAll('.content-body pre')
@@ -420,12 +417,7 @@ const initCodeCopyButtons = () => {
       codeBlocks = document.querySelectorAll('.article-content pre')
     }
 
-    /* console.log('📊 找到的代码块数量:', codeBlocks.length) */
-
-    /* console.log('📋 代码块元素:', codeBlocks) */
-
     codeBlocks.forEach((block, index) => {
-      console.log(`🔧 处理第 ${index + 1} 个代码块:`, block)
       // 检查是否已经添加了复制按钮
       if (block.querySelector('.copy-code-btn')) return
 
@@ -474,7 +466,6 @@ const setupCodeCopyObserver = () => {
 
   const targetNode = document.querySelector('.content-body')
   if (!targetNode) {
-    console.log('❌ 未找到 .content-body 元素')
     return
   }
 
@@ -495,7 +486,6 @@ const setupCodeCopyObserver = () => {
     })
 
     if (shouldInit) {
-      console.log('🔄 检测到新的代码块，重新初始化复制按钮')
       setTimeout(() => {
         initCodeCopyButtons()
       }, 100)
@@ -506,8 +496,6 @@ const setupCodeCopyObserver = () => {
     childList: true,
     subtree: true,
   })
-
-  /* console.log('👀 已设置 DOM 变化监听器') */
 }
 
 // 监听 passage 变化，重新初始化复制按钮

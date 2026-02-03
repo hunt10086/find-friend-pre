@@ -66,7 +66,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
-import { getTeamGetTeam } from '@/api/dist/controller/team-controller/getTeamGetTeam.js'
+import { api } from '@/api/apiClient'
 import { showFailToast } from 'vant'
 import dayjs from 'dayjs'
 
@@ -86,7 +86,7 @@ const loadTeamData = async () => {
     teamList.value = []
     flag.value = false
 
-    const res = await getTeamGetTeam()
+    const res = await api.team.getTeam()
     const rawList = res.data.data || []
     // 只保留有id和teamName的队伍
     teamList.value = rawList.filter((team) => team && team.id && team.teamName)

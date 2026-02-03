@@ -27,19 +27,30 @@
   <div id="divbo"></div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onActivated } from 'vue'
 import { useRouter } from 'vue-router'
+
+// 为组件设置名称，确保 keep-alive 能正确缓存
+defineOptions({
+  name: 'SearchPages',
+})
 
 const router = useRouter()
 //选中的标签
 const activeIds = ref([])
 const activeIndex = ref('')
 
+// 当页面从缓存中激活时，保持已选标签不变
+onActivated(() => {
+  // 不做任何操作，保持用户之前的选择
+  // 用户可以通过关闭标签来调整选择
+})
+
 /**
  * 清除标签
  * @param tag
  */
-const doClose = (tag) => {
+const doClose = (tag: any) => {
   activeIds.value = activeIds.value.filter((item) => {
     return item !== tag
   })
@@ -140,8 +151,8 @@ const originTagList = [
       { text: '外向', id: '外向' },
       { text: '活泼', id: '活泼' },
       { text: ' 谨慎', id: ' 谨慎' },
-    ]
-  }
+    ],
+  },
 ]
 
 let tagList = ref(originTagList)
@@ -152,7 +163,7 @@ let tagList = ref(originTagList)
   margin: 10px;
 }
 
-#divbo{
+#divbo {
   /* 底部间距已在全局设置，无需重复设置 */
 }
 </style>

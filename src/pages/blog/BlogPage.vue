@@ -54,7 +54,8 @@
             plain
             :icon="(blog as any)._liked ? 'good-job' : 'like-o'"
             :type="(blog as any)._liked ? 'primary' : 'default'"
-            @click.stop="likeBlog(blog)">
+            @click.stop="likeBlog(blog)"
+          >
             {{ (blog as any)._liked ? '已点赞' : '点赞' }}
           </van-button>
           <van-button size="mini" plain icon="star-o" @click.stop="collectBlog(blog)">
@@ -67,10 +68,30 @@
     </div>
   </div>
 
-  <div id="blank">
+  <!-- 分页导航 -->
+  <div v-if="totalPages > 1" class="pagination-container">
+    <div class="pagination-wrapper">
+      <van-pagination
+        v-model="currentPage"
+        :total-items="total"
+        :items-per-page="pageSize"
+        :show-page-size="5"
+        force-ellipses
+        @change="onPageChange"
+      />
+      <div class="page-jump-controls">
+        <span class="jump-label">跳转到</span>
+        <van-field v-model="jumpPageInput" type="number" class="page-input" placeholder="页码" />
+        <van-button type="primary" size="small" @click="goToPage">跳转</van-button>
+        <span class="total-pages">共 {{ totalPages }} 页</span>
+      </div>
+    </div>
     <van-divider />
   </div>
 
+  <div id="blank">
+    <van-divider />
+  </div>
   <!-- 固定在右下角的按钮 -->
   <van-sticky :offset-bottom="20" position="bottom">
     <van-button
@@ -87,7 +108,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getBlogList, getUserCurrent, getUserSearchOne, getBlogLike, getBlogIsLike } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { showSuccessToast, showFailToast } from 'vant'
@@ -102,59 +123,96 @@ const blogList = ref<{ [key: string]: any }[]>([])
 const user = ref<{ [key: string]: any }>()
 const router = useRouter()
 
-const loadBlogData = async () => {
-  const response = await getBlogList()
-  const blogs: any[] = response.data.data || []
+// 分页相关
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const totalPages = ref(0)
+const jumpPageInput = ref('')
 
-  // 为每个博客添加作者信息和点赞状态
-  const blogsWithInfo = await Promise.all(
-    blogs.map(async (blog) => {
-      try {
-        // 获取用户信息
-        if (blog.userId) {
-          const userRes = await getUserSearchOne({ id: blog.userId })
-          if (userRes.data.code === 0 && userRes.data.data) {
-            const userData = userRes.data.data
-            blog.author = userData.userName || `用户${blog.userId}`
-            blog.avatarUrl = userData.avatarUrl || blog.avatarUrl || '/ava.jpg'
+const loadBlogData = async (page: number = 1) => {
+  try {
+    const response = await api.blog.getBlogList({ currentPage: page })
+    const blogs: any[] = response.data.data?.records || []
+
+    // 更新分页信息
+    total.value = response.data.data?.total || 0
+    pageSize.value = response.data.data?.size || 10
+    totalPages.value = response.data.data?.pages || Math.ceil(total.value / pageSize.value)
+
+    // 为每个博客添加作者信息和点赞状态
+    const blogsWithInfo = await Promise.all(
+      blogs.map(async (blog) => {
+        try {
+          // 获取用户信息
+          if (blog.userId) {
+            const userRes = await api.user.searchUserById({ id: blog.userId })
+            if (userRes.data.code === 0 && userRes.data.data) {
+              const userData = userRes.data.data
+              blog.author = userData.userName || `用户${blog.userId}`
+              blog.avatarUrl = userData.avatarUrl || blog.avatarUrl || '/ava.jpg'
+            } else {
+              blog.author = `用户${blog.userId}`
+            }
           } else {
-            blog.author = `用户${blog.userId}`
+            blog.author = '匿名用户'
           }
-        } else {
+
+          // 检查当前用户是否已点赞此博客
+          if (blog.id) {
+            const likeStatusRes = await api.blog.getBlogIsLike({ blogId: blog.id })
+            if (likeStatusRes.data.code === 0) {
+              blog._liked = likeStatusRes.data.data // Boolean值，表示是否已点赞
+            } else {
+              blog._liked = false // 默认为未点赞
+            }
+          } else {
+            blog._liked = false
+          }
+
+          return blog
+        } catch (error) {
           blog.author = '匿名用户'
-        }
-
-        // 检查当前用户是否已点赞此博客
-        if (blog.id) {
-          const likeStatusRes = await getBlogIsLike({ blogId: blog.id })
-          if (likeStatusRes.data.code === 0) {
-            blog._liked = likeStatusRes.data.data // Boolean值，表示是否已点赞
-          } else {
-            blog._liked = false // 默认为未点赞
-          }
-        } else {
           blog._liked = false
+          return blog
         }
+      }),
+    )
 
-        return blog
-      } catch (error) {
-        blog.author = '匿名用户'
-        blog._liked = false
-        return blog
-      }
-    }),
-  )
+    blogList.value = blogsWithInfo
+  } catch (error) {
+    showFailToast('加载失败')
+  }
+}
 
-  blogList.value = blogsWithInfo
+// 页码改变时
+const onPageChange = (page: number) => {
+  currentPage.value = page
+  loadBlogData(page)
+  // 滚动到顶部
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+// 跳转到指定页
+const goToPage = () => {
+  let targetPage = parseInt(jumpPageInput.value)
+  if (isNaN(targetPage) || targetPage < 1 || targetPage > totalPages.value) {
+    showFailToast('请输入有效的页码')
+    return
+  }
+  currentPage.value = targetPage
+  loadBlogData(targetPage)
+  jumpPageInput.value = ''
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 onMounted(async () => {
-  await loadBlogData()
+  await loadBlogData(1)
 })
 
 // 当页面从缓存中激活时重新获取数据
 onActivated(async () => {
-  await loadBlogData()
+  await loadBlogData(currentPage.value)
 })
 
 const goToBlog = (id?: number) => {
@@ -167,7 +225,7 @@ const handleAddBlog = () => {
 }
 
 // 格式化时间
-const formatTime = (time: string) => {
+const formatTime = (time: any) => {
   return dayjs(time).format('MM-DD HH:mm')
 }
 
@@ -188,21 +246,21 @@ const likeBlog = async (blog: any) => {
   }
 
   // 记录点击时间用于频率检测
-  const now = Date.now();
+  const now = Date.now()
   if (!blog.clickTimes) {
-    blog.clickTimes = [];
+    blog.clickTimes = []
   }
 
   // 添加当前点击时间
-  blog.clickTimes.push(now);
+  blog.clickTimes.push(now)
 
   // 只保留最近5秒内的点击记录
-  blog.clickTimes = blog.clickTimes.filter(time => now - time < 5000);
+  blog.clickTimes = blog.clickTimes.filter((time: any) => now - time < 5000)
 
   // 检查是否频繁重复点击（5秒内超过3次）
   if (blog.clickTimes.length > 3) {
-    showFailToast('您点击得太快啦，请稍后再试~');
-    return;
+    showFailToast('您点击得太快啦，请稍后再试~')
+    return
   }
 
   blog.isLiking = true
@@ -211,26 +269,26 @@ const likeBlog = async (blog: any) => {
 
   try {
     // 执行点赞/取消点赞操作
-    const res = await getBlogLike({ blogId: blog.id })
+    const res = await api.blog.getBlogLike({ blogId: blog.id })
 
     if (res.data.code === 0) {
       // 成功后，根据操作结果更新状态
       // 如果API返回的是新点赞数，直接使用
       if (typeof res.data.data === 'number') {
-        blog.praise = Math.max(0, res.data.data);
+        blog.praise = Math.max(0, res.data.data)
       } else {
         // 如果API返回的是其他格式或无数据，使用状态翻转逻辑更新点赞数
         // 如果原来是已点赞，现在变成未点赞，则减1；反之则加1
-        blog.praise = originalLiked ? Math.max(0, originalPraise - 1) : originalPraise + 1;
+        blog.praise = originalLiked ? Math.max(0, originalPraise - 1) : originalPraise + 1
       }
 
       // 重新获取当前博客的点赞状态来确保准确性
-      const likeStatusRes = await getBlogIsLike({ blogId: blog.id });
+      const likeStatusRes = await api.blog.getBlogIsLike({ blogId: blog.id })
       if (likeStatusRes.data.code === 0) {
-        blog._liked = likeStatusRes.data.data;
+        blog._liked = likeStatusRes.data.data
       } else {
         // 如果获取状态失败，根据原始状态进行翻转（这是备选方案）
-        blog._liked = !originalLiked;
+        blog._liked = !originalLiked
       }
 
       showSuccessToast(blog._liked ? '点赞成功' : '取消点赞')
@@ -259,6 +317,45 @@ const collectBlog = (blog: any) => {
 <style scoped>
 #blank {
   /* 底部间距已在全局设置，无需重复设置 */
+}
+
+/* 分页容器 */
+.pagination-container {
+  padding: 20px 16px;
+  background: #fff;
+}
+
+.pagination-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.page-jump-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jump-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.page-input {
+  width: 80px;
+  padding: 4px 8px;
+}
+
+.page-input :deep(.van-field__control) {
+  text-align: center;
+}
+
+.total-pages {
+  font-size: 14px;
+  color: #999;
+  margin-left: 8px;
 }
 
 /* 博客卡片容器 */
@@ -464,6 +561,19 @@ const collectBlog = (blog: any) => {
     align-self: stretch;
     justify-content: space-around;
   }
+
+  .pagination-wrapper {
+    gap: 12px;
+  }
+
+  .page-jump-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .page-input {
+    width: 60px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -479,6 +589,23 @@ const collectBlog = (blog: any) => {
 
   .stat-item {
     font-size: 12px;
+  }
+
+  .pagination-wrapper {
+    gap: 8px;
+  }
+
+  .page-jump-controls {
+    gap: 4px;
+  }
+
+  .page-input {
+    width: 50px;
+  }
+
+  .total-pages {
+    width: 100%;
+    text-align: center;
   }
 }
 </style>

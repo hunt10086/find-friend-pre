@@ -2,7 +2,8 @@
   <form action="/">
     <van-divider content-position="left">已选标签</van-divider>
     <div v-if="activeIds.length === 0">请选择标签</div>
-    <van-tag color="#00FFFF"
+    <van-tag
+      color="#00FFFF"
       v-for="tag in activeIds"
       padding="16px"
       closeable
@@ -29,7 +30,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getTeamMyTeam, getUserCurrent, postUserUpdate } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { showSuccessToast } from 'vant'
 
 const router = useRouter()
@@ -38,10 +39,9 @@ const activeIds = ref([])
 const activeIndex = ref('')
 
 onMounted(async () => {
-  const res=await getUserCurrent();
-  activeIds.value = JSON.parse(res.data.data.tags);
+  const res = await api.user.getCurrentUser()
+  activeIds.value = JSON.parse(res.data.data.tags)
 })
-
 
 /**
  * 清除标签
@@ -137,27 +137,25 @@ const originTagList = [
       { text: '外向', id: '外向' },
       { text: '活泼', id: '活泼' },
       { text: ' 谨慎', id: ' 谨慎' },
-    ]
-  }
+    ],
+  },
 ]
 
 let tagList = ref(originTagList)
 
-
 const submit = async () => {
   const input = {
-    tags: JSON.stringify(activeIds.value)
+    tags: JSON.stringify(activeIds.value),
   }
-  const res=await postUserUpdate(input);
-  if(res.data.code===0){
-    showSuccessToast('修改成功');
+  const res = await api.user.userUpdate(input)
+  if (res.data.code === 0) {
+    showSuccessToast('修改成功')
     // 直接返回用户页面，由UserPage.vue的路由监听器处理数据刷新
     router.push('/user')
-  }else{
-    showSuccessToast('修改失败');
+  } else {
+    showSuccessToast('修改失败')
   }
 }
-
 </script>
 
 <style scoped>
@@ -165,7 +163,7 @@ const submit = async () => {
   margin: 10px;
 }
 
-#divbo{
+#divbo {
   /* 底部间距已在全局设置，无需重复设置 */
 }
 </style>

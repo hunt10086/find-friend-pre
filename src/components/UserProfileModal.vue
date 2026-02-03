@@ -128,8 +128,10 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { getUserSearchOne } from '@/api/dist/controller/user-controller/getUserSearchOne.js'
+
 import { showFailToast, showSuccessToast } from 'vant'
+
+import { api } from '@/api/apiClient'
 import { useFriendStore } from '@/stores/friendStore'
 
 interface UserInfo {
@@ -199,10 +201,10 @@ const loadUserInfo = async () => {
 
   try {
     loading.value = true
-    const response = await getUserSearchOne({ id: props.userId })
+    const res = await api.user.searchUserById({ id: props.userId })
 
-    if (response.data.code === 0 && response.data.data) {
-      const userData = response.data.data
+    if (res.data.code === 0 && res.data.data) {
+      const userData = res.data.data
 
       // 解析并规范化标签为 string[]
 
@@ -257,16 +259,12 @@ const checkFriendRequestStatus = async () => {
   if (!props.userId) return
 
   try {
-    // 导入好友申请列表API
-    const { getFriendRequestsList } = await import(
-      '@/api/dist/controller/friend-requests-controller/getFriendRequestsList.js'
-    )
-    const response = await getFriendRequestsList()
+    const res = await api.friendRequests.getFriendRequests()
 
-    if (response.data.code === 0 && response.data.data) {
+    if (res.data.code === 0 && res.data.data) {
       // 检查是否有发送给该用户的好友申请
       // 注意：根据接口定义，字段可能是toUserId而不是receiverId
-      const requests = response.data.data
+      const requests = res.data.data
       const hasRequest = requests.some(
         (request: any) => request.toUserId === props.userId && request.status === 0,
       )

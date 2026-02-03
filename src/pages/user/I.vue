@@ -95,7 +95,7 @@
   <!-- 空状态 -->
   <div v-else class="empty-user-state">
     <van-empty description="获取用户信息失败" />
-    <van-button type="primary" @click="loadUserInfo" class="retry-btn">重试</van-button>
+    <van-button type="primary" @click="loadUserData" class="retry-btn">重试</van-button>
   </div>
 
   <!-- 好友申请列表 -->
@@ -235,7 +235,7 @@
     <van-button
       class="logout-button-inline"
       type="primary"
-      @click="quit"
+      @click="logout"
       :loading="logoutLoading"
       loading-text="退出中..."
       block
@@ -246,7 +246,7 @@
 </template>
 
 <script setup lang="ts">
-import { postUserLogout, getUserCurrent } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'
 import { onMounted, ref, computed, onUnmounted } from 'vue'
@@ -292,55 +292,55 @@ const themes = [
     name: '清新蓝',
     primaryColor: '#1989fa',
     selfBubbleBg: '#dcf8c6',
-    otherBubbleBg: '#ffffff'
+    otherBubbleBg: '#ffffff',
   },
   {
     key: 'purple',
     name: '优雅紫',
     primaryColor: '#7232dd',
     selfBubbleBg: '#e6d4fa',
-    otherBubbleBg: '#ffffff'
+    otherBubbleBg: '#ffffff',
   },
   {
     key: 'green',
     name: '自然绿',
     primaryColor: '#07c160',
     selfBubbleBg: '#c6f8dc',
-    otherBubbleBg: '#ffffff'
+    otherBubbleBg: '#ffffff',
   },
   {
     key: 'pink',
     name: '温柔粉',
     primaryColor: '#ff6b9d',
     selfBubbleBg: '#fad4e6',
-    otherBubbleBg: '#ffffff'
-  }
-];
+    otherBubbleBg: '#ffffff',
+  },
+]
 
 // 主题设置弹窗控制
-const showThemePopup = ref(false);
+const showThemePopup = ref(false)
 
 // 显示主题设置弹窗
 const showThemeSettings = () => {
-  showThemePopup.value = true;
-};
+  showThemePopup.value = true
+}
 
 // 获取主题样式
 const getThemeStyle = (theme: any) => {
   return {
     '--primary-color': theme.primaryColor,
     '--self-bubble-bg': theme.selfBubbleBg,
-    '--other-bubble-bg': theme.otherBubbleBg
-  };
-};
+    '--other-bubble-bg': theme.otherBubbleBg,
+  }
+}
 
 // 选择主题
 const selectTheme = (themeKey: string) => {
-  themeStore.setTheme(themeKey);
-};
+  themeStore.setTheme(themeKey)
+}
 
 // 当前主题
-const currentTheme = computed(() => themeStore.currentTheme);
+const currentTheme = computed(() => themeStore.currentTheme)
 
 // 监听屏幕尺寸变化
 const handleResize = () => {
@@ -351,11 +351,7 @@ const handleResize = () => {
 const loadFriendRequests = async () => {
   try {
     friendRequestsLoading.value = true
-    // 动态导入API
-    const { getFriendRequestsList } = await import(
-      '@/api/dist/controller/friend-requests-controller/getFriendRequestsList.js'
-    )
-    const response = await getFriendRequestsList()
+    const response = await api.friendRequests.getFriendRequests()
 
     if (response.data.code === 0 && response.data.data) {
       // 只显示状态为0（待处理）的好友申请
@@ -375,8 +371,8 @@ const loadFriendRequests = async () => {
 onMounted(() => {
   window.addEventListener('resize', handleResize)
   // 初始化主题
-  themeStore.initializeTheme();
-  loadUserInfo()
+  themeStore.initializeTheme()
+  loadUserData()
   loadFriendRequests()
 })
 
@@ -387,11 +383,7 @@ onUnmounted(() => {
 // 同意好友申请
 const acceptFriendRequest = async (requestId: number) => {
   try {
-    // 动态导入API
-    const { postFriendsAgree } = await import(
-      '@/api/dist/controller/friends-controller/postFriendsAgree.js'
-    )
-    const response = await postFriendsAgree({ id: requestId })
+    const response = await api.friends.agreeFriendRequest({ id: requestId })
 
     if (response.data.code === 0) {
       showSuccessToast('已同意好友申请')
@@ -409,11 +401,7 @@ const acceptFriendRequest = async (requestId: number) => {
 // 拒绝好友申请
 const rejectFriendRequest = async (requestId: number) => {
   try {
-    // 动态导入API
-    const { postFriendsDisagree } = await import(
-      '@/api/dist/controller/friends-controller/postFriendsDisagree.js'
-    )
-    const response = await postFriendsDisagree({ id: requestId })
+    const response = await api.friends.disAgreeFriendRequest({ id: requestId })
 
     if (response.data.code === 0) {
       showSuccessToast('已拒绝好友申请')
@@ -429,10 +417,10 @@ const rejectFriendRequest = async (requestId: number) => {
 }
 
 // 获取用户信息
-const loadUserInfo = async () => {
+const loadUserData = async () => {
   loading.value = true
   try {
-    const res = await getUserCurrent()
+    const res = await api.user.getCurrentUser()
     if (res.data.code === 0) {
       user.value = res.data.data
       // 解析标签JSON字符串
@@ -459,10 +447,10 @@ const loadUserInfo = async () => {
 }
 
 // 退出登录
-const quit = async () => {
+const logout = async () => {
   logoutLoading.value = true
   try {
-    const res = await postUserLogout()
+    const res = await api.user.userLogout()
     if (res.data.code === 0) {
       showSuccessToast('退出登录成功')
       // 重置好友缓存（防止上一个账号的好友关系残留）

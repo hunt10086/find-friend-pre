@@ -40,7 +40,6 @@
               class="search-tag"
               plain
               type="warning"
-              size="small"
               v-for="tag in getDisplayTags(user)"
               :key="tag"
             >
@@ -117,10 +116,10 @@
   <UserProfileModal v-model="showProfileModal" :userId="selectedUserId" />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { onMounted, ref, onActivated, watch, nextTick } from 'vue'
-import myAxios from '@/plugins/myAxios.js'
+import { api } from '@/api/apiClient'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'
 import UserProfileModal from '@/components/UserProfileModal.vue'
@@ -136,20 +135,20 @@ const router = useRouter()
 
 const flag = ref(true)
 
-const userList = ref([])
+const userList = ref<any[]>([])
 
 const isLoading = ref(false)
 
 const showProfileModal = ref(false)
 
-const selectedUserId = ref(null)
+const selectedUserId = ref<number | null>(null)
 
 // 分页相关状态
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 const totalPages = ref(0)
-const allUsers = ref([])
+const allUsers = ref<any[]>([])
 const isServerPaged = ref(false)
 const jumpPageInput = ref('')
 
@@ -174,49 +173,24 @@ const loadSearchData = async () => {
       return
     }
 
-    console.log(
-      'Loading search data with tags:',
-      currentTags.tag,
-      'page:',
-      currentPage.value,
-      'size:',
-      pageSize.value,
-    )
-
-    const response = await myAxios.get('user/search/tags', {
-      params: {
-        tagsList: currentTags.tag, // 假设 currentTags.tag 是数组 ['女', '大二']
-
-        current: currentPage.value,
-        pageSize: pageSize.value,
-      },
-      paramsSerializer: (params) => {
-        const parts = []
-        const tagValues = params.tagsList
-
-        if (Array.isArray(tagValues)) {
-          parts.push(...tagValues.map((value) => `tagsList=${encodeURIComponent(value)}`))
-        } else if (tagValues !== undefined) {
-          parts.push(`tagsList=${encodeURIComponent(tagValues)}`)
-        }
-        if (params.current != null) {
-          parts.push(`current=${encodeURIComponent(params.current)}`)
-        }
-        if (params.pageSize != null) {
-          parts.push(`pageSize=${encodeURIComponent(params.pageSize)}`)
-        }
-        return parts.join('&')
-      },
+    // 使用生成的 API 客户端调用分页接口
+    const tagsList = Array.isArray(currentTags.tag)
+      ? (currentTags.tag as string[])
+      : [currentTags.tag as string]
+    const response = await api.user.searchUsersByTagsWithPagination({
+      tagsList: tagsList,
+      currentPage: currentPage.value,
+      pageSize: pageSize.value,
     })
 
     if (response.data && response.data.data != null) {
       const data = response.data.data
       // 判断是否为分页结构
-      const pageItems = Array.isArray(data) ? data : data.records || data.items || data.list || []
+      const pageItems: any[] = Array.isArray(data) ? data : data.records || []
       isServerPaged.value = !Array.isArray(data)
 
       // 解析 tags
-      pageItems.forEach((user) => {
+      pageItems.forEach((user: any) => {
         try {
           user.tags = JSON.parse(user.tags)
         } catch (e) {
@@ -268,8 +242,6 @@ const loadSearchData = async () => {
     allUsers.value = []
     total.value = 0
     totalPages.value = 0
-    console.error('Failed to fetch data:', error)
-
     showFailToast('搜索失败，请重试')
   } finally {
     isLoading.value = false
@@ -291,14 +263,11 @@ onActivated(async () => {
 watch(
   () => route.query,
   async (newQuery, oldQuery) => {
-    console.log('Route query changed:', { newQuery, oldQuery })
     // 更严格的比较，确保真的发生了变化
     const newQueryStr = JSON.stringify(newQuery)
     const oldQueryStr = JSON.stringify(oldQuery)
 
     if (newQueryStr !== oldQueryStr) {
-      console.log('Query parameters changed, reloading data...')
-
       // 清空当前数据，显示加载状态
 
       userList.value = []
@@ -314,7 +283,6 @@ watch(
 watch(
   () => route.fullPath,
   async (newPath, oldPath) => {
-    console.log('Route path changed:', { newPath, oldPath })
     if (newPath.includes('/user/list') && newPath !== oldPath) {
       await nextTick()
       await loadSearchData()
@@ -323,24 +291,24 @@ watch(
 )
 
 // 图片加载失败处理
-const handleImageError = (event) => {
+const handleImageError = (event: any) => {
   const img = event.target
   img.src = '/ava.jpg'
 }
 
 // 查看资料
-const viewProfile = (user) => {
+const viewProfile = (user: any) => {
   selectedUserId.value = user.id
   showProfileModal.value = true
 }
 
 // 重新搜索
 const goSearch = () => {
-  router.push('/user/tags')
+  router.push('/search')
 }
 
 // 获取要显示的标签
-const getDisplayTags = (user) => {
+const getDisplayTags = (user: any) => {
   if (!user.tags || !user.tags.length) return []
 
   // 如果已展开或标签数量少于等于6个，显示全部标签
@@ -352,7 +320,7 @@ const getDisplayTags = (user) => {
   return user.tags.slice(0, 6)
 }
 
-const toggleTagsExpand = (user) => {
+const toggleTagsExpand = (user: any) => {
   // 使用 Vue 的响应式系统
 
   if (user.tagsExpanded === undefined) {
@@ -363,7 +331,7 @@ const toggleTagsExpand = (user) => {
 }
 
 // 分页变更
-const onPageChange = async (page) => {
+const onPageChange = async (page: any) => {
   currentPage.value = Number(page) || 1
   if (isServerPaged.value) {
     await loadSearchData()
@@ -541,7 +509,6 @@ const goToPage = async () => {
   border: 3px solid #fff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
-
 
 .search-info {
   flex: 1;

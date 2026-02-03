@@ -115,8 +115,7 @@ import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import myAxios from '@/plugins/myAxios.js'
 import { buildWsUrl } from '@/plugins/websocket'
-import { getFriendMessageList } from '@/api/dist/controller/friend-message-controller/getFriendMessageList.js'
-import { postFriendMessageMarkAsRead } from '@/api/dist/controller/friend-message-controller/postFriendMessageMarkAsRead.js'
+import { api } from '@/api/apiClient'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useFriendStore } from '@/stores/friendStore'
 
@@ -229,10 +228,7 @@ const loadCurrentUser = async () => {
 const loadFriendInfo = async () => {
   if (!friendId.value) return
   try {
-    const { getUserSearchOne } = await import(
-      '@/api/dist/controller/user-controller/getUserSearchOne.js'
-    )
-    const res = await getUserSearchOne({ id: friendId.value })
+    const res = await api.user.searchUserById({ id: friendId.value })
     if (res.data.code === 0 && res.data.data) {
       friendName.value = res.data.data.userName
       friendAvatar.value = res.data.data.avatarUrl
@@ -247,7 +243,7 @@ const loadHistory = async () => {
   if (!friendId.value) return
   loadingHistory.value = true
   try {
-    const res = await getFriendMessageList({ friendId: friendId.value })
+    const res = await api.friendMessage.getFriendMessages({ friendId: friendId.value })
     if (res.data.code === 0) {
       const list: FriendMessage[] = (res.data.data || []).map((m) => ({
         ...m,
@@ -276,7 +272,7 @@ const loadHistory = async () => {
 const markAsRead = async () => {
   if (!friendId.value) return
   try {
-    await postFriendMessageMarkAsRead({ friendId: friendId.value })
+    await api.friendMessage.markMessagesAsRead({ friendId: friendId.value })
   } catch (e) {
     // ignore
   }

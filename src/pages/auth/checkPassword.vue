@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onActivated } from 'vue'
-import { postTeamJoin } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { useRoute } from 'vue-router'
 import { showFailToast, showSuccessToast } from 'vant'
 import router from '@/config/router.ts'
@@ -29,13 +29,17 @@ const route = useRoute()
 const teamId = ref(Number(route.params.teamId))
 
 // 监听路由参数变化，当团队ID改变时更新teamId
-watch(() => route.params.teamId, (newTeamId) => {
-  if (newTeamId) {
-    teamId.value = Number(newTeamId)
-    // 清空密码输入框
-    password.value = ''
-  }
-}, { immediate: false })
+watch(
+  () => route.params.teamId,
+  (newTeamId) => {
+    if (newTeamId) {
+      teamId.value = Number(newTeamId)
+      // 清空密码输入框
+      password.value = ''
+    }
+  },
+  { immediate: false },
+)
 
 // 当页面从缓存中激活时，检查路由参数是否变化
 onActivated(() => {
@@ -51,7 +55,7 @@ const onSubmit = async () => {
   const input = {
     id: teamId.value,
   }
-  const res = await postTeamJoin(
+  const res = await api.team.joinTeam(
     {
       password: password.value,
     },

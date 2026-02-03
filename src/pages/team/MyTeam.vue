@@ -8,11 +8,7 @@
     >
       <div class="team-header">
         <div class="team-avatar">
-          <img
-            :src="team.icon || '/ava.jpg'"
-            :alt="team.teamName"
-            @error="handleImageError"
-          />
+          <img :src="team.icon || '/ava.jpg'" :alt="team.teamName" @error="handleImageError" />
           <div class="creator-badge">
             <van-icon name="manager" />
             我的队伍
@@ -61,31 +57,13 @@
       </div>
 
       <div class="team-actions">
-        <van-button
-          type="primary"
-          size="small"
-          round
-          icon="eye"
-          @click="inTeam(team)"
-        >
+        <van-button type="primary" size="small" round icon="eye" @click="inTeam(team)">
           查看详情
         </van-button>
-        <van-button
-          type="warning"
-          size="small"
-          round
-          icon="sign"
-          @click="quitTeam(team)"
-        >
+        <van-button type="warning" size="small" round icon="sign" @click="quitTeam(team)">
           退出队伍
         </van-button>
-        <van-button
-          type="danger"
-          size="small"
-          round
-          icon="delete"
-          @click="delTeam(team)"
-        >
+        <van-button type="danger" size="small" round icon="delete" @click="delTeam(team)">
           解散队伍
         </van-button>
       </div>
@@ -99,12 +77,7 @@
       image="https://fastly.jsdelivr.net/npm/@vant/assets/custom-empty-image.png"
       description="还没有创建队伍"
     >
-      <van-button
-        round
-        type="primary"
-        class="create-button"
-        @click="createTeam"
-      >
+      <van-button round type="primary" class="create-button" @click="createTeam">
         创建队伍
       </van-button>
     </van-empty>
@@ -121,7 +94,7 @@
       type="primary"
       class="round-button"
       round
-      style="position: fixed; right: 20px; bottom: 120px; z-index: 999;"
+      style="position: fixed; right: 20px; bottom: 120px; z-index: 999"
       @click="createTeam"
     >
     </van-button>
@@ -131,7 +104,7 @@
 <script setup lang="ts">
 import { onMounted, ref, onActivated, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { getTeamMyTeam, postTeamDelete, postTeamQuit } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { showSuccessToast } from 'vant'
 
 const flag = ref(false)
@@ -144,7 +117,7 @@ dayjs.extend(relativeTime)
 const teamList = ref()
 
 const loadMyTeamData = async () => {
-  const res = await getTeamMyTeam()
+  const res = await api.team.getMyTeam()
   teamList.value = res.data.data || []
   if (teamList.value.length > 0) {
     flag.value = true
@@ -166,20 +139,20 @@ const inTeam = (team) => {
 }
 
 const quitTeam = async (team) => {
-  const res = await postTeamQuit({ id: team.id })
+  const res = await api.team.quitTeam({ id: team.id })
   if (res.data.data === true) {
     showSuccessToast('退出队伍成功')
-    await router.replace('/myTeam')
+    await loadMyTeamData()
   } else {
     showSuccessToast('退出队伍失败')
   }
 }
 
 const delTeam = async (team) => {
-  const res = await postTeamDelete({ id: team.id })
+  const res = await api.team.deleteTeam({ id: team.id })
   if (res.data.data === true) {
     showSuccessToast('解散队伍成功')
-    await router.replace('/myTeam')
+    await loadMyTeamData()
   } else {
     showSuccessToast('解散队伍失败')
   }
@@ -194,8 +167,6 @@ const handleImageError = (event) => {
   const img = event.target
   img.src = '/ava.jpg'
 }
-
-
 </script>
 
 <style scoped>

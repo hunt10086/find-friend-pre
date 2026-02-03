@@ -717,40 +717,6 @@
         }
       }
     },
-    "/user/search/tags": {
-      "get": {
-        "tags": [
-          "user-controller"
-        ],
-        "summary": "根据标签名查询用户",
-        "operationId": "searchUsersByTags",
-        "parameters": [
-          {
-            "name": "tagsList",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListUser"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/user/search/tags/page": {
       "get": {
         "tags": [
@@ -1296,13 +1262,24 @@
         ],
         "summary": "获取我的博客列表",
         "operationId": "getMyBlogList",
+        "parameters": [
+          {
+            "name": "currentPage",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListBlogVO"
+                  "$ref": "#/components/schemas/BaseResponseIPageBlogVO"
                 }
               }
             }
@@ -1317,13 +1294,24 @@
         ],
         "summary": "获取博客列表",
         "operationId": "getBlogList",
+        "parameters": [
+          {
+            "name": "currentPage",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListBlogVO"
+                  "$ref": "#/components/schemas/BaseResponseIPageBlogVO"
                 }
               }
             }
@@ -1800,6 +1788,14 @@
           },
           "kind": {
             "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -1808,12 +1804,10 @@
         "properties": {
           "teamId": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           },
           "content": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           }
         }
       },
@@ -1869,11 +1863,11 @@
               "$ref": "#/components/schemas/User"
             }
           },
-          "current": {
+          "total": {
             "type": "integer",
             "format": "int64"
           },
-          "total": {
+          "current": {
             "type": "integer",
             "format": "int64"
           },
@@ -2139,7 +2133,7 @@
           }
         }
       },
-      "BaseResponseListBlogVO": {
+      "BaseResponseIPageBlogVO": {
         "type": "object",
         "properties": {
           "code": {
@@ -2147,10 +2141,7 @@
             "format": "int32"
           },
           "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BlogVO"
-            }
+            "$ref": "#/components/schemas/IPageBlogVO"
           },
           "message": {
             "type": "string"
@@ -2188,12 +2179,44 @@
           "kind": {
             "type": "string"
           },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
           "praise": {
             "type": "integer",
             "format": "int32"
           },
           "avatarUrl": {
             "type": "string"
+          }
+        }
+      },
+      "IPageBlogVO": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BlogVO"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "current": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int64",
+            "deprecated": true
           }
         }
       },
@@ -2244,6 +2267,10 @@
             "type": "integer",
             "format": "int32"
           },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
           "kind": {
             "type": "string"
           },
@@ -2279,35 +2306,28 @@
         "properties": {
           "id": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           },
           "teamId": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           },
           "userId": {
             "type": "integer",
-            "format": "int64",
-            "refType": null
+            "format": "int64"
           },
           "userName": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "content": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           },
           "createTime": {
             "type": "string",
-            "format": "date-time",
-            "refType": null
+            "format": "date-time"
           },
           "avatarUrl": {
-            "type": "string",
-            "refType": null
+            "type": "string"
           }
         }
       }

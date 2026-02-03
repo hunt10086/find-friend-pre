@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getFriendsList } from '@/api/dist/controller/friends-controller/getFriendsList.js'
+import { api } from '@/api/apiClient'
 import { useRouter } from 'vue-router'
 import { showFailToast } from 'vant'
 import UserProfileModal from '@/components/UserProfileModal.vue'
@@ -100,7 +100,7 @@ const goToSearch = () => {
 const loadFriendsList = async () => {
   try {
     loading.value = true
-    const response = await getFriendsList()
+    const response = await api.friends.getFriendList()
 
     /* 移除冗余日志: 好友列表API响应 */
 
@@ -112,7 +112,6 @@ const loadFriendsList = async () => {
       friendsList.value = []
     }
   } catch (error) {
-    console.error('获取好友列表失败:', error)
     showFailToast('网络错误，请重试')
     friendsList.value = []
   } finally {

@@ -18,23 +18,15 @@
     >
       <div class="team-header">
         <div class="team-icon">
-          <img
-            :src="team.icon || '/ava.jpg'"
-            :alt="team.teamName"
-            class="team-avatar"
-          />
-          <div class="team-status" :class="{ 'private': team.status === 1 }">
+          <img :src="team.icon || '/ava.jpg'" :alt="team.teamName" class="team-avatar" />
+          <div class="team-status" :class="{ private: team.status === 1 }">
             <van-icon :name="team.status === 1 ? 'lock' : 'eye-o'" />
           </div>
         </div>
         <div class="team-info">
           <h3 class="team-name">{{ team.teamName }}</h3>
           <div class="team-meta">
-            <van-tag
-              :type="team.status === 1 ? 'warning' : 'success'"
-              size="small"
-              plain
-            >
+            <van-tag :type="team.status === 1 ? 'warning' : 'success'" size="small" plain>
               {{ team.status === 1 ? '加密' : '公开' }}
             </van-tag>
             <span class="team-members">
@@ -74,13 +66,7 @@
       </div>
 
       <div class="team-actions">
-        <van-button
-          type="primary"
-          size="small"
-          round
-          icon="contact"
-          @click="inTeam(team)"
-        >
+        <van-button type="primary" size="small" round icon="contact" @click="inTeam(team)">
           查看详情
         </van-button>
         <van-button
@@ -104,12 +90,7 @@
       image="https://fastly.jsdelivr.net/npm/@vant/assets/custom-empty-image.png"
       description="暂无可加入的队伍"
     >
-      <van-button
-        round
-        type="primary"
-        class="bottom-button"
-        @click="createTeam"
-      >
+      <van-button round type="primary" class="bottom-button" @click="createTeam">
         创建队伍
       </van-button>
     </van-empty>
@@ -122,7 +103,7 @@
       type="primary"
       class="round-button"
       round
-      style="position: fixed; right: 20px; bottom: 120px; z-index: 999;"
+      style="position: fixed; right: 20px; bottom: 120px; z-index: 999"
       @click="createTeam"
     >
     </van-button>
@@ -131,21 +112,20 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getTeamSearch, postTeamJoin } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { showSuccessToast, showFailToast, showToast } from 'vant'
 import router from '@/config/router.ts'
 import dayjs from 'dayjs'
-import { getTeamList } from '@/api/dist/controller'
 
 const currentPage = ref(1)
 const teamList = ref()
 const values = ref('')
-const flag=ref(false)
+const flag = ref(false)
 
-const loadTeamList = async () => {
-  const res = await getTeamList()
+const loadTeamData = async () => {
+  const res = await api.team.listTeam()
   teamList.value = res.data.data || []
-  if(teamList.value.length > 0){
+  if (teamList.value.length > 0) {
     flag.value = true
   } else {
     flag.value = false
@@ -153,23 +133,23 @@ const loadTeamList = async () => {
 }
 
 onMounted(async () => {
-  await loadTeamList()
+  await loadTeamData()
 })
 
 // 当页面从缓存中激活时重新获取数据
 onActivated(async () => {
-  await loadTeamList()
+  await loadTeamData()
 })
 
 const joinTeam = async (team) => {
   if (team.status === 1) {
     await router.push(`/check/${team.id}`)
   } else {
-    const res = await postTeamJoin(
+    const res = await api.team.joinTeam(
       {
-        password: team.password,
+        password: team.password || '',
       },
-      team
+      team,
     )
     if (res.data.code === 0) {
       showSuccessToast('加入成功')
@@ -180,7 +160,7 @@ const joinTeam = async (team) => {
 }
 
 const onSearch = async () => {
-  const res = await getTeamSearch({ teamName: values.value })
+  const res = await api.team.searchTeam({ teamName: values.value })
   if (res.data.code === 0) {
     teamList.value = res.data.data || []
     flag.value = teamList.value.length > 0
@@ -193,9 +173,7 @@ const onSearch = async () => {
 const onCancel = async () => {
   showToast('取消')
   currentPage.value = 1 // 回到第一页
-  const res = await getTeamList({ count: currentPage.value })
-  teamList.value = res.data.data || []
-  flag.value = teamList.value.length > 0
+  await loadTeamData()
 }
 
 const createTeam = () => {

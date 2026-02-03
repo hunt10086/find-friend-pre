@@ -8,11 +8,7 @@
     >
       <div class="joined-team-header">
         <div class="joined-team-avatar">
-          <img
-            :src="team.icon || '/ava.jpg'"
-            :alt="team.teamName"
-            @error="handleImageError"
-          />
+          <img :src="team.icon || '/ava.jpg'" :alt="team.teamName" @error="handleImageError" />
           <div class="member-badge">
             <van-icon name="friends-o" />
             成员
@@ -61,22 +57,10 @@
       </div>
 
       <div class="joined-team-actions">
-        <van-button
-          type="primary"
-          size="small"
-          round
-          icon="eye"
-          @click="inTeam(team)"
-        >
+        <van-button type="primary" size="small" round icon="eye" @click="inTeam(team)">
           查看详情
         </van-button>
-        <van-button
-          type="warning"
-          size="small"
-          round
-          icon="sign"
-          @click="quitTeam(team)"
-        >
+        <van-button type="warning" size="small" round icon="sign" @click="quitTeam(team)">
           退出队伍
         </van-button>
       </div>
@@ -99,7 +83,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getTeamJoinTeam, postTeamQuit } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { useRouter } from 'vue-router'
 import { showSuccessToast } from 'vant'
 import dayjs from 'dayjs'
@@ -109,8 +93,8 @@ const teamList = ref()
 const router = useRouter()
 
 const loadTeamData = async () => {
-  const res = await getTeamJoinTeam()
-  teamList.value = res.data.data || []
+  const response = await api.team.getJoinTeam()
+  teamList.value = response.data.data || []
   if (teamList.value.length > 0) {
     flag.value = true
   } else {
@@ -132,7 +116,7 @@ const inTeam = (team) => {
 }
 
 const quitTeam = async (team) => {
-  const res = await postTeamQuit({ id: team.id })
+  const res = await api.team.quitTeam({ id: team.id })
   if (res.data.data === true) {
     showSuccessToast('退出队伍成功')
     await router.replace('/Person')

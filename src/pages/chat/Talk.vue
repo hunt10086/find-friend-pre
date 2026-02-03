@@ -28,14 +28,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { getFriendMessageUnreadCount } from '@/api/dist/controller/friend-message-controller/getFriendMessageUnreadCount.js'
+import { api } from '@/api/apiClient'
 
 const router = useRouter()
 const friendUnreadCount = ref(0)
 
 const fetchUnread = async () => {
   try {
-    const res = await getFriendMessageUnreadCount()
+    const res = await api.friendMessage.getUnreadMessageCount()
     if (res?.data?.code === 0) {
       friendUnreadCount.value = res.data.data || 0
     } else {

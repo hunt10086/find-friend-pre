@@ -1,20 +1,19 @@
 <template>
-  <van-row justify="space-between" align="center" style="padding: 10px;">
+  <van-row justify="space-between" align="center" style="padding: 10px">
     <van-col span="12">
       <van-cell title="猜你喜欢" icon="like-o" />
     </van-col>
-    <van-col span="12" style="text-align: right;">
+    <van-col span="12" style="text-align: right">
       <van-button type="primary" round @click="goToFriends">
         <van-icon name="friends-o" />
         我的好友
       </van-button>
-      <van-button type="success" round @click="findMore" style="margin-left: 10px;">
+      <van-button type="success" round @click="findMore" style="margin-left: 10px">
         <van-icon name="map-marked" />
         附近用户
       </van-button>
     </van-col>
   </van-row>
-
 
   <div class="user-cards-container">
     <div
@@ -24,11 +23,7 @@
       :style="{ animationDelay: `${index * 0.1}s` }"
     >
       <div class="user-avatar">
-        <img
-          :src="user.avatarUrl || '/ava.jpg'"
-          :alt="user.userName"
-          @error="handleImageError"
-        />
+        <img :src="user.avatarUrl || '/ava.jpg'" :alt="user.userName" @error="handleImageError" />
         <div class="avatar-status-dot"></div>
       </div>
 
@@ -65,13 +60,7 @@
         </p>
 
         <div class="user-actions">
-          <van-button
-            type="success"
-            size="small"
-            round
-            icon="guide-o"
-            @click="viewProfile(user)"
-          >
+          <van-button type="success" size="small" round icon="guide-o" @click="viewProfile(user)">
             查看资料
           </van-button>
         </div>
@@ -80,7 +69,10 @@
   </div>
 
   <p class="pages">{{ cont }}</p>
-  <div id="index-button-css" style="display: flex; justify-content: center; gap: 20px; margin-top: 16px">
+  <div
+    id="index-button-css"
+    style="display: flex; justify-content: center; gap: 20px; margin-top: 16px"
+  >
     <van-button v-if="flagPre" type="primary" @click="GoPre">上一页</van-button>
     <div class="page-jump-controls">
       <span class="jump-label">跳至</span>
@@ -98,15 +90,12 @@
   </div>
 
   <!-- 用户资料模态框 -->
-  <UserProfileModal
-    v-model="showProfileModal"
-    :userId="selectedUserId"
-  />
+  <UserProfileModal v-model="showProfileModal" :userId="selectedUserId" />
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getUserListLike } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import router from '@/config/router.ts'
 import UserProfileModal from '@/components/UserProfileModal.vue'
 
@@ -121,7 +110,7 @@ const selectedUserId = ref(null)
 const jumpPageInput = ref('')
 
 const loadUserData = async () => {
-  const res = await getUserListLike({
+  const res = await api.user.userListLike({
     count: cont.value,
   })
   res.data.data.forEach((user) => {
@@ -149,7 +138,7 @@ onActivated(async () => {
 
 const loadMore = async () => {
   cont.value++
-  const res = await getUserListLike({
+  const res = await api.user.userListLike({
     count: cont.value,
   })
   res.data.data.forEach((user) => {
@@ -164,7 +153,7 @@ const loadMore = async () => {
 
 const GoPre = async () => {
   cont.value--
-  const res = await getUserListLike({
+  const res = await api.user.userListLike({
     count: cont.value,
   })
   res.data.data.forEach((user) => {
@@ -255,7 +244,6 @@ const goToPage = async () => {
   }
   flagPre.value = cont.value > 1
 }
-
 </script>
 
 <style scoped>

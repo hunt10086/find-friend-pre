@@ -267,7 +267,6 @@ const saveDraft = async () => {
   } catch (error) {
     toast.close()
     showFailToast('保存失败')
-    /* console.error('保存草稿失败:', error) */
   }
 }
 
@@ -305,8 +304,6 @@ const submitBlog = async () => {
     toast.close()
 
     showFailToast('发布失败，请检查网络连接')
-
-    /* console.error('提交博客失败:', error) */
   }
 }
 
@@ -325,7 +322,7 @@ const loadDraft = () => {
       updateWordCount()
     }
   } catch (error) {
-    /* console.error('加载草稿失败:', error) */
+    // 加载草稿失败，静默处理
   }
 }
 

@@ -17,8 +17,6 @@ myAxios.defaults.withCredentials = true // 请求携带 cookie
 myAxios.interceptors.request.use(
   function (config) {
     // 在发送请求之前做些什么
-    // console.log('我要发请求')
-    // router.push('/user/login');
     return config
   },
   function (error) {
@@ -36,7 +34,6 @@ myAxios.interceptors.response.use(
     return response
   },
   function (error) {
-    console.error('Request failed:', error.message, error.config, error.response)
     return Promise.reject(error)
   },
 )

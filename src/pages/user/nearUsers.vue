@@ -83,7 +83,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getUserNearUser } from '@/api/dist/controller/user-controller/getUserNearUser.js'
+import { api } from '@/api/apiClient'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'
 import UserProfileModal from '@/components/UserProfileModal.vue'
@@ -101,7 +101,7 @@ const selectedUserId = ref(null)
 
 const loadNearUsersData = async () => {
   try {
-    const res = await getUserNearUser()
+    const res = await api.user.nearUser()
     const users = res.data.data || []
 
     // 解析标签
@@ -125,7 +125,6 @@ const loadNearUsersData = async () => {
       showFailToast('获取失败')
     }
   } catch (error) {
-    console.error('获取附近用户失败:', error)
     showFailToast('网络错误，请重试')
   }
 }

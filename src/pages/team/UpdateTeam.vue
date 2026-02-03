@@ -3,7 +3,7 @@
   <van-loading v-if="loading" type="spinner" color="#1989fa" size="24px">
     加载队伍信息中...
   </van-loading>
-  
+
   <!-- 表单内容 -->
   <van-form v-else label-width="100%" @submit="onSubmit">
     <van-cell-group inset>
@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, onActivated } from 'vue'
-import { getTeamSearchById, getUserCurrent, postTeamUpdate } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { useRoute, useRouter } from 'vue-router'
 import { showFailToast, showSuccessToast } from 'vant'
 
@@ -90,11 +90,11 @@ const loadTeamData = async () => {
     status.value = 0
     password.value = ''
     maxNum.value = 3
-    
+
     // 获取队伍详情并预填充表单
-    const teamRes = await getTeamSearchById({ teamId: teamId.value })
+    const teamRes = await api.team.searchTeamById({ teamId: teamId.value })
     const teamData = teamRes.data.data
-    
+
     if (teamData) {
       // 这里需要根据实际API返回的数据结构调整
       // 假设API返回的是队伍详情对象
@@ -120,12 +120,16 @@ onMounted(async () => {
 })
 
 // 监听路由参数变化，当团队ID改变时重新加载数据
-watch(() => route.params.teamId, async (newTeamId) => {
-  if (newTeamId && Number(newTeamId) !== teamId.value) {
-    teamId.value = Number(newTeamId)
-    await loadTeamData()
-  }
-}, { immediate: false })
+watch(
+  () => route.params.teamId,
+  async (newTeamId) => {
+    if (newTeamId && Number(newTeamId) !== teamId.value) {
+      teamId.value = Number(newTeamId)
+      await loadTeamData()
+    }
+  },
+  { immediate: false },
+)
 
 // 当页面从缓存中激活时，检查路由参数是否变化
 onActivated(async () => {
@@ -136,7 +140,6 @@ onActivated(async () => {
   }
 })
 const onSubmit = async () => {
-  const res = await getTeamSearchById({ teamId: teamId.value })
   const input = {
     id: teamId.value,
     teamName: teamName.value,
@@ -146,7 +149,7 @@ const onSubmit = async () => {
     icon: icon.value,
     password: password.value,
   }
-  const response = await postTeamUpdate({ id: teamId.value }, input)
+  const response = await api.team.updateTeam({ id: teamId.value }, input)
   if (response.data.code === 0) {
     showSuccessToast('更新成功')
     // 添加时间戳参数强制刷新列表

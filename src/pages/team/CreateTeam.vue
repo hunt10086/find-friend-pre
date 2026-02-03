@@ -71,7 +71,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { getUserCurrent, postTeamCreate, postUpload } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { watch } from 'vue'
 import { showFailToast, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'
@@ -116,7 +116,7 @@ const beforeRead = (input: any) => {
 }
 
 const check = async () => {
-  const res = await getUserCurrent()
+  const res = await api.user.getCurrentUser()
   userId.value = res.data.data.id
 }
 check()
@@ -129,10 +129,7 @@ const handleUpload = async (item: any) => {
       showFailToast('未选择文件')
       return
     }
-    const res = await postUpload(
-      { file: file as File },
-      { headers: { 'Content-Type': 'multipart/form-data' } },
-    )
+    const res = await api.upload.uploadPicture({ file: file as File })
     if (res?.data?.code === 0 && res?.data?.data) {
       icon.value = res.data.data
       fileList.value = [{ url: res.data.data } as any]
@@ -156,7 +153,7 @@ const onSubmit = async () => {
     icon: icon.value,
     password: password.value,
   }
-  const res = await postTeamCreate(input)
+  const res = await api.team.addTeam(input)
   if (res.data.code === 0) {
     showSuccessToast('创建队伍成功')
     // 添加时间戳参数强制刷新列表

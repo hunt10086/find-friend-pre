@@ -30,3 +30,8 @@ coverage
 *.tsbuildinfo
 CLAUDE.md
 src/docs/SWIPE_USAGE.md
+
+# OpenAPI Generator
+.openapi-generator/
+src/api/generated/
+!src/api/generated/.gitkeep

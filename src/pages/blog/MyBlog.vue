@@ -1,89 +1,115 @@
 <template>
-  <div v-if="flag" class="my-blogs-container">
-    <div
-      class="blog-card"
-      v-for="(blog, index) in blogList"
-      :key="blog.id"
-      :style="{ animationDelay: `${index * 0.1}s` }"
-      @click="goToBlog(blog.id)"
-    >
-      <div class="blog-header">
-        <div class="blog-category">
-          <van-tag type="primary" size="small">{{ blog.kind || '未分类' }}</van-tag>
-        </div>
-        <div class="blog-status">
-          <van-icon name="edit" color="#1890ff" />
-          我的博客
-        </div>
-      </div>
-
-      <div class="blog-content">
-        <h3 class="blog-title">{{ blog.title }}</h3>
-        <div class="blog-excerpt" v-if="blog.content">
-          {{ getExcerpt(blog.content) }}
-        </div>
-      </div>
-
-      <div class="blog-footer">
-        <div class="blog-stats">
-          <div class="stat-item">
-            <van-icon name="like-o" color="#ff6b6b" />
-            <span>{{ blog.praise || 0 }}</span>
+  <div>
+    <div v-if="flag" class="my-blogs-container">
+      <div
+        class="blog-card"
+        v-for="(blog, index) in blogList"
+        :key="blog.id"
+        :style="{ animationDelay: `${index * 0.1}s` }"
+        @click="goToBlog(blog.id)"
+      >
+        <div class="blog-header">
+          <div class="blog-category">
+            <van-tag type="primary">{{ blog.kind || '未分类' }}</van-tag>
           </div>
-          <div class="stat-item">
-            <van-icon name="eye-o" color="#1890ff" />
-            <span>{{ blog.viewCount || 0 }}</span>
-          </div>
-          <div class="stat-item">
-            <van-icon name="comment-o" color="#52c41a" />
-            <span>{{ blog.commentCount || 0 }}</span>
+          <div class="blog-status">
+            <van-icon name="edit" color="#1890ff" />
+            我的博客
           </div>
         </div>
-        <div class="blog-actions">
-          <van-button size="mini" plain icon="edit" @click.stop="editBlog(blog)"> 编辑 </van-button>
-          <van-button size="mini" plain icon="delete" @click.stop="deleteBlog(blog)">
-            删除
-          </van-button>
-        </div>
-      </div>
 
-      <div class="blog-card-bg"></div>
+        <div class="blog-content">
+          <h3 class="blog-title">{{ blog.title }}</h3>
+          <div class="blog-excerpt" v-if="blog.content">
+            {{ getExcerpt(blog.content) }}
+          </div>
+        </div>
+
+        <div class="blog-footer">
+          <div class="blog-stats">
+            <div class="stat-item">
+              <van-icon name="like-o" color="#ff6b6b" />
+              <span>{{ blog.praise || 0 }}</span>
+            </div>
+            <div class="stat-item">
+              <van-icon name="eye-o" color="#1890ff" />
+              <span>{{ blog.viewCount || 0 }}</span>
+            </div>
+            <div class="stat-item">
+              <van-icon name="comment-o" color="#52c41a" />
+              <span>{{ blog.commentCount || 0 }}</span>
+            </div>
+          </div>
+          <div class="blog-actions">
+            <van-button size="mini" plain icon="edit" @click.stop="editBlog(blog)">
+              编辑
+            </van-button>
+            <van-button size="mini" plain icon="delete" @click.stop="deleteBlog(blog)">
+              删除
+            </van-button>
+          </div>
+        </div>
+
+        <div class="blog-card-bg"></div>
+      </div>
     </div>
-  </div>
 
-  <div v-else class="empty-container">
-    <van-empty
-      image="https://fastly.jsdelivr.net/npm/@vant/assets/custom-empty-image.png"
-      description="暂无博客分享"
-    >
-      <van-button round type="primary" class="create-button" @click="handleAddBlog">
-        写第一篇博客
+    <!-- 分页导航 -->
+    <div v-if="flag && totalPages > 1" class="pagination-container">
+      <div class="pagination-wrapper">
+        <van-pagination
+          v-model="currentPage"
+          :total-items="total"
+          :items-per-page="pageSize"
+          :show-page-size="5"
+          force-ellipses
+          @change="onPageChange"
+        />
+        <div class="page-jump-controls">
+          <span class="jump-label">跳转到</span>
+          <van-field v-model="jumpPageInput" type="number" class="page-input" placeholder="页码" />
+          <van-button type="primary" size="small" @click="goToPage">跳转</van-button>
+          <span class="total-pages">共 {{ totalPages }} 页</span>
+        </div>
+      </div>
+      <van-divider />
+    </div>
+
+    <div v-else class="empty-container">
+      <van-empty
+        image="https://fastly.jsdelivr.net/npm/@vant/assets/custom-empty-image.png"
+        description="暂无博客分享"
+      >
+        <van-button round type="primary" class="create-button" @click="handleAddBlog">
+          写第一篇博客
+        </van-button>
+      </van-empty>
+    </div>
+
+    <div id="blank">
+      <van-divider />
+    </div>
+
+    <!-- 固定在右下角的按钮 -->
+    <van-sticky :offset-bottom="20" position="bottom">
+      <van-button
+        icon="plus"
+        type="primary"
+        class="round-button"
+        round
+        style="position: fixed; right: 20px; bottom: 120px; z-index: 999"
+        @click="handleAddBlog"
+      >
       </van-button>
-    </van-empty>
+    </van-sticky>
   </div>
-
-  <div id="blank">
-    <van-divider />
-  </div>
-
-  <!-- 固定在右下角的按钮 -->
-  <van-sticky :offset-bottom="20" position="bottom">
-    <van-button
-      icon="plus"
-      type="primary"
-      class="round-button"
-      round
-      style="position: fixed; right: 20px; bottom: 120px; z-index: 999"
-      @click="handleAddBlog"
-    >
-    </van-button>
-  </van-sticky>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, onActivated } from 'vue'
-import { getBlogMyList } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { useRouter } from 'vue-router'
+import { showFailToast } from 'vant'
 
 // 为组件设置名称，确保 keep-alive 能正确缓存
 defineOptions({
@@ -93,28 +119,69 @@ defineOptions({
 const blogList = ref() || []
 const user = ref()
 const router = useRouter()
-const flag = ref(false)
 
-const loadMyBlogData = async () => {
-  const response = await getBlogMyList()
-  blogList.value = response.data.data || []
-  if (response.data.code === 0 && blogList.value.length > 0) {
-    flag.value = true
-  } else {
-    flag.value = false
+// 分页相关
+const currentPage = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const totalPages = ref(0)
+const flag = ref(true)
+const jumpPageInput = ref('')
+
+const loadBlogData = async (page: number = 1) => {
+  try {
+    const res = await api.blog.getMyBlogList({ currentPage: page })
+    const blogs = res.data.data?.records || []
+
+    // 更新分页信息
+    total.value = res.data.data?.total || 0
+    pageSize.value = res.data.data?.size || 10
+    totalPages.value = res.data.data?.pages || Math.ceil(total.value / pageSize.value)
+
+    // 更新 flag 状态
+    if (page === 1 && blogs.length === 0) {
+      flag.value = false
+    } else {
+      flag.value = true
+    }
+
+    blogList.value = blogs
+  } catch (error) {
+    showFailToast('加载失败')
   }
 }
 
+// 页码改变时
+const onPageChange = (page: number) => {
+  currentPage.value = page
+  loadBlogData(page)
+  // 滚动到顶部
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+// 跳转到指定页
+const goToPage = () => {
+  let targetPage = parseInt(jumpPageInput.value)
+  if (isNaN(targetPage) || targetPage < 1 || targetPage > totalPages.value) {
+    showFailToast('请输入有效的页码')
+    return
+  }
+  currentPage.value = targetPage
+  loadBlogData(targetPage)
+  jumpPageInput.value = ''
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
 onMounted(async () => {
-  await loadMyBlogData()
+  await loadBlogData(1)
 })
 
 // 当页面从缓存中激活时重新获取数据
 onActivated(async () => {
-  await loadMyBlogData()
+  await loadBlogData(currentPage.value)
 })
 
-const goToBlog = (id) => {
+const goToBlog = (id: any) => {
   router.push(`/user/blog/${id}`)
 }
 
@@ -142,6 +209,45 @@ const deleteBlog = (blog: any) => {
 <style scoped>
 #blank {
   /* 底部间距已在全局设置，无需重复设置 */
+}
+
+/* 分页容器 */
+.pagination-container {
+  padding: 20px 16px;
+  background: #fff;
+}
+
+.pagination-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.page-jump-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jump-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.page-input {
+  width: 80px;
+  padding: 4px 8px;
+}
+
+.page-input :deep(.van-field__control) {
+  text-align: center;
+}
+
+.total-pages {
+  font-size: 14px;
+  color: #999;
+  margin-left: 8px;
 }
 
 /* 我的博客容器 */
@@ -350,6 +456,19 @@ const deleteBlog = (blog: any) => {
     align-self: stretch;
     justify-content: space-around;
   }
+
+  .pagination-wrapper {
+    gap: 12px;
+  }
+
+  .page-jump-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .page-input {
+    width: 60px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -365,6 +484,23 @@ const deleteBlog = (blog: any) => {
 
   .stat-item {
     font-size: 12px;
+  }
+
+  .pagination-wrapper {
+    gap: 8px;
+  }
+
+  .page-jump-controls {
+    gap: 4px;
+  }
+
+  .page-input {
+    width: 50px;
+  }
+
+  .total-pages {
+    width: 100%;
+    text-align: center;
   }
 }
 </style>

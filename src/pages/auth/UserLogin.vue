@@ -58,13 +58,7 @@
         <!-- 注册链接 -->
         <div class="register-section">
           <van-divider>还没有学习账号？</van-divider>
-          <van-button
-            round
-            block
-            type="default"
-            @click="Register"
-            class="register-btn"
-          >
+          <van-button round block type="default" @click="Register" class="register-btn">
             加入学习社区
           </van-button>
         </div>
@@ -87,7 +81,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { postUserLogin } from '@/api/dist/controller'
+import { api } from '@/api/apiClient'
 import { showSuccessToast, showFailToast, showToast } from 'vant'
 import { useRouter } from 'vue-router'
 
@@ -157,7 +151,7 @@ const onSubmit = async () => {
       userAccount: userAccount.value,
       userPassword: userPassword.value,
       latitude: latitude.value,
-      longitude: longitude.value
+      longitude: longitude.value,
     }
 
     const config = {
@@ -166,7 +160,7 @@ const onSubmit = async () => {
       },
     }
 
-    const res = await postUserLogin(input, config)
+    const res = await api.user.userLogin(input)
 
     if (res.data.code === 0) {
       showSuccessToast('登录成功')
@@ -176,7 +170,6 @@ const onSubmit = async () => {
       showFailToast(errorMessage)
     }
   } catch (error) {
-    console.error('登录失败:', error)
     showFailToast('网络错误，请检查网络连接后重试')
   } finally {
     isLoading.value = false
@@ -215,8 +208,13 @@ const showForgotPassword = () => {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(180deg); }
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
 }
 
 .header-section {
