@@ -188,7 +188,7 @@ const showForgotPassword = () => {
 <style scoped>
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3498db 0%, #8e44ad 100%);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -202,8 +202,8 @@ const showForgotPassword = () => {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-  animation: float 20s ease-in-out infinite;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="geometric" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M0,0 L20,0 L20,20 L0,20 Z" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23geometric)"/></svg>');
+  animation: float 25s ease-in-out infinite;
   pointer-events: none;
 }
 
@@ -264,6 +264,15 @@ const showForgotPassword = () => {
   padding: 0 20px;
   position: relative;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  animation: slideUp 0.8s ease-out 0.2s both;
 }
 
 .login-form {
@@ -316,9 +325,9 @@ const showForgotPassword = () => {
   height: 50px;
   font-size: 18px;
   font-weight: 600;
-  background: linear-gradient(135deg, #1989fa 0%, #1976d2 100%);
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
   border: none;
-  box-shadow: 0 4px 16px rgba(25, 137, 250, 0.4);
+  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.4);
   transition: all 0.3s ease;
 }
 
@@ -397,13 +406,27 @@ const showForgotPassword = () => {
 }
 
 /* 响应式设计 */
-@media (max-width: 375px) {
+@media (max-width: 768px) {
+  .form-section {
+    padding: 0 16px;
+    flex: 2;
+  }
+
+  .login-form {
+    max-width: 100%;
+    width: 100%;
+  }
+
   .app-title {
     font-size: 28px;
   }
 
   .app-subtitle {
     font-size: 14px;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
   }
 
   .login-btn {
@@ -413,6 +436,68 @@ const showForgotPassword = () => {
 
   .register-btn {
     height: 40px;
+  }
+
+  .header-section {
+    padding: 20px 16px 10px;
+  }
+
+  .footer-section {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-container {
+    min-height: 100vh;
+  }
+
+  .header-section {
+    flex: 0 0 auto;
+    padding: 20px 16px 10px;
+  }
+
+  .logo-container {
+    margin-bottom: 20px;
+  }
+
+  .app-title {
+    font-size: 24px;
+  }
+
+  .app-subtitle {
+    font-size: 13px;
+  }
+
+  .form-section {
+    flex: 1;
+    padding: 10px 12px 20px;
+    justify-content: flex-start;
+  }
+
+  .login-form {
+    width: 100%;
+  }
+
+  .button-section {
+    margin: 24px 0 20px;
+  }
+
+  .login-btn {
+    height: 44px;
+    font-size: 15px;
+  }
+
+  .form-group :deep(.van-field__control) {
+    font-size: 15px;
+  }
+
+  .footer-section {
+    padding: 12px;
+  }
+
+  .footer-text {
+    font-size: 12px;
   }
 }
 

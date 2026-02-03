@@ -1,6 +1,6 @@
 <template>
   <!-- Loading状态 -->
-  <van-loading v-if="loading" type="spinner" color="#1989fa" size="24px"> 加载中... </van-loading>
+  <van-loading v-if="loading" type="spinner" color="#003366" size="24px"> 加载中... </van-loading>
 
   <!-- 正常内容 -->
   <div v-else class="team-members-container">
@@ -26,27 +26,24 @@
         :style="{ animationDelay: `${index * 0.1}s` }"
       >
         <div class="member-header">
-          <div class="member-avatar">
+          <div class="member-avatar" @click="viewProfile(user)">
             <img
               :src="user.avatarUrl || '/ava.jpg'"
               :alt="user.userName"
               @error="handleImageError"
             />
-            <div class="role-badge" v-if="captain === user.id">
-              <van-icon name="star" />
-              队长
-            </div>
           </div>
           <div class="member-info">
             <h3 class="member-name">{{ user.userName }}</h3>
-            <div class="member-id">用户ID: #{{ user.id }}</div>
-            <div class="member-role" v-if="captain === user.id">
-              <van-icon name="crown" color="#ffd700" />
-              队伍管理员
-            </div>
-            <div class="member-role" v-else>
-              <van-icon name="friends-o" />
-              队伍成员
+            <div class="member-role">
+              <template v-if="captain === user.id">
+                <van-tag type="warning">队长</van-tag>
+                <span class="role-text">队伍管理员</span>
+              </template>
+              <template v-else>
+                <van-tag type="primary">成员</van-tag>
+                <span class="role-text">队伍成员</span>
+              </template>
             </div>
           </div>
         </div>
@@ -79,24 +76,59 @@
           <van-button type="warning" size="small" round icon="cross" @click="removeMember(user)">
             移除成员
           </van-button>
-          <van-button type="success" size="small" round icon="guide-o" @click="viewProfile(user)">
-            查看资料
+          <van-button
+            v-if="isFriend(user.id)"
+            type="primary"
+            size="small"
+            round
+            icon="chat-o"
+            @click="sendMessage(user)"
+          >
+            发送消息
+          </van-button>
+          <van-button
+            v-else
+            type="primary"
+            size="small"
+            round
+            icon="friends-o"
+            @click="viewProfile(user)"
+          >
+            添加好友
           </van-button>
         </div>
 
         <div class="member-actions" v-else-if="user.id !== userId">
-          <van-button type="primary" size="small" round icon="chat-o" @click="sendMessage(user)">
+          <van-button
+            v-if="isFriend(user.id)"
+            type="primary"
+            size="small"
+            round
+            icon="chat-o"
+            @click="sendMessage(user)"
+          >
             发送消息
           </van-button>
+          <van-button
+            v-else
+            type="primary"
+            size="small"
+            round
+            icon="friends-o"
+            @click="viewProfile(user)"
+          >
+            添加好友
+          </van-button>
         </div>
-
-        <div class="member-card-bg"></div>
       </div>
     </div>
 
     <div id="blank">
       <van-divider />
     </div>
+
+    <!-- 用户资料模态框 -->
+    <UserProfileModal v-model="showProfileModal" :userId="selectedUserId" />
   </div>
 </template>
 
@@ -106,6 +138,8 @@ import { api } from '@/api/apiClient'
 import { useRoute } from 'vue-router'
 import router from '@/config/router.ts'
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant'
+import UserProfileModal from '@/components/UserProfileModal.vue'
+import { useFriendStore } from '@/stores/friendStore'
 
 // 为组件设置名称，确保 keep-alive 能正确缓存
 defineOptions({
@@ -118,6 +152,10 @@ const teamId = ref(Number(route.params.teamId))
 const userId = ref()
 const captain = ref()
 const loading = ref(false)
+
+const friendStore = useFriendStore()
+const showProfileModal = ref(false)
+const selectedUserId = ref<number | null>(null)
 
 const getTeamData = async () => {
   loading.value = true
@@ -145,7 +183,7 @@ const getTeamData = async () => {
 }
 
 onMounted(async () => {
-  await getTeamData()
+  await Promise.all([getTeamData(), friendStore.ensureLoaded()])
 })
 
 // 监听路由参数变化，当团队ID改变时重新获取数据
@@ -197,14 +235,16 @@ const removeMember = async (user: any) => {
 
 // 查看资料
 const viewProfile = (user: any) => {
-  router.push(`/user/profile/${user.id}`)
+  selectedUserId.value = user.id
+  showProfileModal.value = true
 }
 
 // 发送消息
 const sendMessage = (user: any) => {
-  showSuccessToast(`向 ${user.userName} 发送消息`)
-  // 这里可以添加实际的聊天逻辑
+  router.push(`/friendChat/${user.id}`)
 }
+
+const isFriend = (id: number) => friendStore.isFriend(id)
 
 // 获取要显示的标签
 const getDisplayTags = (user: any) => {
@@ -247,9 +287,9 @@ const toggleTagsExpand = (user: any) => {
 }
 
 .update-team-btn {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background: #003366;
   border: none;
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 51, 102, 0.3);
   padding: 12px 24px;
 }
 
@@ -260,11 +300,12 @@ const toggleTagsExpand = (user: any) => {
 
 /* 成员卡片样式 */
 .member-card {
-  background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5dc 100%);
+  border: 1px solid #a89f91;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
   animation: slideInUp 0.6s ease-out forwards;
@@ -273,30 +314,9 @@ const toggleTagsExpand = (user: any) => {
   transition: all 0.3s ease;
 }
 
-.member-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%);
-}
-
 .member-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-}
-
-.member-card-bg {
-  position: absolute;
-  top: -40%;
-  right: -15%;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, transparent 70%);
-  border-radius: 50%;
-  z-index: 0;
 }
 
 /* 成员头部 */
@@ -312,6 +332,7 @@ const toggleTagsExpand = (user: any) => {
 .member-avatar {
   position: relative;
   flex-shrink: 0;
+  cursor: pointer;
 }
 
 .member-avatar img {
@@ -323,24 +344,10 @@ const toggleTagsExpand = (user: any) => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.role-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: linear-gradient(135deg, #ffd700 0%, #ffb700 100%);
-  color: white;
-  border-radius: 12px;
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.role-badge .van-icon {
-  font-size: 10px;
+.role-text {
+  margin-left: 8px;
+  font-size: 13px;
+  color: #4b4b4b;
 }
 
 .member-info {
@@ -350,28 +357,21 @@ const toggleTagsExpand = (user: any) => {
 .member-name {
   font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
+  color: #003366;
   margin: 0 0 4px 0;
   line-height: 1.3;
 }
 
 .member-id {
   font-size: 12px;
-  color: #95a5a6;
+  color: #4b4b4b;
   margin-bottom: 6px;
 }
 
 .member-role {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  color: #8b5cf6;
-  font-weight: 500;
-}
-
-.member-role .van-icon {
-  font-size: 14px;
+  margin-top: 4px;
 }
 
 /* 成员内容 */
@@ -390,9 +390,9 @@ const toggleTagsExpand = (user: any) => {
 .member-tag {
   font-size: 12px;
   border-radius: 12px;
-  background: rgba(139, 92, 246, 0.1);
-  border-color: rgba(139, 92, 246, 0.3);
-  color: #8b5cf6;
+  background: rgba(157, 193, 131, 0.2);
+  border-color: #9dc183;
+  color: #003366;
 }
 
 .expand-tags-btn {
@@ -401,17 +401,17 @@ const toggleTagsExpand = (user: any) => {
   height: 20px;
   line-height: 16px;
   border-radius: 10px;
-  border-color: rgba(139, 92, 246, 0.3);
-  color: #8b5cf6;
-  background: rgba(139, 92, 246, 0.05);
+  border-color: #9dc183;
+  color: #003366;
+  background: rgba(157, 193, 131, 0.1);
   transition: all 0.2s ease;
   align-self: center;
   min-width: 32px;
 }
 
 .expand-tags-btn:hover {
-  background: rgba(139, 92, 246, 0.1);
-  border-color: rgba(139, 92, 246, 0.5);
+  background: rgba(157, 193, 131, 0.2);
+  border-color: #8db600;
 }
 
 .expand-tags-btn:active {

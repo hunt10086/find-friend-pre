@@ -58,9 +58,6 @@
           >
             {{ (blog as any)._liked ? '已点赞' : '点赞' }}
           </van-button>
-          <van-button size="mini" plain icon="star-o" @click.stop="collectBlog(blog)">
-            收藏
-          </van-button>
         </div>
       </div>
 
@@ -307,11 +304,6 @@ const likeBlog = async (blog: any) => {
     // 重置状态
     blog.isLiking = false
   }
-}
-
-// 收藏博客
-const collectBlog = (blog: any) => {
-  showSuccessToast('收藏成功')
 }
 </script>
 <style scoped>

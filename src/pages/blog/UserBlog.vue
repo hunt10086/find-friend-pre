@@ -31,7 +31,7 @@
             <div class="author-desc">{{ userProfile || '这个人很懒，什么都没有留下...' }}</div>
           </div>
           <div class="author-actions">
-            <van-button type="primary" size="small" round>
+            <van-button type="primary" size="small" round @click="showFailToast('暂未实现')">
               <van-icon name="plus" />
               关注
             </van-button>
@@ -64,11 +64,23 @@
               <van-icon :name="isLiked ? 'good-job' : 'good-job-o'" />
               点赞 {{ praise }}
             </van-button>
-            <van-button type="default" size="small" round class="action-btn">
+            <van-button
+              type="default"
+              size="small"
+              round
+              class="action-btn"
+              @click="showFailToast('暂未实现')"
+            >
               <van-icon name="star-o" />
               收藏
             </van-button>
-            <van-button type="default" size="small" round class="action-btn">
+            <van-button
+              type="default"
+              size="small"
+              round
+              class="action-btn"
+              @click="showFailToast('暂未实现')"
+            >
               <van-icon name="share-o" />
               分享
             </van-button>
@@ -141,11 +153,11 @@
                   {{ comment.content }}
                 </div>
                 <div class="comment-footer">
-                  <van-button type="default" size="mini" plain>
+                  <van-button type="default" size="mini" plain @click="showFailToast('功能未开放')">
                     <van-icon name="good-job-o" />
                     点赞
                   </van-button>
-                  <van-button type="default" size="mini" plain>
+                  <van-button type="default" size="mini" plain @click="showFailToast('功能未开放')">
                     <van-icon name="chat-o" />
                     回复
                   </van-button>

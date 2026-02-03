@@ -3,7 +3,7 @@
     <!-- 头部区域 -->
     <div class="header-section">
       <div class="logo-container">
-        <van-icon name="add-square" size="50" color="#1989fa" />
+        <van-icon name="add-square" size="50" color="#3498db" />
         <h1 class="app-title">加入学习社区</h1>
         <p class="app-subtitle">创建账号，开始寻找学习伙伴的旅程</p>
       </div>
@@ -359,7 +359,7 @@ const goToLogin = () => {
 <style scoped>
 .register-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3498db 0%, #8e44ad 100%);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -373,7 +373,7 @@ const goToLogin = () => {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="geometric" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M0,0 L20,0 L20,20 L0,20 Z" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23geometric)"/></svg>');
   animation: drift 30s ease-in-out infinite;
   pointer-events: none;
 }
@@ -435,9 +435,14 @@ const goToLogin = () => {
   z-index: 1;
   flex: 1;
   overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .register-form {
+  width: 100%;
+  max-width: 420px;
   animation: slideUp 0.8s ease-out 0.2s both;
 }
 
@@ -468,7 +473,7 @@ const goToLogin = () => {
 }
 
 .step-title .van-icon {
-  color: #1989fa;
+  color: #3498db;
   background: white;
   border-radius: 50%;
   padding: 4px;
@@ -492,7 +497,7 @@ const goToLogin = () => {
 }
 
 .form-group :deep(.van-field__left-icon) {
-  color: #1989fa;
+  color: #3498db;
   margin-right: 8px;
 }
 
@@ -520,6 +525,7 @@ const goToLogin = () => {
   border-radius: 18px;
   font-size: 13px;
   transition: all 0.3s ease;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
 }
 
 .send-code-btn:active {
@@ -538,15 +544,15 @@ const goToLogin = () => {
   height: 48px;
   font-size: 16px;
   font-weight: 600;
-  background: linear-gradient(135deg, #1989fa 0%, #1976d2 100%);
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
   border: none;
-  box-shadow: 0 4px 16px rgba(25, 137, 250, 0.4);
+  box-shadow: 0 4px 16px rgba(52, 152, 219, 0.4);
   transition: all 0.3s ease;
 }
 
 .register-btn:active {
   transform: translateY(1px);
-  box-shadow: 0 2px 8px rgba(25, 137, 250, 0.4);
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
 }
 
 .register-btn:disabled {
@@ -595,11 +601,11 @@ const goToLogin = () => {
 
 /* 错误状态样式 */
 :deep(.van-field--error .van-field__control) {
-  color: #ee0a24;
+  color: #e74c3c;
 }
 
 :deep(.van-field--error .van-field__left-icon) {
-  color: #ee0a24;
+  color: #e74c3c;
 }
 
 /* Toast 提示信息优化 */
@@ -646,7 +652,16 @@ const goToLogin = () => {
 }
 
 /* 响应式设计 */
-@media (max-width: 375px) {
+@media (max-width: 768px) {
+  .form-section {
+    padding: 0 12px 60px;
+  }
+
+  .register-form {
+    max-width: 100%;
+    width: 100%;
+  }
+
   .app-title {
     font-size: 24px;
   }
@@ -669,10 +684,6 @@ const goToLogin = () => {
     font-size: 12px;
   }
 
-  .form-section {
-    padding: 0 12px 60px;
-  }
-
   .header-section {
     padding: 15px 15px 10px;
   }
@@ -686,20 +697,18 @@ const goToLogin = () => {
     line-height: 1.3;
   }
 
-  /* 小屏幕下的Toast优化 */
+  /* 中等屏幕尺寸优化 */
   :deep(.van-toast) {
     max-width: calc(100vw - 24px);
     font-size: 13px;
     padding: 10px 14px;
   }
 
-  /* 小屏幕下的错误消息优化 */
   :deep(.van-field__error-message) {
     font-size: 11px;
     line-height: 1.2;
   }
 
-  /* 小屏幕下的表单字段优化 */
   :deep(.van-field__label) {
     font-size: 13px;
     min-width: 55px;
@@ -715,13 +724,12 @@ const goToLogin = () => {
     gap: 6px;
   }
 
-  /* 小屏幕下的Placeholder优化 */
   :deep(.van-field__control::placeholder) {
     font-size: 13px;
   }
 }
 
-@media (max-width: 320px) {
+@media (max-width: 480px) {
   .app-title {
     font-size: 22px;
   }
@@ -747,6 +755,7 @@ const goToLogin = () => {
 
   .form-section {
     padding: 0 8px 50px;
+    justify-content: flex-start;
   }
 
   .header-section {
@@ -762,7 +771,6 @@ const goToLogin = () => {
     max-width: calc(100vw - 16px);
     font-size: 12px;
     padding: 8px 12px;
-    line-height: 1.3;
   }
 
   /* 超小屏幕下的错误消息优化 */

@@ -191,44 +191,8 @@
         <van-icon name="edit" :size="iconSize" color="#9c26b0" />
         <span class="grid-text">我的博客分享</span>
       </van-grid-item>
-
-      <!-- 主题设置选项 -->
-      <van-grid-item
-        @click="showThemeSettings"
-        class="nav-item"
-        :class="{ 'nav-item-active': activeNavItem === 5 }"
-        @touchstart="setActiveNav(5)"
-        @touchend="clearActiveNav"
-        @touchcancel="clearActiveNav"
-      >
-        <van-icon name="setting-o" :size="iconSize" color="#ff976a" />
-        <span class="grid-text">聊天主题</span>
-      </van-grid-item>
     </van-grid>
   </div>
-
-  <!-- 主题设置弹窗 -->
-  <van-popup v-model:show="showThemePopup" round position="bottom" :style="{ height: '40%' }">
-    <div class="theme-popup-header">
-      <h3>聊天主题设置</h3>
-      <van-icon name="close" @click="showThemePopup = false" class="close-icon" />
-    </div>
-    <div class="theme-options">
-      <div
-        v-for="theme in themes"
-        :key="theme.key"
-        :class="['theme-option', { active: currentTheme === theme.key }]"
-        :style="getThemeStyle(theme)"
-        @click="selectTheme(theme.key)"
-      >
-        <div class="theme-preview">
-          <div class="self-bubble" :style="{ backgroundColor: theme.selfBubbleBg }"></div>
-          <div class="other-bubble" :style="{ backgroundColor: theme.otherBubbleBg }"></div>
-        </div>
-        <span class="theme-name">{{ theme.name }}</span>
-      </div>
-    </div>
-  </van-popup>
 
   <!-- 退出登录按钮 -->
   <div class="logout-section">
@@ -251,7 +215,6 @@ import { showFailToast, showSuccessToast } from 'vant'
 import { useRouter } from 'vue-router'
 import { onMounted, ref, computed, onUnmounted } from 'vue'
 import dayjs from 'dayjs'
-import { useThemeStore } from '@/stores/themeStore'
 
 const router = useRouter()
 const user = ref()
@@ -261,9 +224,6 @@ const avatarLoading = ref(true)
 const profileExpanded = ref(false)
 const activeNavItem = ref(-1)
 const screenWidth = ref(window.innerWidth)
-
-// 使用主题store
-const themeStore = useThemeStore()
 
 interface FriendRequest {
   id: number
@@ -286,61 +246,6 @@ const iconSize = computed(() => {
 })
 
 // 主题设置
-const themes = [
-  {
-    key: 'default',
-    name: '清新蓝',
-    primaryColor: '#1989fa',
-    selfBubbleBg: '#dcf8c6',
-    otherBubbleBg: '#ffffff',
-  },
-  {
-    key: 'purple',
-    name: '优雅紫',
-    primaryColor: '#7232dd',
-    selfBubbleBg: '#e6d4fa',
-    otherBubbleBg: '#ffffff',
-  },
-  {
-    key: 'green',
-    name: '自然绿',
-    primaryColor: '#07c160',
-    selfBubbleBg: '#c6f8dc',
-    otherBubbleBg: '#ffffff',
-  },
-  {
-    key: 'pink',
-    name: '温柔粉',
-    primaryColor: '#ff6b9d',
-    selfBubbleBg: '#fad4e6',
-    otherBubbleBg: '#ffffff',
-  },
-]
-
-// 主题设置弹窗控制
-const showThemePopup = ref(false)
-
-// 显示主题设置弹窗
-const showThemeSettings = () => {
-  showThemePopup.value = true
-}
-
-// 获取主题样式
-const getThemeStyle = (theme: any) => {
-  return {
-    '--primary-color': theme.primaryColor,
-    '--self-bubble-bg': theme.selfBubbleBg,
-    '--other-bubble-bg': theme.otherBubbleBg,
-  }
-}
-
-// 选择主题
-const selectTheme = (themeKey: string) => {
-  themeStore.setTheme(themeKey)
-}
-
-// 当前主题
-const currentTheme = computed(() => themeStore.currentTheme)
 
 // 监听屏幕尺寸变化
 const handleResize = () => {
@@ -370,8 +275,6 @@ const loadFriendRequests = async () => {
 
 onMounted(() => {
   window.addEventListener('resize', handleResize)
-  // 初始化主题
-  themeStore.initializeTheme()
   loadUserData()
   loadFriendRequests()
 })
@@ -996,85 +899,5 @@ const handleImageError = (event: Event) => {
     transition: none !important;
     animation: none !important;
   }
-}
-
-/* 主题设置样式 */
-.theme-options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  padding: 16px;
-  height: calc(100% - 60px);
-  overflow-y: auto;
-}
-
-.theme-option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: 2px solid transparent;
-}
-
-.theme-option:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.theme-option.active {
-  border-color: var(--primary-color);
-  background: rgba(var(--primary-color-rgb), 0.05);
-}
-
-.theme-preview {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.self-bubble {
-  width: 24px;
-  height: 20px;
-  border-radius: 12px 4px 12px 12px;
-  background: var(--self-bubble-bg, #dcf8c6);
-}
-
-.other-bubble {
-  width: 24px;
-  height: 20px;
-  border-radius: 4px 12px 12px 12px;
-  background: var(--other-bubble-bg, #ffffff);
-  border: 1px solid #ebedf0;
-}
-
-.theme-name {
-  font-size: 13px;
-  color: #666;
-  font-weight: 500;
-}
-
-.theme-popup-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.theme-popup-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-}
-
-.close-icon {
-  font-size: 24px;
-  color: #999;
-  cursor: pointer;
 }
 </style>

@@ -3,11 +3,16 @@
     <!-- 顶部导航栏 -->
     <div class="editor-header">
       <div class="header-left">
-        <h1 class="page-title">写博客</h1>
+        <van-icon name="arrow-left" class="back-icon" @click="handleBack" />
+        <h1 class="page-title">{{ getPageTitle() }}</h1>
       </div>
       <div class="header-right">
-        <button @click="saveDraft" class="draft-button">保存草稿</button>
-        <button @click="submitBlog" class="publish-button">发布文章</button>
+        <button v-if="!isEditMode || blogStatus === 1" @click="saveDraft" class="draft-button">
+          保存草稿
+        </button>
+        <button @click="submitBlog" class="publish-button">
+          {{ getPublishButtonText() }}
+        </button>
       </div>
     </div>
 
@@ -137,21 +142,6 @@
             ></textarea>
             <div class="form-tip">{{ summary.length }}/200</div>
           </div>
-
-          <!-- 可见性设置 -->
-          <div class="form-item">
-            <label class="form-label">可见性</label>
-            <div class="radio-group">
-              <label class="radio-item">
-                <input type="radio" v-model="visibility" value="public" />
-                <span class="radio-text">🌍 公开</span>
-              </label>
-              <label class="radio-item">
-                <input type="radio" v-model="visibility" value="private" />
-                <span class="radio-text">🔒 私密</span>
-              </label>
-            </div>
-          </div>
         </div>
 
         <!-- Markdown预览区域 -->
@@ -173,20 +163,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick, watch, onMounted, onBeforeUnmount, computed } from 'vue'
 import VueMarkdown from 'vue-markdown-render'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import myAxios from '@/plugins/myAxios'
-import { showFailToast, showSuccessToast, showLoadingToast } from 'vant'
+import { showFailToast, showSuccessToast, showLoadingToast, showDialog } from 'vant'
+import { api } from '@/api/apiClient'
 
 const router = useRouter()
+const route = useRoute()
+
+// 编辑模式相关
+const isEditMode = ref(false)
+const blogId = ref<number>()
+const blogStatus = ref<number>(0) // 博客状态：0=已发布，1=草稿
 
 // 基本数据
 const title = ref('')
 const category = ref('技术')
 const content = ref('')
 const summary = ref('')
-const visibility = ref('public')
+
+// 内容修改追踪
+const initialTitle = ref('')
+const initialCategory = ref('技术')
+const initialContent = ref('')
+const hasUnsavedChanges = computed(() => {
+  return (
+    title.value !== initialTitle.value ||
+    category.value !== initialCategory.value ||
+    content.value !== initialContent.value
+  )
+})
+const isSaving = ref(false) // 标记是否正在保存
 
 // 标签相关
 const tags = ref<string[]>([])
@@ -236,6 +245,47 @@ const insertCodeBlock = () => {
   insertFormat('\n```\n', '\n```\n')
 }
 
+// 获取页面标题
+const getPageTitle = () => {
+  if (isEditMode.value) {
+    return blogStatus.value === 1 ? '编辑草稿' : '编辑博客'
+  }
+  return '写博客'
+}
+
+// 获取发布按钮文字
+const getPublishButtonText = () => {
+  if (isEditMode.value) {
+    return blogStatus.value === 1 ? '发布文章' : '更新文章'
+  }
+  return '发布文章'
+}
+
+const handleBack = () => {
+  if (!isSaving.value && hasUnsavedChanges.value) {
+    showDialog({
+      title: '提示',
+      message: '您有未保存的内容，确定要离开吗？离开后将丢失未保存的数据。',
+      showCancelButton: true,
+      confirmButtonText: '离开',
+      cancelButtonText: '取消',
+      confirmButtonColor: '#ee0a24',
+    })
+      .then(() => {
+        // 重置初始值，防止触发 onBeforeRouteLeave 的二次弹窗
+        initialTitle.value = title.value
+        initialCategory.value = category.value
+        initialContent.value = content.value
+        router.back()
+      })
+      .catch(() => {
+        // 取消操作
+      })
+  } else {
+    router.back()
+  }
+}
+
 // 保存草稿
 const saveDraft = async () => {
   if (!title.value.trim()) {
@@ -249,24 +299,44 @@ const saveDraft = async () => {
   })
 
   try {
-    // 这里可以实现草稿保存逻辑
-    // 暂时使用 localStorage 保存
-    const draft = {
-      title: title.value,
-      category: category.value,
-      content: content.value,
-      summary: summary.value,
-      tags: tags.value,
-      visibility: visibility.value,
-      timestamp: Date.now(),
+    isSaving.value = true
+    let response
+
+    if (isEditMode.value && blogId.value && blogStatus.value === 1) {
+      // 编辑草稿模式 - 调用更新接口
+      response = await api.blog.updateBlog(
+        { id: blogId.value },
+        {
+          title: title.value,
+          kind: category.value,
+          passage: content.value,
+          status: 1,
+        },
+      )
+    } else {
+      // 新建草稿 - 调用创建接口，status=1
+      response = await myAxios.post('/blog/create', {
+        title: title.value,
+        kind: category.value,
+        passage: content.value,
+        status: 1,
+      })
     }
 
-    localStorage.setItem('blog_draft', JSON.stringify(draft))
     toast.close()
-    showSuccessToast('草稿已保存')
+
+    if (response.data.code === 0) {
+      showSuccessToast('草稿已保存')
+      // 跳转回我的博客页面
+      router.push({ path: '/my/blog', query: { refresh: Date.now() } })
+    } else {
+      showFailToast('保存失败，请重试')
+      isSaving.value = false
+    }
   } catch (error) {
     toast.close()
-    showFailToast('保存失败')
+    showFailToast('保存失败，请检查网络连接')
+    isSaving.value = false
   }
 }
 
@@ -283,48 +353,142 @@ const submitBlog = async () => {
   })
 
   try {
-    const response = await myAxios.post('/blog/create', {
-      title: title.value,
-      kind: category.value,
-      passage: content.value,
-    })
+    isSaving.value = true
+    let response
+
+    if (isEditMode.value && blogId.value && blogStatus.value === 0) {
+      // 编辑已发布的博客 - 调用更新接口
+      response = await api.blog.updateBlog(
+        { id: blogId.value },
+        {
+          title: title.value,
+          kind: category.value,
+          passage: content.value,
+          status: 0,
+        },
+      )
+    } else {
+      // 草稿发布：先删除原草稿，再创建新博客
+      if (isEditMode.value && blogId.value && blogStatus.value === 1) {
+        await api.blog.deleteBlog({ id: blogId.value })
+      }
+
+      // 新建博客 或 草稿发布 - 调用创建接口，status=0
+      response = await myAxios.post('/blog/create', {
+        title: title.value,
+        kind: category.value,
+        passage: content.value,
+        status: 0,
+      })
+    }
 
     toast.close()
 
     if (response.data.code === 0) {
       showSuccessToast('博客发布成功！')
-      // 清除草稿
-      localStorage.removeItem('blog_draft')
-      // 添加时间戳参数强制刷新列表
-      router.push({ path: '/blog', query: { refresh: Date.now() } })
+      // 跳转回我的博客页面
+      router.push({ path: '/my/blog', query: { refresh: Date.now() } })
     } else {
       showFailToast('发布失败，请重试')
+      isSaving.value = false
     }
   } catch (error) {
     toast.close()
-
     showFailToast('发布失败，请检查网络连接')
+    isSaving.value = false
   }
 }
 
-// 页面加载时恢复草稿
-const loadDraft = () => {
+// 加载博客数据（编辑模式）
+const loadBlogData = async (id: number) => {
+  const toast = showLoadingToast({
+    message: '加载中...',
+    forbidClick: true,
+  })
+
   try {
-    const draft = localStorage.getItem('blog_draft')
-    if (draft) {
-      const draftData = JSON.parse(draft)
-      title.value = draftData.title || ''
-      category.value = draftData.category || '技术'
-      content.value = draftData.content || ''
-      summary.value = draftData.summary || ''
-      tags.value = draftData.tags || []
-      visibility.value = draftData.visibility || 'public'
+    const response = await api.blog.getBlog({ blogId: id })
+    toast.close()
+
+    if (response.data.code === 0 && response.data.data) {
+      const blog = response.data.data
+      title.value = blog.title || ''
+      category.value = blog.kind || '技术'
+      content.value = blog.passage || ''
+      blogStatus.value = Number(blog.status) || 0 // 记录博客状态
+      // summary 字段在 Blog 类型中不存在，暂时留空
+      summary.value = ''
       updateWordCount()
+
+      // 记录初始值用于检测修改
+      initialTitle.value = title.value
+      initialCategory.value = category.value
+      initialContent.value = content.value
+    } else {
+      showFailToast('加载博客失败')
+      router.back()
     }
   } catch (error) {
-    // 加载草稿失败，静默处理
+    toast.close()
+    showFailToast('加载博客失败，请检查网络连接')
+    router.back()
   }
 }
+
+// 页面初始化
+onMounted(async () => {
+  // 检查是否为编辑模式
+  const id = route.params.id
+  if (id) {
+    isEditMode.value = true
+    blogId.value = Number(id)
+    await loadBlogData(blogId.value)
+  } else {
+    // 新建模式，记录初始值
+    initialTitle.value = ''
+    initialCategory.value = '技术'
+    initialContent.value = ''
+  }
+})
+
+// 路由离开前确认
+onBeforeRouteLeave((to, from, next) => {
+  if (!isSaving.value && hasUnsavedChanges.value) {
+    showDialog({
+      title: '提示',
+      message: '您有未保存的内容，确定要离开吗？离开后将丢失未保存的数据。',
+      showCancelButton: true,
+      confirmButtonText: '离开',
+      cancelButtonText: '取消',
+      confirmButtonColor: '#ee0a24',
+    })
+      .then(() => {
+        next()
+      })
+      .catch(() => {
+        next(false)
+      })
+  } else {
+    next()
+  }
+})
+
+// 浏览器刷新/关闭前提示
+onMounted(() => {
+  const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    if (!isSaving.value && hasUnsavedChanges.value) {
+      e.preventDefault()
+      e.returnValue = '您有未保存的内容，确定要离开吗？'
+      return e.returnValue
+    }
+  }
+
+  window.addEventListener('beforeunload', handleBeforeUnload)
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('beforeunload', handleBeforeUnload)
+  })
+})
 
 // 复制代码功能
 const copyCode = async (code: string) => {
@@ -460,12 +624,27 @@ watch(
     }
   },
 )
-
-// 组件挂载时加载草稿
-loadDraft()
 </script>
 
 <style scoped>
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-icon {
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.back-icon:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
 /* 全局样式 */
 .create-blog-page {
   min-height: 100vh;

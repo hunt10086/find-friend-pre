@@ -1,9 +1,9 @@
 <template id="app">
-  <div id="app" :class="{ 'container': shouldUseContainer }">
+  <div id="app" :class="{ container: shouldUseContainer }">
     <!-- 根据 meta 控制是否显示全局导航栏 -->
     <header-nav v-if="$route.meta.showNavBar" />
     <!-- 使用 keep-alive 缓存指定页面 -->
-    <div id="router" v-if="$route.meta.keepAlive">
+    <div :id="$route.meta.showNavBar ? 'router' : ''" v-if="$route.meta.keepAlive">
       <router-view v-slot="{ Component }">
         <keep-alive>
           <component :is="Component" />
@@ -11,7 +11,7 @@
       </router-view>
     </div>
     <!-- 非缓存页面直接渲染 -->
-    <div id="router" v-if="!$route.meta.keepAlive">
+    <div :id="$route.meta.showNavBar ? 'router' : ''" v-if="!$route.meta.keepAlive">
       <router-view v-slot="{ Component }">
         <component :is="Component" />
       </router-view>
@@ -20,36 +20,36 @@
 </template>
 
 <script>
-import HeaderNav from '@/layouts/BasicLayout.vue';
-import { computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { useThemeStore } from '@/stores/themeStore';
+import HeaderNav from '@/layouts/BasicLayout.vue'
+import { computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useThemeStore } from '@/stores/themeStore'
 
 export default {
   components: {
-    HeaderNav
+    HeaderNav,
   },
   setup() {
-    const route = useRoute();
-    const themeStore = useThemeStore();
+    const route = useRoute()
+    const themeStore = useThemeStore()
 
     // 定义不需要容器样式的全屏页面
-    const fullScreenPages = ['/user/login', '/user/register'];
+    const fullScreenPages = ['/user/login', '/user/register']
 
     const shouldUseContainer = computed(() => {
-      return !fullScreenPages.includes(route.path);
-    });
+      return !fullScreenPages.includes(route.path)
+    })
 
     // 初始化主题
     onMounted(() => {
-      themeStore.initializeTheme();
-    });
+      themeStore.initializeTheme()
+    })
 
     return {
-      shouldUseContainer
-    };
-  }
-};
+      shouldUseContainer,
+    }
+  },
+}
 </script>
 <style scoped>
 /* 只为容器页面设置样式 */
@@ -58,7 +58,7 @@ export default {
   padding: 0;
 }
 
-#router{
+#router {
   padding-bottom: 70px; /* 为底部导航栏预留空间 */
   min-height: calc(100vh - 120px); /* 减去顶部导航栏和底部导航栏的高度 */
 }

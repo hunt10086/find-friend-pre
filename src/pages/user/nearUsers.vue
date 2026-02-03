@@ -16,7 +16,6 @@
         </div>
         <div class="nearby-info">
           <h3 class="nearby-name">{{ user.userName }}</h3>
-          <div class="nearby-id">用户ID: #{{ user.id }}</div>
           <div class="nearby-distance">
             <van-icon name="compass-o" />
             距离你 {{ formatDistance(user.distance) }}
@@ -122,7 +121,7 @@ const loadNearUsersData = async () => {
         showFailToast('附近没有用户')
       }
     } else {
-      showFailToast('获取失败')
+      showFailToast(res.data.description || '获取失败')
     }
   } catch (error) {
     showFailToast('网络错误，请重试')

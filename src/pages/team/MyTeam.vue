@@ -9,14 +9,12 @@
       <div class="team-header">
         <div class="team-avatar">
           <img :src="team.icon || '/ava.jpg'" :alt="team.teamName" @error="handleImageError" />
-          <div class="creator-badge">
-            <van-icon name="manager" />
-            我的队伍
-          </div>
         </div>
         <div class="team-info">
-          <h3 class="team-name">{{ team.teamName }}</h3>
-          <div class="team-id">队伍ID: #{{ team.id }}</div>
+          <h3 class="team-name">
+            {{ team.teamName }}
+            <van-tag type="primary" plain style="margin-left: 8px">我的队伍</van-tag>
+          </h3>
           <div class="team-privacy">
             <van-icon
               :name="team.status === 0 ? 'eye-o' : 'lock'"
@@ -28,9 +26,7 @@
       </div>
 
       <div class="team-content">
-        <p class="team-description" v-if="team.description">
-          {{ team.description }}
-        </p>
+        <p class="team-description" v-if="team.description">留言：{{ team.description }}</p>
 
         <div class="team-stats">
           <div class="stat-item">
@@ -67,8 +63,6 @@
           解散队伍
         </van-button>
       </div>
-
-      <div class="team-card-bg"></div>
     </div>
   </div>
 
@@ -105,7 +99,7 @@
 import { onMounted, ref, onActivated, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { api } from '@/api/apiClient'
-import { showSuccessToast } from 'vant'
+import { showSuccessToast, showConfirmDialog } from 'vant'
 
 const flag = ref(false)
 const router = useRouter()
@@ -139,22 +133,38 @@ const inTeam = (team) => {
 }
 
 const quitTeam = async (team) => {
-  const res = await api.team.quitTeam({ id: team.id })
-  if (res.data.data === true) {
-    showSuccessToast('退出队伍成功')
-    await loadMyTeamData()
-  } else {
-    showSuccessToast('退出队伍失败')
+  try {
+    await showConfirmDialog({
+      title: '确认退出',
+      message: `确定要退出队伍"${team.teamName}"吗？\n若是队长，退出后队长权限将移交给其他成员。`,
+    })
+    const res = await api.team.quitTeam({ id: team.id })
+    if (res.data.data === true) {
+      showSuccessToast('退出队伍成功')
+      await loadMyTeamData()
+    } else {
+      showSuccessToast('退出队伍失败')
+    }
+  } catch {
+    // 用户取消操作
   }
 }
 
 const delTeam = async (team) => {
-  const res = await api.team.deleteTeam({ id: team.id })
-  if (res.data.data === true) {
-    showSuccessToast('解散队伍成功')
-    await loadMyTeamData()
-  } else {
-    showSuccessToast('解散队伍失败')
+  try {
+    await showConfirmDialog({
+      title: '确认解散',
+      message: `确定要解散队伍"${team.teamName}"吗？\n解散后队伍将被销毁且不可恢复。`,
+    })
+    const res = await api.team.deleteTeam({ id: team.id })
+    if (res.data.data === true) {
+      showSuccessToast('解散队伍成功')
+      await loadMyTeamData()
+    } else {
+      showSuccessToast('解散队伍失败')
+    }
+  } catch {
+    // 用户取消操作
   }
 }
 
@@ -181,43 +191,23 @@ const handleImageError = (event) => {
 
 /* 队伍卡片样式 */
 .team-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(135deg, #e6e6fa 0%, #f5f5dc 100%);
+  border: 1px solid #a89f91;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   animation: slideInUp 0.6s ease-out forwards;
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.3s ease;
-}
-
-.team-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #1890ff 0%, #52c41a 100%);
+  position: relative;
+  overflow: hidden;
 }
 
 .team-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-}
-
-.team-card-bg {
-  position: absolute;
-  top: -40%;
-  right: -15%;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(24, 144, 255, 0.05) 0%, transparent 70%);
-  border-radius: 50%;
-  z-index: 0;
 }
 
 /* 队伍头部 */
@@ -244,26 +234,6 @@ const handleImageError = (event) => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.creator-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: linear-gradient(135deg, #1890ff 0%, #52c41a 100%);
-  color: white;
-  border-radius: 12px;
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.creator-badge .van-icon {
-  font-size: 10px;
-}
-
 .team-info {
   flex: 1;
 }
@@ -271,15 +241,11 @@ const handleImageError = (event) => {
 .team-name {
   font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
+  color: #003366;
   margin: 0 0 4px 0;
   line-height: 1.3;
-}
-
-.team-id {
-  font-size: 12px;
-  color: #95a5a6;
-  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
 }
 
 .team-privacy {
@@ -287,7 +253,7 @@ const handleImageError = (event) => {
   align-items: center;
   gap: 4px;
   font-size: 13px;
-  color: #1890ff;
+  color: #003366;
   font-weight: 500;
 }
 
@@ -304,7 +270,7 @@ const handleImageError = (event) => {
 
 .team-description {
   font-size: 14px;
-  color: #7f8c8d;
+  color: #4b4b4b;
   line-height: 1.5;
   margin: 0 0 12px 0;
   display: -webkit-box;
@@ -324,22 +290,23 @@ const handleImageError = (event) => {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #2c3e50;
+  color: #003366;
   font-weight: 500;
 }
 
 .progress-bar {
   flex: 1;
   height: 6px;
-  background: #e8f4fd;
+  background: #ffffff;
   border-radius: 3px;
   overflow: hidden;
   max-width: 100px;
+  border: 1px solid #a89f91;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #1890ff 0%, #52c41a 100%);
+  background: #9dc183;
   border-radius: 3px;
   transition: width 0.3s ease;
 }
@@ -365,25 +332,42 @@ const handleImageError = (event) => {
 /* 队伍操作 */
 .team-actions {
   display: flex;
-  gap: 8px;
-  position: relative;
-  z-index: 1;
-  padding-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f7f8fa;
 }
 
 .team-actions .van-button {
   flex: 1;
-  padding: 6px 12px;
-  font-size: 12px;
+  height: 36px;
+  padding: 0;
+  font-size: 14px;
   border-radius: 18px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  font-weight: 500;
+  border: none;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.team-actions .van-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.team-actions .van-button--primary {
+  background: #003366;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.25);
+}
+
+.team-actions .van-button--warning {
+  background: #ff7f50;
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.25);
+}
+
+.team-actions .van-button--danger {
+  background: #d94f4f;
+  color: white;
+  box-shadow: 0 4px 12px rgba(217, 79, 79, 0.25);
+}
+
+.team-actions .van-button:active {
+  transform: scale(0.96);
 }
 
 /* 空状态容器 */
@@ -396,9 +380,9 @@ const handleImageError = (event) => {
   width: 140px;
   height: 40px;
   margin-top: 20px;
-  background: linear-gradient(135deg, #1890ff 0%, #52c41a 100%);
+  background: #003366;
   border: none;
-  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 51, 102, 0.3);
 }
 
 /* 动画效果 */

@@ -9,14 +9,9 @@
       <div class="joined-team-header">
         <div class="joined-team-avatar">
           <img :src="team.icon || '/ava.jpg'" :alt="team.teamName" @error="handleImageError" />
-          <div class="member-badge">
-            <van-icon name="friends-o" />
-            成员
-          </div>
         </div>
         <div class="joined-team-info">
           <h3 class="joined-team-name">{{ team.teamName }}</h3>
-          <div class="joined-team-id">队伍ID: #{{ team.id }}</div>
           <div class="joined-team-privacy">
             <van-icon
               :name="team.status === 0 ? 'eye-o' : 'lock'"
@@ -28,9 +23,7 @@
       </div>
 
       <div class="joined-team-content">
-        <p class="joined-team-description" v-if="team.description">
-          {{ team.description }}
-        </p>
+        <p class="joined-team-description" v-if="team.description">留言：{{ team.description }}</p>
 
         <div class="joined-team-stats">
           <div class="joined-stat-item">
@@ -85,7 +78,7 @@
 import { onMounted, ref, onActivated } from 'vue'
 import { api } from '@/api/apiClient'
 import { useRouter } from 'vue-router'
-import { showSuccessToast } from 'vant'
+import { showSuccessToast, showConfirmDialog } from 'vant'
 import dayjs from 'dayjs'
 
 const flag = ref(false)
@@ -116,12 +109,20 @@ const inTeam = (team) => {
 }
 
 const quitTeam = async (team) => {
-  const res = await api.team.quitTeam({ id: team.id })
-  if (res.data.data === true) {
-    showSuccessToast('退出队伍成功')
-    await router.replace('/Person')
-  } else {
-    showSuccessToast('退出队伍失败')
+  try {
+    await showConfirmDialog({
+      title: '确认退出',
+      message: `确定要退出队伍"${team.teamName}"吗？`,
+    })
+    const res = await api.team.quitTeam({ id: team.id })
+    if (res.data.data === true) {
+      showSuccessToast('退出队伍成功')
+      await router.replace('/Person')
+    } else {
+      showSuccessToast('退出队伍失败')
+    }
+  } catch {
+    // 用户取消操作
   }
 }
 
@@ -144,43 +145,31 @@ const handleImageError = (event) => {
 
 /* 加入的队伍卡片样式 */
 .joined-team-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f6ffed 100%);
+  background: linear-gradient(135deg, #e6e6fa 0%, #f5f5dc 100%);
+  border: 1px solid #a89f91;
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1);
   animation: slideInUp 0.6s ease-out forwards;
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: visible;
 }
 
 .joined-team-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #52c41a 0%, #faad14 100%);
+  display: none;
 }
 
 .joined-team-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(149, 157, 165, 0.15);
 }
 
 .joined-team-card-bg {
-  position: absolute;
-  top: -40%;
-  right: -15%;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(82, 196, 26, 0.05) 0%, transparent 70%);
-  border-radius: 50%;
-  z-index: 0;
+  display: none;
 }
 
 /* 加入的队伍头部 */
@@ -207,26 +196,6 @@ const handleImageError = (event) => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.member-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: linear-gradient(135deg, #52c41a 0%, #faad14 100%);
-  color: white;
-  border-radius: 12px;
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(82, 196, 26, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.member-badge .van-icon {
-  font-size: 10px;
-}
-
 .joined-team-info {
   flex: 1;
 }
@@ -234,15 +203,9 @@ const handleImageError = (event) => {
 .joined-team-name {
   font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
+  color: #003366;
   margin: 0 0 4px 0;
   line-height: 1.3;
-}
-
-.joined-team-id {
-  font-size: 12px;
-  color: #95a5a6;
-  margin-bottom: 6px;
 }
 
 .joined-team-privacy {
@@ -250,7 +213,7 @@ const handleImageError = (event) => {
   align-items: center;
   gap: 4px;
   font-size: 13px;
-  color: #52c41a;
+  color: #003366;
   font-weight: 500;
 }
 
@@ -267,7 +230,7 @@ const handleImageError = (event) => {
 
 .joined-team-description {
   font-size: 14px;
-  color: #7f8c8d;
+  color: #4b4b4b;
   line-height: 1.5;
   margin: 0 0 12px 0;
   display: -webkit-box;
@@ -287,14 +250,15 @@ const handleImageError = (event) => {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #2c3e50;
+  color: #003366;
   font-weight: 500;
 }
 
 .joined-progress-bar {
   flex: 1;
   height: 6px;
-  background: #f0f9ff;
+  background: #ffffff;
+  border: 1px solid #a89f91;
   border-radius: 3px;
   overflow: hidden;
   max-width: 100px;
@@ -302,7 +266,7 @@ const handleImageError = (event) => {
 
 .joined-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #52c41a 0%, #faad14 100%);
+  background: #9dc183;
   border-radius: 3px;
   transition: width 0.3s ease;
 }
@@ -328,25 +292,36 @@ const handleImageError = (event) => {
 /* 加入的队伍操作 */
 .joined-team-actions {
   display: flex;
-  gap: 8px;
-  position: relative;
-  z-index: 1;
-  padding-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f7f8fa;
 }
 
 .joined-team-actions .van-button {
   flex: 1;
-  padding: 6px 12px;
-  font-size: 12px;
+  height: 36px;
+  padding: 0;
+  font-size: 14px;
   border-radius: 18px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  font-weight: 500;
+  border: none;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.joined-team-actions .van-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.joined-team-actions .van-button--primary {
+  background: #003366;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.25);
+}
+
+.joined-team-actions .van-button--warning {
+  background: #ff7f50;
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 127, 80, 0.25);
+}
+
+.joined-team-actions .van-button:active {
+  transform: scale(0.96);
 }
 
 /* 空状态容器 */

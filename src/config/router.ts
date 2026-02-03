@@ -91,7 +91,7 @@ const routes = [
   {
     path: '/create',
     component: CreateTeam,
-    meta: { keepAlive: true, showNavBar: true },
+    meta: { keepAlive: false, showNavBar: true },
   },
   {
     path: '/showMembers/:teamId',
@@ -126,7 +126,12 @@ const routes = [
   {
     path: '/blog/create',
     component: CreateBlog,
-    meta: { keepAlive: true, showNavBar: true },
+    meta: { keepAlive: false, showNavBar: true },
+  },
+  {
+    path: '/blog/edit/:id',
+    component: CreateBlog,
+    meta: { keepAlive: false, showNavBar: true },
   },
   {
     path: '/my/blog',
@@ -146,7 +151,7 @@ const routes = [
   {
     path: '/teamChat/:teamId',
     component: TeamChat,
-    meta: { keepAlive: true, showNavBar: true },
+    meta: { keepAlive: true, showNavBar: false },
   },
   {
     path: '/teamChats',
@@ -156,7 +161,7 @@ const routes = [
   {
     path: '/friendChat/:friendId',
     component: FriendChat,
-    meta: { keepAlive: false, showNavBar: true },
+    meta: { keepAlive: false, showNavBar: false },
   },
 ]
 

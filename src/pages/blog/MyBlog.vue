@@ -1,78 +1,90 @@
 <template>
   <div>
-    <div v-if="flag" class="my-blogs-container">
-      <div
-        class="blog-card"
-        v-for="(blog, index) in blogList"
-        :key="blog.id"
-        :style="{ animationDelay: `${index * 0.1}s` }"
-        @click="goToBlog(blog.id)"
-      >
-        <div class="blog-header">
-          <div class="blog-category">
-            <van-tag type="primary">{{ blog.kind || '未分类' }}</van-tag>
-          </div>
-          <div class="blog-status">
-            <van-icon name="edit" color="#1890ff" />
-            我的博客
-          </div>
-        </div>
-
-        <div class="blog-content">
-          <h3 class="blog-title">{{ blog.title }}</h3>
-          <div class="blog-excerpt" v-if="blog.content">
-            {{ getExcerpt(blog.content) }}
-          </div>
-        </div>
-
-        <div class="blog-footer">
-          <div class="blog-stats">
-            <div class="stat-item">
-              <van-icon name="like-o" color="#ff6b6b" />
-              <span>{{ blog.praise || 0 }}</span>
+    <div v-if="flag">
+      <div class="my-blogs-container">
+        <div
+          :class="['blog-card', { 'blog-card-draft': blog.status === 1 }]"
+          v-for="(blog, index) in blogList"
+          :key="blog.id"
+          :style="{ animationDelay: `${index * 0.1}s` }"
+          @click="goToBlog(blog)"
+        >
+          <div class="blog-header">
+            <div class="blog-category">
+              <van-tag v-if="blog.status === 1" type="warning">待上传</van-tag>
+              <van-tag v-else type="primary">{{ blog.kind || '未分类' }}</van-tag>
             </div>
-            <div class="stat-item">
-              <van-icon name="eye-o" color="#1890ff" />
-              <span>{{ blog.viewCount || 0 }}</span>
-            </div>
-            <div class="stat-item">
-              <van-icon name="comment-o" color="#52c41a" />
-              <span>{{ blog.commentCount || 0 }}</span>
+            <div class="blog-status">
+              <van-icon name="edit" :color="blog.status === 1 ? '#ff9800' : '#1890ff'" />
+              {{ blog.status === 1 ? '草稿' : '我的博客' }}
             </div>
           </div>
-          <div class="blog-actions">
-            <van-button size="mini" plain icon="edit" @click.stop="editBlog(blog)">
-              编辑
-            </van-button>
-            <van-button size="mini" plain icon="delete" @click.stop="deleteBlog(blog)">
-              删除
-            </van-button>
+
+          <div class="blog-content">
+            <h3 class="blog-title">{{ blog.title }}</h3>
+            <div class="blog-excerpt" v-if="blog.content">
+              {{ getExcerpt(blog.content) }}
+            </div>
           </div>
-        </div>
 
-        <div class="blog-card-bg"></div>
-      </div>
-    </div>
+          <div class="blog-footer">
+            <div class="blog-stats">
+              <div class="stat-item">
+                <van-icon name="like-o" color="#ff6b6b" />
+                <span>{{ blog.praise || 0 }}</span>
+              </div>
+              <div class="stat-item">
+                <van-icon name="eye-o" color="#1890ff" />
+                <span>{{ blog.viewCount || 0 }}</span>
+              </div>
+              <div class="stat-item">
+                <van-icon name="comment-o" color="#52c41a" />
+                <span>{{ blog.commentCount || 0 }}</span>
+              </div>
+            </div>
+            <div class="blog-actions">
+              <van-button size="mini" plain icon="edit" @click.stop="editBlog(blog)">
+                编辑
+              </van-button>
+              <van-button size="mini" plain icon="delete" @click.stop="deleteBlog(blog)">
+                删除
+              </van-button>
+            </div>
+          </div>
 
-    <!-- 分页导航 -->
-    <div v-if="flag && totalPages > 1" class="pagination-container">
-      <div class="pagination-wrapper">
-        <van-pagination
-          v-model="currentPage"
-          :total-items="total"
-          :items-per-page="pageSize"
-          :show-page-size="5"
-          force-ellipses
-          @change="onPageChange"
-        />
-        <div class="page-jump-controls">
-          <span class="jump-label">跳转到</span>
-          <van-field v-model="jumpPageInput" type="number" class="page-input" placeholder="页码" />
-          <van-button type="primary" size="small" @click="goToPage">跳转</van-button>
-          <span class="total-pages">共 {{ totalPages }} 页</span>
+          <div class="blog-card-bg"></div>
         </div>
       </div>
-      <van-divider />
+
+      <!-- 分页导航 -->
+      <div v-if="totalPages > 1" class="pagination-container">
+        <div class="pagination-wrapper">
+          <van-pagination
+            v-model="currentPage"
+            :total-items="total"
+            :items-per-page="pageSize"
+            :show-page-size="5"
+            force-ellipses
+            @change="onPageChange"
+          />
+          <div class="page-jump-controls">
+            <span class="jump-label">跳转到</span>
+            <van-field
+              v-model="jumpPageInput"
+              type="number"
+              class="page-input"
+              placeholder="页码"
+            />
+            <van-button type="primary" size="small" @click="goToPage">跳转</van-button>
+            <span class="total-pages">共 {{ totalPages }} 页</span>
+          </div>
+        </div>
+        <van-divider />
+      </div>
+
+      <div id="blank">
+        <van-divider />
+      </div>
     </div>
 
     <div v-else class="empty-container">
@@ -84,10 +96,6 @@
           写第一篇博客
         </van-button>
       </van-empty>
-    </div>
-
-    <div id="blank">
-      <van-divider />
     </div>
 
     <!-- 固定在右下角的按钮 -->
@@ -109,7 +117,7 @@
 import { onMounted, ref, onActivated } from 'vue'
 import { api } from '@/api/apiClient'
 import { useRouter } from 'vue-router'
-import { showFailToast } from 'vant'
+import { showFailToast, showSuccessToast, showDialog, showLoadingToast } from 'vant'
 
 // 为组件设置名称，确保 keep-alive 能正确缓存
 defineOptions({
@@ -145,7 +153,12 @@ const loadBlogData = async (page: number = 1) => {
       flag.value = true
     }
 
-    blogList.value = blogs
+    // 草稿置顶：status=1 的博客排在前面
+    blogList.value = blogs.sort((a: any, b: any) => {
+      if (a.status === 1 && b.status !== 1) return -1
+      if (a.status !== 1 && b.status === 1) return 1
+      return 0
+    })
   } catch (error) {
     showFailToast('加载失败')
   }
@@ -181,8 +194,14 @@ onActivated(async () => {
   await loadBlogData(currentPage.value)
 })
 
-const goToBlog = (id: any) => {
-  router.push(`/user/blog/${id}`)
+const goToBlog = (blog: any) => {
+  if (blog.status === 1) {
+    // 草稿跳转到编辑页面
+    router.push(`/blog/edit/${blog.id}`)
+  } else {
+    // 已发布博客跳转到查看页面
+    router.push(`/user/blog/${blog.id}`)
+  }
 }
 
 const handleAddBlog = () => {
@@ -201,9 +220,49 @@ const editBlog = (blog: any) => {
 }
 
 // 删除博客
-const deleteBlog = (blog: any) => {
-  // 这里可以添加删除确认对话框和实际的删除逻辑
-  // 已移除控制台日志，后续可在此调用实际删除接口
+const deleteBlog = async (blog: any) => {
+  try {
+    // 显示确认对话框
+    await showDialog({
+      title: '确认删除',
+      message: `确定要删除博客《${blog.title}》吗？此操作不可恢复！`,
+      showCancelButton: true,
+      confirmButtonText: '确定删除',
+      cancelButtonText: '取消',
+      confirmButtonColor: '#ee0a24',
+      closeOnClickOverlay: true,
+    })
+  } catch (error) {
+    // 用户点击取消或关闭对话框
+    return
+  }
+
+  // 用户确认删除后，执行删除操作
+  const deleteToast = showLoadingToast({
+    message: '删除中...',
+    forbidClick: true,
+    duration: 0,
+  })
+
+  try {
+    // 调用删除 API，传入正确的参数
+    await api.blog.deleteBlog({ id: blog.id })
+    deleteToast.close()
+    showSuccessToast('删除成功')
+
+    // 重新加载当前页数据
+    await loadBlogData(currentPage.value)
+
+    // 如果当前页没有数据了，且不是第一页，则返回上一页
+    if (blogList.value.length === 0 && currentPage.value > 1) {
+      currentPage.value--
+      await loadBlogData(currentPage.value)
+    }
+  } catch (error: any) {
+    deleteToast.close()
+    showFailToast('删除失败：' + (error.message || '网络错误'))
+    console.error('删除博客失败:', error)
+  }
 }
 </script>
 <style scoped>
@@ -279,6 +338,20 @@ const deleteBlog = (blog: any) => {
   right: 0;
   height: 3px;
   background: linear-gradient(90deg, #ff6b6b 0%, #f39c12 100%);
+}
+
+/* 草稿博客卡片样式 */
+.blog-card-draft {
+  background: linear-gradient(135deg, #fffbf0 0%, #fff8e1 100%);
+  border: 2px dashed #ff9800;
+}
+
+.blog-card-draft::before {
+  background: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
+}
+
+.blog-card-draft .blog-card-bg {
+  background: radial-gradient(circle, rgba(255, 152, 0, 0.05) 0%, transparent 70%);
 }
 
 .blog-card:hover {

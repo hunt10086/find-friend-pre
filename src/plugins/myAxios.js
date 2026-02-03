@@ -1,5 +1,6 @@
 import axios from 'axios'
 import router from '@/config/router.js'
+import { showFailToast } from 'vant'
 // 创建实例时配置默认值
 
 export const BASE_URL =
@@ -30,6 +31,10 @@ myAxios.interceptors.response.use(
   function (response) {
     if (response?.data?.code === 40100) {
       window.location.href = '/user/login'
+    }
+    const code = response?.data?.code
+    if (code === 4000 || code === 4001 || code === 401001 || code === 50000) {
+      showFailToast(`${response.data.message}, ${response.data.description}`)
     }
     return response
   },

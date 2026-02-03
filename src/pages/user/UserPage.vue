@@ -1,30 +1,24 @@
 <template id="UserPage">
   <div v-if="user">
-    <van-cell title="用户ID" :value="user?.id" />
     <van-cell
       title="用户名"
       is-link
-      to="/user/edit"
       :value="user.userName"
       @click="toEdit('userName', '用户名', user.userName)"
     />
-    <br />
     <van-cell title="账号" :value="user.userAccount" />
-    <van-cell
-      title="头像"
-      is-link
-      to="/user/edit"
-      :value="user.avatarUrl"
-      @click="toEdit('avatarUrl', '头像地址', user.avatarUrl)"
-    >
-      <br />
-      <img :src="user.avatarUrl || '/ava.jpg'" style="height: 50px" @error="handleImageError" />
+    <br />
+    <van-cell title="头像" is-link @click="toEdit('avatarUrl', '头像地址', user.avatarUrl)">
+      <img
+        :src="user.avatarUrl || '/ava.jpg'"
+        style="height: 50px; width: 50px; border-radius: 50%; object-fit: cover"
+        @error="handleImageError"
+      />
     </van-cell>
     <van-cell
       v-if="user.gender === 1"
       title="性别"
       is-link
-      to="/user/edit"
       :value="'男'"
       @click="toEdit('gender', '性别', user.gender)"
     />
@@ -32,7 +26,6 @@
       v-if="user.gender === 0"
       title="性别"
       is-link
-      to="/user/edit"
       :value="'女'"
       @click="toEdit('gender', '性别', user.gender)"
     />
@@ -40,29 +33,19 @@
       v-if="user.gender !== 1 && user.gender !== 0"
       title="性别"
       is-link
-      to="/user/edit"
       :value="'未知'"
       @click="toEdit('gender', '性别', user.gender)"
     />
     <van-cell
       title="个人简介"
       is-link
-      to="/user/edit"
       :value="user.profile"
       @click="toEdit('profile', '个人简介', user.profile)"
     />
-    <van-cell
-      title="电话"
-      is-link
-      to="/user/edit"
-      :value="user.phone"
-      @click="toEdit('phone', '电话', user.phone)"
-    />
-    <br />
+
     <van-cell
       title="邮箱"
       is-link
-      to="/user/edit"
       :value="user.email"
       @click="toEdit('email', '邮箱', user.email)"
     />
@@ -70,7 +53,6 @@
     <van-cell
       title="经度"
       is-link
-      to="/user/edit"
       :value="user.longitude"
       @click="toEdit('longitude', '经度', user.longitude)"
     />
@@ -78,18 +60,11 @@
     <van-cell
       title="纬度"
       is-link
-      to="/user/edit"
       :value="user.latitude"
       @click="toEdit('latitude', '纬度', user.latitude)"
     />
     <br />
-    <van-cell
-      title="标签"
-      is-link
-      to="/user/edit"
-      value=""
-      @click="toEditTags('tags', '标签', user.tags)"
-    >
+    <van-cell title="标签" is-link value="" @click="toEditTags('tags', '标签', user.tags)">
       <template #value>
         <van-tag color="#D94F4F" type="primary" v-for="tag in user.tags">
           {{ tag }}
@@ -118,7 +93,13 @@ const user = ref()
 const loadUserData = async () => {
   const res = await api.user.getCurrentUser()
   user.value = res.data.data
-  user.value.tags = JSON.parse(user.value.tags)
+  if (user.value.tags) {
+    try {
+      user.value.tags = JSON.parse(user.value.tags)
+    } catch (e) {
+      user.value.tags = []
+    }
+  }
   if (user) {
     showSuccessToast('获取用户信息成功')
   } else {

@@ -3,23 +3,8 @@
     <!-- Header -->
     <div class="chat-header">
       <van-icon name="arrow-left" class="back-icon" @click="goBack" />
-      <div class="friend-info">
-        <img
-          :src="friendAvatar || '/ava.jpg'"
-          :alt="friendName"
-          class="friend-avatar"
-          @error="handleImageError"
-        />
-        <div class="info-texts">
-          <h3 class="friend-name">{{ friendName || '好友聊天' }}</h3>
-          <div class="status-line">
-            <span v-if="wsConnected" class="status-dot online" title="WebSocket 已连接"></span>
-            <span v-else class="status-dot offline" title="WebSocket 未连接，使用接口发送"></span>
-            <span class="status-text">
-              {{ wsConnected ? '实时连接已建立' : '使用接口发送（重试中）' }}
-            </span>
-          </div>
-        </div>
+      <div class="header-title">
+        <h3 class="friend-name">{{ friendName || '好友聊天' }}</h3>
       </div>
       <div class="header-actions">
         <van-icon v-if="!wsConnected" name="replay" class="retry-icon" @click="manualReconnect" />
@@ -28,40 +13,35 @@
 
     <!-- Messages -->
     <div class="message-list" ref="messageListRef">
-      <div
-        v-for="(msg, idx) in messages"
-        :key="msg.localId || msg.id || idx"
-        :class="[
-          'message-item',
-          msg.senderId === currentUserId ? 'self' : 'other',
-          msg.sending ? 'sending' : '',
-          msg.failed ? 'failed' : '',
-        ]"
-      >
-        <img
-          class="avatar"
-          :src="
-            msg.senderId === currentUserId
-              ? currentUserAvatar || '/ava.jpg'
-              : friendAvatar || '/ava.jpg'
-          "
-          @error="handleImageError"
-        />
-        <div class="bubble-wrapper">
-          <div class="meta">
-            <span class="name">
-              {{ msg.senderId === currentUserId ? currentUserName || '我' : friendName || '好友' }}
-            </span>
-            <span class="time">{{
-              formatTime((msg.sendTime || msg.createTime || '').toString().trim())
-            }}</span>
-          </div>
-          <div class="bubble">
-            <span class="content">{{
-              (msg.messageContent || msg.content || '').replace(/\s+$/, '')
-            }}</span>
-            <span v-if="msg.sending" class="sending-indicator">...</span>
-            <span v-if="msg.failed" class="failed-indicator">发送失败</span>
+      <div v-for="(msg, idx) in messages" :key="msg.localId || msg.id || idx">
+        <div class="message-time-center" v-if="shouldShowTime(msg, idx)">
+          {{ formatTime((msg.sendTime || msg.createTime || '').toString().trim()) }}
+        </div>
+        <div
+          :class="[
+            'message-item',
+            msg.senderId === currentUserId ? 'self' : 'other',
+            msg.sending ? 'sending' : '',
+            msg.failed ? 'failed' : '',
+          ]"
+        >
+          <img
+            class="avatar"
+            :src="
+              msg.senderId === currentUserId
+                ? currentUserAvatar || '/ava.jpg'
+                : friendAvatar || '/ava.jpg'
+            "
+            @error="handleImageError"
+          />
+          <div class="bubble-wrapper">
+            <div class="bubble">
+              <span class="content">{{
+                (msg.messageContent || msg.content || '').replace(/\s+$/, '')
+              }}</span>
+              <span v-if="msg.sending" class="sending-indicator">...</span>
+              <span v-if="msg.failed" class="failed-indicator">发送失败</span>
+            </div>
           </div>
         </div>
       </div>
@@ -210,6 +190,14 @@ const formatTime = (time?: string) => {
   return dayjs(time).format('MM-DD HH:mm')
 }
 
+const shouldShowTime = (msg: FriendMessage, idx: number) => {
+  if (idx === 0) return true
+  const prevMsg = messages.value[idx - 1]
+  const currTime = dayjs(msg.sendTime || msg.createTime || 0)
+  const prevTime = dayjs(prevMsg.sendTime || prevMsg.createTime || 0)
+  return currTime.diff(prevTime, 'minute') >= 3
+}
+
 // Load current user
 const loadCurrentUser = async () => {
   try {
@@ -328,7 +316,7 @@ const handleWsMessage = (raw: string) => {
         // Use the original client time to maintain consistent UX
         // Only update if server time is reasonably close to client time (within 5 seconds)
         const serverTime = new Date(sentData.sendTime)
-        const clientTime = new Date(local.sendTime)
+        const clientTime = new Date(local.sendTime || Date.now())
         const timeDiff = Math.abs(serverTime.getTime() - clientTime.getTime())
 
         // If the time difference is reasonable (< 5 seconds), keep the client time
@@ -554,9 +542,12 @@ onUnmounted(() => {
 }
 
 .chat-header {
+  position: relative;
   display: flex;
   align-items: center;
-  padding: 10px 14px;
+  justify-content: space-between;
+  height: 44px;
+  padding: 0 12px;
   background: #fff;
   border-bottom: 1px solid #ebedf0;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
@@ -565,65 +556,33 @@ onUnmounted(() => {
 
 .back-icon {
   font-size: 24px;
-  margin-right: 10px;
-  color: #666;
+  color: #333;
   cursor: pointer;
+  z-index: 2;
 }
 
-.friend-info {
-  display: flex;
-  align-items: center;
-  flex: 1;
-  gap: 12px;
-  min-width: 0;
-}
-
-.friend-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  border: 2px solid #fff;
-}
-
-.info-texts {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+.header-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 60%;
+  text-align: center;
+  z-index: 1;
 }
 
 .friend-name {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
   color: #323233;
-  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.status-line {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #969799;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.status-dot.online {
-  background: #07c160;
-}
-
-.status-dot.offline {
-  background: #ee0a24;
+.header-actions {
+  z-index: 2;
 }
 
 .retry-icon {
@@ -638,10 +597,17 @@ onUnmounted(() => {
   padding: 16px 12px 12px;
 }
 
+.message-time-center {
+  text-align: center;
+  font-size: 12px;
+  color: #969799;
+  padding: 12px 0;
+}
+
 .message-item {
   display: flex;
   margin-bottom: 16px;
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
 .message-item.self {

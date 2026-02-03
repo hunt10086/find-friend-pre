@@ -1,19 +1,26 @@
 <template>
-  <van-row justify="space-between" align="center" style="padding: 10px">
-    <van-col span="12">
-      <van-cell title="猜你喜欢" icon="like-o" />
-    </van-col>
-    <van-col span="12" style="text-align: right">
-      <van-button type="primary" round @click="goToFriends">
+  <div class="home-header">
+    <div class="header-title">
+      <van-icon name="fire-o" color="#ee0a24" size="20" />
+      <span>推荐用户</span>
+    </div>
+    <div class="header-actions">
+      <van-button type="primary" size="small" plain round @click="goToFriends">
         <van-icon name="friends-o" />
         我的好友
       </van-button>
-      <van-button type="success" round @click="findMore" style="margin-left: 10px">
-        <van-icon name="map-marked" />
+      <van-button
+        type="primary"
+        size="small"
+        round
+        @click="findMore"
+        color="linear-gradient(to right, #ff6034, #ee0a24)"
+      >
+        <van-icon name="location-o" />
         附近用户
       </van-button>
-    </van-col>
-  </van-row>
+    </div>
+  </div>
 
   <div class="user-cards-container">
     <div
@@ -24,13 +31,11 @@
     >
       <div class="user-avatar">
         <img :src="user.avatarUrl || '/ava.jpg'" :alt="user.userName" @error="handleImageError" />
-        <div class="avatar-status-dot"></div>
       </div>
 
       <div class="user-info">
         <div class="user-header">
           <h3 class="user-name">{{ user.userName }}</h3>
-          <span class="user-id">#{{ user.id }}</span>
         </div>
 
         <div class="user-tags" v-if="user.tags && user.tags.length">
@@ -68,25 +73,42 @@
     </div>
   </div>
 
-  <p class="pages">{{ cont }}</p>
-  <div
-    id="index-button-css"
-    style="display: flex; justify-content: center; gap: 20px; margin-top: 16px"
-  >
-    <van-button v-if="flagPre" type="primary" @click="GoPre">上一页</van-button>
-    <div class="page-jump-controls">
-      <span class="jump-label">跳至</span>
-      <van-field
-        v-model="jumpPageInput"
-        type="number"
-        placeholder="页数"
-        class="page-input"
-        @keyup.enter="goToPage"
-      />
-      <van-button size="small" @click="goToPage">跳转</van-button>
-      <span class="total-pages">共 {{ max }} 页</span>
+  <div class="pagination-container">
+    <van-button
+      :disabled="!flagPre"
+      plain
+      type="primary"
+      size="small"
+      icon="arrow-left"
+      @click="GoPre"
+      class="page-btn"
+    >
+      上一页
+    </van-button>
+
+    <div class="page-info">
+      <span class="current-page">{{ cont }}</span>
+      <span class="divider">/</span>
+      <span class="total-pages">{{ max }}</span>
     </div>
-    <van-button v-if="flag" type="primary" @click="loadMore">下一页</van-button>
+
+    <van-button
+      :disabled="!flag"
+      plain
+      type="primary"
+      size="small"
+      icon="arrow"
+      icon-position="right"
+      @click="loadMore"
+      class="page-btn"
+    >
+      下一页
+    </van-button>
+
+    <div class="jump-control">
+      <input v-model="jumpPageInput" type="number" placeholder="页" @keyup.enter="goToPage" />
+      <span class="jump-btn" @click="goToPage">GO</span>
+    </div>
   </div>
 
   <!-- 用户资料模态框 -->
@@ -110,17 +132,39 @@ const selectedUserId = ref(null)
 const jumpPageInput = ref('')
 
 const loadUserData = async () => {
-  const res = await api.user.userListLike({
-    count: cont.value,
-  })
-  res.data.data.forEach((user) => {
-    user.tags = JSON.parse(user.tags)
-  })
-  userList.value = res.data.data || []
-  if (res.data.code < 8) {
-    flag.value = false
-  } else {
-    flag.value = true
+  try {
+    const res = await api.user.userListLike({
+      count: cont.value,
+    })
+
+    if (res.data && res.data.data) {
+      res.data.data.forEach((user: any) => {
+        if (user.tags && typeof user.tags === 'string') {
+          try {
+            user.tags = JSON.parse(user.tags)
+          } catch (e) {
+            console.error('解析用户标签失败', e)
+            user.tags = []
+          }
+        }
+      })
+      userList.value = res.data.data
+    } else {
+      userList.value = []
+    }
+
+    // 根据返回的数据量判断是否有下一页
+    if (!userList.value || userList.value.length < size.value) {
+      flag.value = false
+    } else {
+      flag.value = true
+    }
+
+    // 判断是否有上一页
+    flagPre.value = cont.value > 1
+  } catch (error) {
+    console.error('获取用户列表失败', error)
+    userList.value = []
   }
 }
 
@@ -138,31 +182,13 @@ onActivated(async () => {
 
 const loadMore = async () => {
   cont.value++
-  const res = await api.user.userListLike({
-    count: cont.value,
-  })
-  res.data.data.forEach((user) => {
-    user.tags = JSON.parse(user.tags)
-  })
-  userList.value = res.data.data || []
-  if (res.data.code < 8) {
-    flag.value = false
-  }
-  flagPre.value = true
+  await loadUserData()
 }
 
 const GoPre = async () => {
-  cont.value--
-  const res = await api.user.userListLike({
-    count: cont.value,
-  })
-  res.data.data.forEach((user) => {
-    user.tags = JSON.parse(user.tags)
-  })
-  userList.value = res.data.data || []
-  flag.value = true
-  if (cont.value == 1) {
-    flagPre.value = false
+  if (cont.value > 1) {
+    cont.value--
+    await loadUserData()
   }
 }
 
@@ -228,38 +254,37 @@ const goToPage = async () => {
   jumpPageInput.value = '' // 清空输入框
 
   // 加载指定页的数据
-  const res = await getUserListLike({
-    count: cont.value,
-  })
-  res.data.data.forEach((user) => {
-    user.tags = JSON.parse(user.tags)
-  })
-  userList.value = res.data.data || []
-
-  // 更新按钮状态
-  if (res.data.code < 8) {
-    flag.value = false
-  } else {
-    flag.value = true
-  }
-  flagPre.value = cont.value > 1
+  await loadUserData()
 }
 </script>
 
 <style scoped>
 /* 页面头部样式 */
-.van-cell {
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 16px 12px;
 }
 
-.van-button {
-  padding: 8px 16px;
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
 }
 
-.van-button:active {
-  transform: scale(0.98);
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.header-actions .van-button {
+  padding: 0 12px;
+  height: 32px;
+  line-height: 30px;
 }
 
 /* 用户卡片容器 */
@@ -268,13 +293,14 @@ const goToPage = async () => {
   margin-bottom: 20px;
 }
 
-/* 用户卡片样式 */
+/* 用户卡片样式 - 现代简约风格 */
 .user-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-  border-radius: 16px;
+  background: linear-gradient(135deg, #e6e6fa 0%, #f5f5dc 100%);
+  border: 1px solid #a89f91;
+  border-radius: 8px;
   padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   display: flex;
   gap: 16px;
   position: relative;
@@ -285,18 +311,8 @@ const goToPage = async () => {
   transition: all 0.3s ease;
 }
 
-.user-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-}
-
 .user-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
@@ -307,30 +323,18 @@ const goToPage = async () => {
 }
 
 .user-avatar img {
-  width: 80px;
-  height: 80px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 .user-avatar img:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-.avatar-status-dot {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 16px;
-  height: 16px;
-  background-color: #4caf50;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  animation: pulse 2s infinite;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 /* 用户信息区域 */
@@ -351,7 +355,7 @@ const goToPage = async () => {
 .user-name {
   font-size: 18px;
   font-weight: 600;
-  color: #2c3e50;
+  color: #003366;
   margin: 0;
   padding: 0;
 }
@@ -373,9 +377,9 @@ const goToPage = async () => {
 .user-tag {
   font-size: 12px;
   border-radius: 12px;
-  background: rgba(102, 126, 234, 0.1);
-  border-color: rgba(102, 126, 234, 0.3);
-  color: #667eea;
+  background: #e3f2fd;
+  border-color: #bbdefb;
+  color: #1976d2;
 }
 
 .expand-tags-btn {
@@ -384,17 +388,17 @@ const goToPage = async () => {
   height: 20px;
   line-height: 16px;
   border-radius: 10px;
-  border-color: rgba(102, 126, 234, 0.3);
-  color: #667eea;
-  background: rgba(102, 126, 234, 0.05);
+  border-color: #bbdefb;
+  color: #1976d2;
+  background: #e3f2fd;
   transition: all 0.2s ease;
   align-self: center;
   min-width: 32px;
 }
 
 .expand-tags-btn:hover {
-  background: rgba(102, 126, 234, 0.1);
-  border-color: rgba(102, 126, 234, 0.5);
+  background: #bbdefb;
+  border-color: #90caf9;
 }
 
 .expand-tags-btn:active {
@@ -404,7 +408,7 @@ const goToPage = async () => {
 /* 用户简介 */
 .user-profile {
   font-size: 14px;
-  color: #7f8c8d;
+  color: #4b4b4b;
   line-height: 1.4;
   margin: 0;
   display: -webkit-box;
@@ -426,54 +430,97 @@ const goToPage = async () => {
   font-size: 13px;
   height: auto;
   border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
+  border: 1px solid #e0e0e0;
+  background: #fafafa;
+  color: #2c3e50;
+}
+
+.user-actions .van-button--success {
+  background: #003366;
+  color: white;
+  border-color: #003366;
 }
 
 .user-actions .van-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.user-actions .van-button:active {
+  transform: translateY(0);
 }
 
 /* 分页样式 */
-.pages {
-  text-align: center;
-  margin: 20px 0;
-  font-size: 14px;
-  color: #7f8c8d;
-}
-
-#index-button-css {
-  margin-bottom: 30px;
-}
-
-.page-jump-controls {
+.pagination-container {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 12px;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px 0 40px;
 }
 
-.jump-label {
+.page-info {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: 'Helvetica Neue', Helvetica, sans-serif;
+}
+
+.current-page {
+  font-size: 20px;
+  font-weight: 600;
+  color: #003366;
+}
+
+.divider {
   font-size: 14px;
-  color: #646566;
-}
-
-.page-input {
-  width: 80px;
-  margin: 0 4px;
-}
-
-.page-input .van-field__control {
-  text-align: center;
-  font-size: 14px;
+  color: #999;
 }
 
 .total-pages {
   font-size: 14px;
-  color: #646566;
-  white-space: nowrap;
+  color: #666;
+}
+
+.page-btn {
+  min-width: 80px;
+  border-color: #a89f91 !important;
+  color: #003366 !important;
+}
+
+.jump-control {
+  display: flex;
+  align-items: center;
+  background: #e6e6fa;
+  border-radius: 16px;
+  padding: 2px 4px;
   margin-left: 8px;
+  border: 1px solid #a89f91;
+}
+
+.jump-control input {
+  width: 32px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 12px;
+  padding: 4px 0;
+  color: #003366;
+}
+
+.jump-control input:focus {
+  outline: none;
+}
+
+.jump-btn {
+  font-size: 12px;
+  color: #003366;
+  font-weight: 600;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-left: 1px solid rgba(0, 51, 102, 0.1);
 }
 
 /* 动画效果 */
@@ -485,18 +532,6 @@ const goToPage = async () => {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
   }
 }
 
@@ -532,21 +567,6 @@ const goToPage = async () => {
     padding: 5px 12px;
     font-size: 12px;
   }
-
-  #index-button-css {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .page-jump-controls {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  .page-input {
-    width: 70px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -561,20 +581,18 @@ const goToPage = async () => {
     gap: 4px;
   }
 
-  .page-jump-controls {
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
+  .pagination-container {
+    gap: 10px;
   }
 
-  .page-input {
-    width: 100%;
-    max-width: 120px;
+  .page-btn {
+    min-width: 60px;
+    padding: 0 8px;
+    font-size: 12px;
   }
 
-  .total-pages {
-    margin-left: 0;
-    text-align: center;
+  .current-page {
+    font-size: 16px;
   }
 
   .user-actions {

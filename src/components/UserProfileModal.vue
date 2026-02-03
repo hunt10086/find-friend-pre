@@ -33,10 +33,6 @@
 
         <div class="basic-info">
           <h2 class="user-name">{{ userInfo.userName }}</h2>
-          <div class="user-meta">
-            <span class="user-id">ID: #{{ userInfo.id }}</span>
-            <span class="user-account">@{{ userInfo.userAccount }}</span>
-          </div>
         </div>
       </div>
 
@@ -69,24 +65,6 @@
         </div>
       </div>
 
-      <!-- 联系信息 -->
-      <div class="profile-section">
-        <h4 class="section-title">
-          <van-icon name="contact" />
-          联系方式
-        </h4>
-        <div class="contact-info">
-          <div class="contact-item" v-if="userInfo.phone">
-            <van-icon name="phone-o" />
-            <span>{{ userInfo.phone }}</span>
-          </div>
-          <div class="contact-item" v-if="userInfo.email">
-            <van-icon name="envelop-o" />
-            <span>{{ userInfo.email }}</span>
-          </div>
-        </div>
-      </div>
-
       <!-- 位置信息 -->
       <div class="profile-section" v-if="userInfo.latitude && userInfo.longitude">
         <h4 class="section-title">
@@ -101,7 +79,7 @@
       </div>
 
       <!-- 操作按钮 -->
-      <div class="action-buttons" v-if="!isFriend">
+      <div class="action-buttons" v-if="!isFriend && userInfo?.id !== currentUserId">
         <van-button
           type="success"
           round
@@ -113,7 +91,7 @@
           {{ hasSentRequest ? '已发送好友申请，请勿重复点击' : '添加好友' }}
         </van-button>
       </div>
-      <div class="action-buttons" v-else>
+      <div class="action-buttons" v-else-if="userInfo?.id !== currentUserId">
         <van-button type="success" round disabled class="action-btn"> 已是好友 </van-button>
       </div>
     </div>
@@ -127,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 
 import { showFailToast, showSuccessToast } from 'vant'
 
@@ -166,8 +144,16 @@ const userInfo = ref<UserInfo | null>(null)
 const isFriend = ref(false)
 const hasSentRequest = ref(false)
 const isAddingFriend = ref(false)
+const currentUserId = ref<number | null>(null)
 
 const friendStore = useFriendStore()
+
+onMounted(async () => {
+  const res = await api.user.getCurrentUser()
+  if (res.data.code === 0 && res.data.data) {
+    currentUserId.value = res.data.data.id ?? null
+  }
+})
 
 // 监听父组件的显示状态变化
 watch(

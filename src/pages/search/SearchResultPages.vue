@@ -22,7 +22,6 @@
           </div>
           <div class="search-info">
             <h3 class="search-name">{{ user.userName }}</h3>
-            <div class="search-id">用户ID: #{{ user.id }}</div>
             <div class="search-match">
               <van-icon name="fire-o" color="#ff6b6b" />
               标签匹配

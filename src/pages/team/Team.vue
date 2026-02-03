@@ -38,9 +38,7 @@
       </div>
 
       <div class="team-content">
-        <p class="team-description" v-if="team.description">
-          {{ team.description }}
-        </p>
+        <p class="team-description" v-if="team.description">留言：{{ team.description }}</p>
 
         <div class="team-progress">
           <div class="progress-label">队伍进度</div>
@@ -153,6 +151,7 @@ const joinTeam = async (team) => {
     )
     if (res.data.code === 0) {
       showSuccessToast('加入成功')
+      await loadTeamData()
     } else {
       showFailToast('加入失败')
     }
@@ -194,12 +193,18 @@ const formatTime = (time: string) => {
 /* 搜索栏样式 */
 .team-search {
   padding: 12px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(100, 100, 100, 0.03);
 }
 
 .team-search :deep(.van-search__content) {
-  border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  background-color: #faf0e6;
+  border: 1px solid #a89f91;
+  box-shadow: none;
 }
 
 /* 团队卡片容器 */
@@ -210,53 +215,40 @@ const formatTime = (time: string) => {
 
 /* 团队卡片样式 */
 .team-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f0fff4 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f5f5dc 100%);
+  border: 1px solid #a89f91;
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(149, 157, 165, 0.1);
   animation: bounceIn 0.6s ease-out forwards;
   opacity: 0;
   transform: scale(0.9);
   transition: all 0.3s ease;
-}
-
-.team-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #00d2d3 0%, #01a3a4 100%);
+  position: relative;
+  overflow: visible;
 }
 
 .team-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(149, 157, 165, 0.15);
+}
+
+/* 移除多余的装饰元素 */
+.team-card::before {
+  display: none; /* 移除顶部彩色条 */
 }
 
 .team-card-bg {
-  position: absolute;
-  top: -30%;
-  right: -15%;
-  width: 180px;
-  height: 180px;
-  background: radial-gradient(circle, rgba(0, 210, 211, 0.05) 0%, transparent 70%);
-  border-radius: 50%;
-  z-index: 0;
+  display: none; /* 移除背景装饰圆圈 */
 }
 
 /* 团队头部 */
 .team-header {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 16px;
-  position: relative;
-  z-index: 1;
+  gap: 12px; /* 减少间距 */
+  margin-bottom: 12px;
 }
 
 .team-icon {
@@ -265,33 +257,31 @@ const formatTime = (time: string) => {
 }
 
 .team-avatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
   object-fit: cover;
-  border: 3px solid #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid #f0f0f0; /* 更简约的边框 */
 }
 
 .team-status {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 24px;
-  height: 24px;
+  top: -2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  background: linear-gradient(135deg, #00d2d3 0%, #01a3a4 100%);
+  font-size: 10px;
+  background: #003366; /* 深蓝色 */
   color: white;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid white;
 }
 
 .team-status.private {
-  background: linear-gradient(135deg, #ffa502 0%, #ff6348 100%);
+  background: #d94f4f; /* 深红色 */
 }
 
 .team-info {
@@ -299,40 +289,37 @@ const formatTime = (time: string) => {
 }
 
 .team-name {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  color: #2c3e50;
-  margin: 0 0 8px 0;
+  color: #003366; /* 深蓝色 */
+  margin: 0 0 6px 0;
   line-height: 1.3;
 }
 
 .team-meta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .team-members {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 13px;
-  color: #7f8c8d;
-  font-weight: 500;
+  font-size: 12px;
+  color: #4b4b4b; /* 深灰色 */
 }
 
 /* 团队内容 */
 .team-content {
-  margin-bottom: 16px;
-  position: relative;
-  z-index: 1;
+  margin-bottom: 12px;
 }
 
 .team-description {
-  font-size: 14px;
-  color: #7f8c8d;
+  font-size: 13px;
+  color: #4b4b4b; /* 深灰色 */
   line-height: 1.5;
-  margin: 0 0 16px 0;
+  margin: 0 0 12px 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -342,84 +329,97 @@ const formatTime = (time: string) => {
 .team-progress {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .progress-label {
-  font-size: 12px;
-  color: #95a5a6;
-  min-width: 60px;
+  font-size: 11px;
+  color: #4b4b4b; /* 深灰色 */
+  min-width: 50px;
 }
 
 .progress-bar {
   flex: 1;
-  height: 6px;
-  background-color: rgba(0, 210, 211, 0.1);
-  border-radius: 3px;
+  height: 4px;
+  background-color: #f0f0f0; /* 更简约的背景色 */
+  border-radius: 2px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #00d2d3 0%, #01a3a4 100%);
-  border-radius: 3px;
+  background: #9dc183; /* 自然绿 */
+  border-radius: 2px;
   transition: width 0.3s ease;
 }
 
 .progress-text {
-  font-size: 12px;
-  color: #01a3a4;
-  font-weight: 600;
-  min-width: 40px;
+  font-size: 11px;
+  color: #9dc183; /* 自然绿 */
+  font-weight: 500;
+  min-width: 35px;
   text-align: right;
 }
 
 .team-time {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .time-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #95a5a6;
+  gap: 4px;
+  font-size: 11px;
+  color: #4b4b4b; /* 深灰色 */
 }
 
 .time-item .van-icon {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 /* 团队操作 */
 .team-actions {
   display: flex;
   gap: 12px;
-  position: relative;
-  z-index: 1;
-  padding-top: 12px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 16px;
+  border-top: 1px solid #f7f8fa;
 }
 
 .team-actions .van-button {
   flex: 1;
-  padding: 8px 16px;
-  font-size: 13px;
-  border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  height: 36px;
+  padding: 0;
+  font-size: 14px;
+  border-radius: 18px;
+  font-weight: 500;
+  border: none;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.team-actions .van-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.team-actions .van-button--primary {
+  background: #003366; /* 深蓝色 */
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 51, 102, 0.25);
+}
+
+.team-actions .van-button--success {
+  background: linear-gradient(135deg, #ff7f50 0%, #d94f4f 100%); /* 珊瑚色到深红 */
+  color: white;
+  box-shadow: 0 4px 12px rgba(217, 79, 79, 0.25);
+}
+
+.team-actions .van-button:active {
+  transform: scale(0.96);
 }
 
 .team-actions .van-button:disabled {
-  opacity: 0.6;
-  transform: none;
+  background: #f5f5f5;
+  color: #ccc;
+  box-shadow: none;
+  opacity: 1;
 }
 
 /* 空状态容器 */
@@ -432,9 +432,9 @@ const formatTime = (time: string) => {
   width: 160px;
   height: 40px;
   margin-top: 20px;
-  background: linear-gradient(135deg, #00d2d3 0%, #01a3a4 100%);
+  background: #003366; /* 深蓝色 */
   border: none;
-  box-shadow: 0 4px 16px rgba(0, 210, 211, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 51, 102, 0.3);
 }
 
 /* 动画效果 */
