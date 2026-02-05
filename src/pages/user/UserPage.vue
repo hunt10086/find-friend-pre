@@ -6,7 +6,6 @@
       :value="user.userName"
       @click="toEdit('userName', '用户名', user.userName)"
     />
-    <van-cell title="账号" :value="user.userAccount" />
     <br />
     <van-cell title="头像" is-link @click="toEdit('avatarUrl', '头像地址', user.avatarUrl)">
       <img
@@ -43,12 +42,7 @@
       @click="toEdit('profile', '个人简介', user.profile)"
     />
 
-    <van-cell
-      title="邮箱"
-      is-link
-      :value="user.email"
-      @click="toEdit('email', '邮箱', user.email)"
-    />
+    <van-cell title="邮箱" :value="user.email || '未设置'" />
     <br />
     <van-cell
       title="经度"
@@ -81,26 +75,26 @@
 
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-import { api } from '@/api/apiClient'
+import { api, type UserVO } from '@/api/apiClient'
 import { onMounted, ref, onActivated, watch } from 'vue'
 import { showSuccessToast } from 'vant'
 import dayjs from 'dayjs'
 
 const router = useRouter()
 const route = useRoute()
-const user = ref()
+const user = ref<any>()
 
 const loadUserData = async () => {
   const res = await api.user.getCurrentUser()
-  user.value = res.data.data
-  if (user.value.tags) {
-    try {
-      user.value.tags = JSON.parse(user.value.tags)
-    } catch (e) {
-      user.value.tags = []
+  if (res.data.data) {
+    user.value = res.data.data
+    if (user.value.tags) {
+      try {
+        user.value.tags = JSON.parse(user.value.tags)
+      } catch (e) {
+        user.value.tags = []
+      }
     }
-  }
-  if (user) {
     showSuccessToast('获取用户信息成功')
   } else {
     showSuccessToast('获取用户信息失败')
@@ -130,12 +124,26 @@ watch(
   },
 )
 
-const toEdit = (editKey: string, editName: string, currentValue: string) => {
-  router.push({ path: '/user/edit', query: { editKey, editName, currentValue } })
+const toEdit = (editKey: string, editName: string, currentValue: string | number | undefined) => {
+  router.push({
+    path: '/user/edit',
+    query: {
+      editKey,
+      editName,
+      currentValue: currentValue !== undefined ? String(currentValue) : '',
+    },
+  })
 }
 
-const toEditTags = (editKey: string, editName: string, currentValue: string) => {
-  router.push({ path: '/edit/tags', query: { editKey, editName, currentValue } })
+const toEditTags = (editKey: string, editName: string, currentValue: any) => {
+  router.push({
+    path: '/edit/tags',
+    query: {
+      editKey,
+      editName,
+      currentValue: JSON.stringify(currentValue),
+    },
+  })
 }
 
 const handleImageError = (event: Event) => {

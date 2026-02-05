@@ -22,7 +22,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/User"
+                "$ref": "#/components/schemas/UserUpdateRequest"
               }
             }
           },
@@ -117,7 +117,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseUser"
+                  "$ref": "#/components/schemas/BaseResponseUserVO"
                 }
               }
             }
@@ -165,6 +165,16 @@
         "summary": "上传图片",
         "description": "上传图片文件到指定空间",
         "operationId": "uploadPicture",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -219,7 +229,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TeamDTO"
+                "$ref": "#/components/schemas/TeamVO"
               }
             }
           },
@@ -250,7 +260,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TeamDTO"
+                "$ref": "#/components/schemas/TeamVO"
               }
             }
           },
@@ -291,7 +301,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TeamDTO"
+                "$ref": "#/components/schemas/TeamVO"
               }
             }
           },
@@ -322,7 +332,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TeamDTO"
+                "$ref": "#/components/schemas/TeamVO"
               }
             }
           },
@@ -688,7 +698,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListUser"
+                  "$ref": "#/components/schemas/BaseResponseListUserVO"
                 }
               }
             }
@@ -709,7 +719,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListUser"
+                  "$ref": "#/components/schemas/BaseResponseListUserVO"
                 }
               }
             }
@@ -763,7 +773,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseIPageUser"
+                  "$ref": "#/components/schemas/BaseResponseIPageUserVO"
                 }
               }
             }
@@ -795,7 +805,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseUser"
+                  "$ref": "#/components/schemas/BaseResponseUserVO"
                 }
               }
             }
@@ -848,7 +858,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListUser"
+                  "$ref": "#/components/schemas/BaseResponseListUserVO"
                 }
               }
             }
@@ -869,7 +879,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseUser"
+                  "$ref": "#/components/schemas/BaseResponseUserVO"
                 }
               }
             }
@@ -901,7 +911,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListUser"
+                  "$ref": "#/components/schemas/BaseResponseListUserVO"
                 }
               }
             }
@@ -932,7 +942,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                  "$ref": "#/components/schemas/BaseResponseListTeamVO"
                 }
               }
             }
@@ -985,7 +995,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                  "$ref": "#/components/schemas/BaseResponseListTeamVO"
                 }
               }
             }
@@ -1006,7 +1016,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                  "$ref": "#/components/schemas/BaseResponseListTeamVO"
                 }
               }
             }
@@ -1027,7 +1037,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                  "$ref": "#/components/schemas/BaseResponseListTeamVO"
                 }
               }
             }
@@ -1048,7 +1058,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BaseResponseListTeamDTO"
+                  "$ref": "#/components/schemas/BaseResponseListTeamVO"
                 }
               }
             }
@@ -1482,13 +1492,9 @@
   },
   "components": {
     "schemas": {
-      "User": {
+      "UserUpdateRequest": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
           "userName": {
             "type": "string"
           },
@@ -1504,35 +1510,6 @@
           },
           "tags": {
             "type": "string"
-          },
-          "userPassword": {
-            "type": "string"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "userStatus": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "createTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updateTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "isDelete": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "userRole": {
-            "type": "integer",
-            "format": "int32"
           },
           "profile": {
             "type": "string"
@@ -1623,7 +1600,7 @@
           }
         }
       },
-      "BaseResponseUser": {
+      "BaseResponseUserVO": {
         "type": "object",
         "properties": {
           "code": {
@@ -1631,13 +1608,60 @@
             "format": "int32"
           },
           "data": {
-            "$ref": "#/components/schemas/User"
+            "$ref": "#/components/schemas/UserVO"
           },
           "message": {
             "type": "string"
           },
           "description": {
             "type": "string"
+          }
+        }
+      },
+      "UserVO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tags": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "distance": {
+            "type": "number",
+            "format": "double"
           }
         }
       },
@@ -1659,7 +1683,7 @@
           }
         }
       },
-      "TeamDTO": {
+      "TeamVO": {
         "type": "object",
         "properties": {
           "id": {
@@ -1811,73 +1835,6 @@
           }
         }
       },
-      "BaseResponseListUser": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/User"
-            }
-          },
-          "message": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          }
-        }
-      },
-      "BaseResponseIPageUser": {
-        "type": "object",
-        "properties": {
-          "code": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "data": {
-            "$ref": "#/components/schemas/IPageUser"
-          },
-          "message": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          }
-        }
-      },
-      "IPageUser": {
-        "type": "object",
-        "properties": {
-          "size": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "records": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/User"
-            }
-          },
-          "total": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "current": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "pages": {
-            "type": "integer",
-            "format": "int64",
-            "deprecated": true
-          }
-        }
-      },
       "BaseResponseListUserVO": {
         "type": "object",
         "properties": {
@@ -1899,32 +1856,7 @@
           }
         }
       },
-      "UserVO": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "userName": {
-            "type": "string"
-          },
-          "avatarUrl": {
-            "type": "string"
-          },
-          "tags": {
-            "type": "string"
-          },
-          "profile": {
-            "type": "string"
-          },
-          "distance": {
-            "type": "number",
-            "format": "double"
-          }
-        }
-      },
-      "BaseResponseListTeamDTO": {
+      "BaseResponseIPageUserVO": {
         "type": "object",
         "properties": {
           "code": {
@@ -1932,10 +1864,7 @@
             "format": "int32"
           },
           "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TeamDTO"
-            }
+            "$ref": "#/components/schemas/IPageUserVO"
           },
           "message": {
             "type": "string"
@@ -1945,7 +1874,35 @@
           }
         }
       },
-      "BaseResponseUserVO": {
+      "IPageUserVO": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserVO"
+            }
+          },
+          "current": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int64",
+            "deprecated": true
+          }
+        }
+      },
+      "BaseResponseListTeamVO": {
         "type": "object",
         "properties": {
           "code": {
@@ -1953,7 +1910,10 @@
             "format": "int32"
           },
           "data": {
-            "$ref": "#/components/schemas/UserVO"
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamVO"
+            }
           },
           "message": {
             "type": "string"
@@ -2205,11 +2165,11 @@
               "$ref": "#/components/schemas/BlogVO"
             }
           },
-          "total": {
+          "current": {
             "type": "integer",
             "format": "int64"
           },
-          "current": {
+          "total": {
             "type": "integer",
             "format": "int64"
           },

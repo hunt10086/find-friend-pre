@@ -65,19 +65,6 @@
         </div>
       </div>
 
-      <!-- 位置信息 -->
-      <div class="profile-section" v-if="userInfo.latitude && userInfo.longitude">
-        <h4 class="section-title">
-          <van-icon name="location-o" />
-          位置信息
-        </h4>
-        <div class="location-info">
-          <van-icon name="compass-o" />
-          <span>经度: {{ userInfo.longitude }}</span>
-          <span>纬度: {{ userInfo.latitude }}</span>
-        </div>
-      </div>
-
       <!-- 操作按钮 -->
       <div class="action-buttons" v-if="!isFriend && userInfo?.id !== currentUserId">
         <van-button
@@ -109,24 +96,11 @@ import { ref, watch, onMounted } from 'vue'
 
 import { showFailToast, showSuccessToast } from 'vant'
 
-import { api } from '@/api/apiClient'
+import { api, type UserVO } from '@/api/apiClient'
 import { useFriendStore } from '@/stores/friendStore'
 
-interface UserInfo {
-  id: number
-  userName: string
-  userAccount: string
-  avatarUrl: string
-  gender: number
-  tags: string[]
-  phone: string
-  email: string
-  profile: string
-  latitude: number
-  longitude: number
-  createTime: string
-  userStatus: number
-  userRole: number
+interface UserInfo extends Omit<UserVO, 'tags'> {
+  tags?: string[]
 }
 
 const props = defineProps<{
@@ -290,7 +264,7 @@ const addFriend = async () => {
   try {
     isAddingFriend.value = true
     const result = await friendStore.addFriendRequest(
-      userInfo.value.id,
+      userInfo.value.id!,
       `你好，我是${userInfo.value.userName}，希望能和你成为好友！`,
     )
     if (result.success) {
@@ -474,19 +448,6 @@ const addFriend = async () => {
 .contact-item .van-icon {
   color: #667eea;
   font-size: 16px;
-}
-
-.location-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #7f8c8d;
-}
-
-.location-info .van-icon {
-  color: #667eea;
-  margin-right: 4px;
 }
 
 .action-buttons {

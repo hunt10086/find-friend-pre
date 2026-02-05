@@ -2,13 +2,6 @@
   <div>
     <van-form label-width="100%" @submit="onSubmit">
       <van-cell-group inset>
-        <van-field
-          v-if="editUser.editKey === 'avatarUrl'"
-          v-model="editUser.currentValue"
-          name="avatarUrl"
-          label="头像链接"
-          placeholder="请选择或粘贴头像链接"
-        />
         <van-field v-if="editUser.editKey === 'avatarUrl'" name="avatarUploader" label="上传头像">
           <template #input>
             <van-uploader
@@ -177,7 +170,7 @@ const handleUpload = async (item: any) => {
       showFailToast('未选择文件')
       return
     }
-    const res = await api.upload.uploadPicture({ file: file as File })
+    const res = await api.upload.uploadPicture({ type: 'User' }, { file: file as File })
     if (res?.data?.code === 0 && res?.data?.data) {
       editUser.value.currentValue = res.data.data
       fileList.value = [{ url: res.data.data } as any]
@@ -193,6 +186,10 @@ const handleUpload = async (item: any) => {
 }
 const onSubmit = async (values: any) => {
   let submitValue = values[editUser.value.editKey]
+
+  if (editUser.value.editKey === 'avatarUrl') {
+    submitValue = editUser.value.currentValue
+  }
 
   if (editUser.value.editKey === 'gender') {
     // 将“男/女”转为数字

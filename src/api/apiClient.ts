@@ -32,7 +32,7 @@ class MyApiClient extends Api<unknown> {
  * await api.blog.createBlog({ title: 'Test', passage: 'Content' });
  *
  * // 队伍相关
- * await api.team.listTeams();
+ * await api.team.listTeam();
  * await api.team.addTeam({ teamName: 'MyTeam' });
  * ```
  */
@@ -43,9 +43,9 @@ export const api = new MyApiClient()
  *
  * 使用方式：
  * ```typescript
- * import { type User, type BlogVO, type TeamDTO } from '@/api/apiClient';
+ * import { type UserVO, type BlogVO, type TeamVO } from '@/api/apiClient';
  *
- * const user = ref<User | null>(null);
+ * const user = ref<UserVO | null>(null);
  * const blogs = ref<BlogVO[]>([]);
  * ```
  */

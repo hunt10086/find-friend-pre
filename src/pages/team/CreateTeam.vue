@@ -20,14 +20,6 @@
         show-word-limit
       />
 
-      <van-field
-        v-model="icon"
-        name="icon"
-        label="队伍头像链接"
-        placeholder="请输入链接"
-        maxlength="256"
-        :rules="[{ required: false, message: '请输入队伍头像链接' }]"
-      />
       <van-field name="uploader" label="上传队伍头像">
         <template #input>
           <van-uploader
@@ -117,7 +109,9 @@ const beforeRead = (input: any) => {
 
 const check = async () => {
   const res = await api.user.getCurrentUser()
-  userId.value = res.data.data.id
+  if (res.data.data) {
+    userId.value = res.data.data.id
+  }
 }
 check()
 
@@ -129,7 +123,7 @@ const handleUpload = async (item: any) => {
       showFailToast('未选择文件')
       return
     }
-    const res = await api.upload.uploadPicture({ file: file as File })
+    const res = await api.upload.uploadPicture({ type: 'Team' }, { file: file as File })
     if (res?.data?.code === 0 && res?.data?.data) {
       icon.value = res.data.data
       fileList.value = [{ url: res.data.data } as any]

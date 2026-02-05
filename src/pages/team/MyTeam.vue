@@ -31,11 +31,11 @@
         <div class="team-stats">
           <div class="stat-item">
             <van-icon name="friends-o" color="#1890ff" />
-            <span>成员: {{ team.nowNum }}/{{ team.maxNum }}</span>
+            <span>成员: {{ team.nowNum || 0 }}/{{ team.maxNum || 0 }}</span>
             <div class="progress-bar">
               <div
                 class="progress-fill"
-                :style="{ width: `${(team.nowNum / team.maxNum) * 100}%` }"
+                :style="{ width: `${((team.nowNum || 0) / (team.maxNum || 1)) * 100}%` }"
               ></div>
             </div>
           </div>
@@ -98,7 +98,7 @@
 <script setup lang="ts">
 import { onMounted, ref, onActivated, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { api } from '@/api/apiClient'
+import { api, type TeamVO } from '@/api/apiClient'
 import { showSuccessToast, showConfirmDialog } from 'vant'
 
 const flag = ref(false)
@@ -108,7 +108,7 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime' // 可选插件
 dayjs.extend(relativeTime)
 
-const teamList = ref()
+const teamList = ref<TeamVO[]>([])
 
 const loadMyTeamData = async () => {
   const res = await api.team.getMyTeam()
@@ -128,11 +128,11 @@ onMounted(async () => {
 onActivated(async () => {
   await loadMyTeamData()
 })
-const inTeam = (team) => {
+const inTeam = (team: TeamVO) => {
   router.push(`/showMembers/${team.id}`)
 }
 
-const quitTeam = async (team) => {
+const quitTeam = async (team: TeamVO) => {
   try {
     await showConfirmDialog({
       title: '确认退出',
@@ -150,7 +150,7 @@ const quitTeam = async (team) => {
   }
 }
 
-const delTeam = async (team) => {
+const delTeam = async (team: TeamVO) => {
   try {
     await showConfirmDialog({
       title: '确认解散',
@@ -173,8 +173,8 @@ const createTeam = () => {
 }
 
 // 图片加载失败处理
-const handleImageError = (event) => {
-  const img = event.target
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
   img.src = '/ava.jpg'
 }
 </script>

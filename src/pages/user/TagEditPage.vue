@@ -2,6 +2,11 @@
   <form action="/">
     <van-divider content-position="left">已选标签</van-divider>
     <div v-if="activeIds.length === 0">请选择标签</div>
+    <div v-else class="selected-tags-header">
+      <van-button type="danger" size="small" plain icon="delete-o" @click="clearAllTags">
+        一键清除
+      </van-button>
+    </div>
     <van-tag
       color="#00FFFF"
       v-for="tag in activeIds"
@@ -28,7 +33,7 @@
   <div id="divbo"></div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '@/api/apiClient'
 import { showSuccessToast } from 'vant'
@@ -52,6 +57,46 @@ const doClose = (tag) => {
     return item !== tag
   })
 }
+
+/**
+ * 一键清除所有已选标签
+ */
+const clearAllTags = () => {
+  activeIds.value = []
+}
+
+// 性别和年级标签（单选限制）
+const genderTags = ['女', '男']
+const gradeTags = ['大一', '大二', '大三', '大四', '研一', '研二', '研三']
+
+/**
+ * 监听标签变化，确保性别和年级只能各选一个
+ */
+watch(
+  activeIds,
+  (newVal, oldVal) => {
+    if (!oldVal) return
+
+    // 找出新增的标签
+    const addedTags = newVal.filter((tag) => !oldVal.includes(tag))
+
+    addedTags.forEach((addedTag) => {
+      // 如果新增的是性别标签，移除其他性别标签
+      if (genderTags.includes(addedTag)) {
+        activeIds.value = activeIds.value.filter(
+          (tag) => !genderTags.includes(tag) || tag === addedTag,
+        )
+      }
+      // 如果新增的是年级标签，移除其他年级标签
+      if (gradeTags.includes(addedTag)) {
+        activeIds.value = activeIds.value.filter(
+          (tag) => !gradeTags.includes(tag) || tag === addedTag,
+        )
+      }
+    })
+  },
+  { deep: true },
+)
 
 const originTagList = [
   {
@@ -159,6 +204,12 @@ const submit = async () => {
 </script>
 
 <style scoped>
+.selected-tags-header {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .van-tag {
   margin: 10px;
 }

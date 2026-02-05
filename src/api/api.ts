@@ -10,28 +10,13 @@
  * ---------------------------------------------------------------
  */
 
-export interface User {
-  /** @format int64 */
-  id?: number;
+export interface UserUpdateRequest {
   userName?: string;
   userAccount?: string;
   avatarUrl?: string;
   /** @format int32 */
   gender?: number;
   tags?: string;
-  userPassword?: string;
-  phone?: string;
-  email?: string;
-  /** @format int32 */
-  userStatus?: number;
-  /** @format date-time */
-  createTime?: string;
-  /** @format date-time */
-  updateTime?: string;
-  /** @format int32 */
-  isDelete?: number;
-  /** @format int32 */
-  userRole?: number;
   profile?: string;
   /** @format double */
   latitude?: number;
@@ -73,12 +58,33 @@ export interface UserLoginRequest {
   longitude?: number;
 }
 
-export interface BaseResponseUser {
+export interface BaseResponseUserVO {
   /** @format int32 */
   code?: number;
-  data?: User;
+  data?: UserVO;
   message?: string;
   description?: string;
+}
+
+export interface UserVO {
+  /** @format int64 */
+  id?: number;
+  userName?: string;
+  avatarUrl?: string;
+  /** @format int32 */
+  gender?: number;
+  tags?: string;
+  phone?: string;
+  email?: string;
+  /** @format date-time */
+  createTime?: string;
+  profile?: string;
+  /** @format double */
+  latitude?: number;
+  /** @format double */
+  longitude?: number;
+  /** @format double */
+  distance?: number;
 }
 
 export interface BaseResponseString {
@@ -89,7 +95,7 @@ export interface BaseResponseString {
   description?: string;
 }
 
-export interface TeamDTO {
+export interface TeamVO {
   /** @format int64 */
   id?: number;
   teamName?: string;
@@ -161,37 +167,6 @@ export interface TeamChatMessageRequest {
   content?: string;
 }
 
-export interface BaseResponseListUser {
-  /** @format int32 */
-  code?: number;
-  data?: User[];
-  message?: string;
-  description?: string;
-}
-
-export interface BaseResponseIPageUser {
-  /** @format int32 */
-  code?: number;
-  data?: IPageUser;
-  message?: string;
-  description?: string;
-}
-
-export interface IPageUser {
-  /** @format int64 */
-  size?: number;
-  records?: User[];
-  /** @format int64 */
-  total?: number;
-  /** @format int64 */
-  current?: number;
-  /**
-   * @deprecated
-   * @format int64
-   */
-  pages?: number;
-}
-
 export interface BaseResponseListUserVO {
   /** @format int32 */
   code?: number;
@@ -200,29 +175,33 @@ export interface BaseResponseListUserVO {
   description?: string;
 }
 
-export interface UserVO {
-  /** @format int64 */
-  id?: number;
-  userName?: string;
-  avatarUrl?: string;
-  tags?: string;
-  profile?: string;
-  /** @format double */
-  distance?: number;
-}
-
-export interface BaseResponseListTeamDTO {
+export interface BaseResponseIPageUserVO {
   /** @format int32 */
   code?: number;
-  data?: TeamDTO[];
+  data?: IPageUserVO;
   message?: string;
   description?: string;
 }
 
-export interface BaseResponseUserVO {
+export interface IPageUserVO {
+  /** @format int64 */
+  size?: number;
+  records?: UserVO[];
+  /** @format int64 */
+  current?: number;
+  /** @format int64 */
+  total?: number;
+  /**
+   * @deprecated
+   * @format int64
+   */
+  pages?: number;
+}
+
+export interface BaseResponseListTeamVO {
   /** @format int32 */
   code?: number;
-  data?: UserVO;
+  data?: TeamVO[];
   message?: string;
   description?: string;
 }
@@ -334,9 +313,9 @@ export interface IPageBlogVO {
   size?: number;
   records?: BlogVO[];
   /** @format int64 */
-  total?: number;
-  /** @format int64 */
   current?: number;
+  /** @format int64 */
+  total?: number;
   /**
    * @deprecated
    * @format int64
@@ -586,7 +565,7 @@ export class Api<
      * @summary 用户更新
      * @request POST:/user/update
      */
-    userUpdate: (data: User, params: RequestParams = {}) =>
+    userUpdate: (data: UserUpdateRequest, params: RequestParams = {}) =>
       this.request<BaseResponseBoolean, any>({
         path: `/user/update`,
         method: "POST",
@@ -636,7 +615,7 @@ export class Api<
      * @request POST:/user/login
      */
     userLogin: (data: UserLoginRequest, params: RequestParams = {}) =>
-      this.request<BaseResponseUser, any>({
+      this.request<BaseResponseUserVO, any>({
         path: `/user/login`,
         method: "POST",
         body: data,
@@ -696,7 +675,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<BaseResponseListUser, any>({
+      this.request<BaseResponseListUserVO, any>({
         path: `/user/search`,
         method: "GET",
         query: query,
@@ -712,7 +691,7 @@ export class Api<
      * @request GET:/user/searchOne
      */
     updateMassage: (params: RequestParams = {}) =>
-      this.request<BaseResponseListUser, any>({
+      this.request<BaseResponseListUserVO, any>({
         path: `/user/searchOne`,
         method: "GET",
         ...params,
@@ -742,7 +721,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<BaseResponseIPageUser, any>({
+      this.request<BaseResponseIPageUserVO, any>({
         path: `/user/search/tags/page`,
         method: "GET",
         query: query,
@@ -764,7 +743,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<BaseResponseUser, any>({
+      this.request<BaseResponseUserVO, any>({
         path: `/user/search/one`,
         method: "GET",
         query: query,
@@ -801,7 +780,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<BaseResponseListUser, any>({
+      this.request<BaseResponseListUserVO, any>({
         path: `/user/listLike`,
         method: "GET",
         query: query,
@@ -817,7 +796,7 @@ export class Api<
      * @request GET:/user/current
      */
     getCurrentUser: (params: RequestParams = {}) =>
-      this.request<BaseResponseUser, any>({
+      this.request<BaseResponseUserVO, any>({
         path: `/user/current`,
         method: "GET",
         ...params,
@@ -833,6 +812,9 @@ export class Api<
      * @request POST:/upload
      */
     uploadPicture: (
+      query: {
+        type: string;
+      },
       data: {
         /** @format binary */
         file: File;
@@ -842,6 +824,7 @@ export class Api<
       this.request<BaseResponseString, any>({
         path: `/upload`,
         method: "POST",
+        query: query,
         body: data,
         type: ContentType.FormData,
         ...params,
@@ -861,7 +844,7 @@ export class Api<
         /** @format int64 */
         id: number;
       },
-      data: TeamDTO,
+      data: TeamVO,
       params: RequestParams = {},
     ) =>
       this.request<BaseResponseBoolean, any>({
@@ -881,7 +864,7 @@ export class Api<
      * @summary 退出队伍
      * @request POST:/team/quit
      */
-    quitTeam: (data: TeamDTO, params: RequestParams = {}) =>
+    quitTeam: (data: TeamVO, params: RequestParams = {}) =>
       this.request<BaseResponseBoolean, any>({
         path: `/team/quit`,
         method: "POST",
@@ -902,7 +885,7 @@ export class Api<
       query: {
         password: string;
       },
-      data: TeamDTO,
+      data: TeamVO,
       params: RequestParams = {},
     ) =>
       this.request<BaseResponseBoolean, any>({
@@ -922,7 +905,7 @@ export class Api<
      * @summary 删除队伍
      * @request POST:/team/delete
      */
-    deleteTeam: (data: TeamDTO, params: RequestParams = {}) =>
+    deleteTeam: (data: TeamVO, params: RequestParams = {}) =>
       this.request<BaseResponseBoolean, any>({
         path: `/team/delete`,
         method: "POST",
@@ -962,7 +945,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<BaseResponseListTeamDTO, any>({
+      this.request<BaseResponseListTeamVO, any>({
         path: `/team/search`,
         method: "GET",
         query: query,
@@ -1000,7 +983,7 @@ export class Api<
      * @request GET:/team/myTeam
      */
     getMyTeam: (params: RequestParams = {}) =>
-      this.request<BaseResponseListTeamDTO, any>({
+      this.request<BaseResponseListTeamVO, any>({
         path: `/team/myTeam`,
         method: "GET",
         ...params,
@@ -1015,7 +998,7 @@ export class Api<
      * @request GET:/team/list
      */
     listTeam: (params: RequestParams = {}) =>
-      this.request<BaseResponseListTeamDTO, any>({
+      this.request<BaseResponseListTeamVO, any>({
         path: `/team/list`,
         method: "GET",
         ...params,
@@ -1030,7 +1013,7 @@ export class Api<
      * @request GET:/team/joinTeam
      */
     getJoinTeam: (params: RequestParams = {}) =>
-      this.request<BaseResponseListTeamDTO, any>({
+      this.request<BaseResponseListTeamVO, any>({
         path: `/team/joinTeam`,
         method: "GET",
         ...params,
@@ -1045,7 +1028,7 @@ export class Api<
      * @request GET:/team/get/team
      */
     getTeam: (params: RequestParams = {}) =>
-      this.request<BaseResponseListTeamDTO, any>({
+      this.request<BaseResponseListTeamVO, any>({
         path: `/team/get/team`,
         method: "GET",
         ...params,
@@ -1467,7 +1450,7 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<BaseResponseListUser, any>({
+      this.request<BaseResponseListUserVO, any>({
         path: `/teamUser/list`,
         method: "GET",
         query: query,

@@ -54,7 +54,6 @@
               class="member-tag"
               plain
               type="primary"
-              size="small"
               v-for="tag in getDisplayTags(user)"
               :key="tag"
             >
@@ -134,7 +133,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, onActivated } from 'vue'
-import { api } from '@/api/apiClient'
+import { api, type UserVO } from '@/api/apiClient'
 import { useRoute } from 'vue-router'
 import router from '@/config/router.ts'
 import { showSuccessToast, showFailToast, showConfirmDialog } from 'vant'
@@ -146,7 +145,12 @@ defineOptions({
   name: 'TeamMembers',
 })
 
-const userList = ref([])
+interface MemberUser extends Omit<UserVO, 'tags'> {
+  tags?: string[]
+  tagsExpanded?: boolean
+}
+
+const userList = ref<MemberUser[]>([])
 const route = useRoute()
 const teamId = ref(Number(route.params.teamId))
 const userId = ref()
@@ -165,18 +169,26 @@ const getTeamData = async () => {
     captain.value = null
 
     const id = await api.user.getCurrentUser()
-    userId.value = id.data.data.id
+    userId.value = id.data.data?.id
     const response = await api.team.searchTeamById({ teamId: teamId.value })
     captain.value = response.data.data
     const res = await api.teamUser.list({ teamId: teamId.value })
-    res.data.data.forEach((user) => {
-      try {
-        user.tags = JSON.parse(user.tags)
-      } catch (e) {
-        user.tags = []
-      }
-    })
-    userList.value = res.data.data || []
+    if (res.data.data) {
+      res.data.data.forEach((user: any) => {
+        try {
+          if (user.tags) {
+            user.tags = JSON.parse(user.tags)
+          } else {
+            user.tags = []
+          }
+        } catch (e) {
+          user.tags = []
+        }
+      })
+      userList.value = res.data.data as MemberUser[]
+    } else {
+      userList.value = []
+    }
   } finally {
     loading.value = false
   }
@@ -244,7 +256,7 @@ const sendMessage = (user: any) => {
   router.push(`/friendChat/${user.id}`)
 }
 
-const isFriend = (id: number) => friendStore.isFriend(id)
+const isFriend = (id?: number) => (id ? friendStore.isFriend(id) : false)
 
 // 获取要显示的标签
 const getDisplayTags = (user: any) => {

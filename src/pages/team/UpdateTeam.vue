@@ -25,14 +25,18 @@
         placeholder="请更改队伍描述"
         show-word-limit
       />
-      <van-field
-        v-model="icon"
-        name="icon"
-        label="更改队伍头像链接"
-        placeholder="请输入链接"
-        maxlength="256"
-        :rules="[{ required: true, message: '请输入队伍头像链接' }]"
-      />
+      <van-field name="uploader" label="上传队伍头像">
+        <template #input>
+          <van-uploader
+            :before-read="beforeRead"
+            v-model="fileList"
+            :max-count="1"
+            :after-read="handleUpload"
+            :disabled="uploading"
+            accept="image/*"
+          />
+        </template>
+      </van-field>
       <br />
       <div>
         <p>更改队伍人数</p>
@@ -63,7 +67,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, onActivated } from 'vue'
-import { api } from '@/api/apiClient'
+import { api, type TeamVO } from '@/api/apiClient'
 import { useRoute, useRouter } from 'vue-router'
 import { showFailToast, showSuccessToast } from 'vant'
 
@@ -75,10 +79,63 @@ const status = ref(0)
 const password = ref('')
 const router = useRouter()
 const maxNum = ref(3)
-let team = ref()
+let team = ref<TeamVO>()
 const route = useRoute()
 const teamId = ref(Number(route.params.teamId))
 const loading = ref(false)
+
+const fileList = ref<any[]>([])
+const uploading = ref(false)
+
+const MAX_UPLOAD_SIZE = 4 * 1024 * 1024
+const ALLOWED_EXTS = ['jpeg', 'jpg', 'png', 'webp']
+const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp']
+
+const beforeRead = (input: any) => {
+  const toFile = (it: any): File => (it && (it.file as File)) || (it as File)
+
+  const validate = (file: File): boolean => {
+    const name = (file?.name || '').toLowerCase()
+    const ext = name.includes('.') ? name.split('.').pop() || '' : ''
+    if (file.size > MAX_UPLOAD_SIZE) {
+      showFailToast('图片大小不能超过 4MB')
+      return false
+    }
+    if (!ALLOWED_EXTS.includes(ext) || !ALLOWED_MIME.includes(file.type)) {
+      showFailToast('仅支持 jpeg / jpg / png / webp 格式')
+      return false
+    }
+    return true
+  }
+
+  if (Array.isArray(input)) {
+    return input.every((it) => validate(toFile(it)))
+  }
+  return validate(toFile(input))
+}
+
+const handleUpload = async (item: any) => {
+  try {
+    uploading.value = true
+    const file = Array.isArray(item) ? item[0].file : item.file
+    if (!file) {
+      showFailToast('未选择文件')
+      return
+    }
+    const res = await api.upload.uploadPicture({ type: 'Team' }, { file: file as File })
+    if (res?.data?.code === 0 && res?.data?.data) {
+      icon.value = res.data.data
+      fileList.value = [{ url: res.data.data } as any]
+      showSuccessToast('上传成功')
+    } else {
+      showFailToast(res?.data?.message || '上传失败')
+    }
+  } catch (e) {
+    showFailToast('上传失败')
+  } finally {
+    uploading.value = false
+  }
+}
 
 const loadTeamData = async () => {
   loading.value = true
@@ -92,15 +149,21 @@ const loadTeamData = async () => {
     maxNum.value = 3
 
     // 获取队伍详情并预填充表单
-    const teamRes = await api.team.searchTeamById({ teamId: teamId.value })
+    const teamRes = await api.team.getMyTeam()
     const teamData = teamRes.data.data
 
     if (teamData) {
-      // 这里需要根据实际API返回的数据结构调整
-      // 假设API返回的是队伍详情对象
-      const teamDetails = await getTeamSearchById({ teamId: teamId.value })
-      // 注意：这里可能需要调用不同的API来获取完整的队伍信息
-      // 暂时使用现有的API结构
+      const team = teamData.find((t) => t.id === teamId.value)
+      if (team) {
+        teamName.value = team.teamName || ''
+        description.value = team.description || ''
+        icon.value = team.icon || ''
+        if (team.icon) {
+          fileList.value = [{ url: team.icon }]
+        }
+        status.value = team.status || 0
+        maxNum.value = team.maxNum || 3
+      }
     }
   } catch (error) {
     showFailToast('加载队伍信息失败')
@@ -110,8 +173,8 @@ const loadTeamData = async () => {
 }
 
 const check = async () => {
-  const res = await getUserCurrent()
-  userId.value = res.data.data.id
+  const res = await api.user.getCurrentUser()
+  userId.value = res.data.data?.id
 }
 
 onMounted(async () => {
@@ -140,7 +203,7 @@ onActivated(async () => {
   }
 })
 const onSubmit = async () => {
-  const input = {
+  const input: TeamVO = {
     id: teamId.value,
     teamName: teamName.value,
     maxNum: maxNum.value,
