@@ -275,6 +275,15 @@ onMounted(() => {
   border-top: 1px solid #ebedf0;
 }
 
+@media (min-width: 640px) {
+  .footer-tabbar {
+    max-width: 480px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}
+
 /* 确保页面内容不被底部标签栏遮挡 */
 :deep(.van-swipe-item) {
   padding-bottom: 0;

@@ -9,10 +9,6 @@
       <div class="nearby-header">
         <div class="nearby-avatar">
           <img :src="user.avatarUrl || '/ava.jpg'" :alt="user.userName" @error="handleImageError" />
-          <div class="distance-badge">
-            <van-icon name="location-o" />
-            {{ formatDistance(user.distance) }}
-          </div>
         </div>
         <div class="nearby-info">
           <h3 class="nearby-name">{{ user.userName }}</h3>
@@ -259,26 +255,6 @@ const toggleTagsExpand = (user: any) => {
   object-fit: cover;
   border: 3px solid #fff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.distance-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-  color: white;
-  border-radius: 12px;
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.distance-badge .van-icon {
-  font-size: 10px;
 }
 
 .nearby-info {

@@ -5,13 +5,6 @@
   font-weight: normal;
 }
 
-/* 为非全屏页面设置容器样式 */
-#app.container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
 a,
 .green {
   text-decoration: none;
@@ -26,15 +19,80 @@ a,
   }
 }
 
-@media (min-width: 1024px) {
-  body.Desktop-layout {
-    display: flex;
-    place-items: center;
+/* Floating Action Button Base Style */
+.floating-action-button {
+  position: fixed !important;
+  right: 20px !important;
+  left: auto !important;
+  bottom: 80px !important;
+  z-index: 999 !important;
+  width: 50px !important;
+  height: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  font-size: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Ensure Vant button icon is centered in floating button */
+.floating-action-button .van-icon,
+.floating-action-button .van-button__icon {
+  margin: 0 !important;
+  font-size: 20px !important;
+}
+
+/* Hide any text content in floating button */
+.floating-action-button .van-button__text {
+  display: none !important;
+}
+
+/* Round Button Style (for backwards compatibility) */
+.round-button {
+  width: 50px !important;
+  height: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+  padding: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 20px;
+}
+
+/* PC Adaptation: Centered Mobile View */
+@media (min-width: 640px) {
+  body {
+    background-color: #f7f8fa;
+    min-height: 100vh;
   }
 
-  #app.container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+  #app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background-color: #fff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  /* Fix position of fixed elements to be centered */
+  #footer,
+  .van-tabbar--fixed,
+  .van-nav-bar--fixed {
+    max-width: 480px;
+    left: 50% !important;
+    transform: translateX(-50%);
+    width: 100%;
+  }
+
+  /* Fix floating action buttons to stay within the centered container */
+  .floating-action-button {
+    position: fixed !important;
+    right: calc(50vw - 220px) !important;
+    left: auto !important;
+    bottom: 80px !important;
   }
 }

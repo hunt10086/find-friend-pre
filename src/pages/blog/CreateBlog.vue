@@ -718,6 +718,7 @@ watch(
 /* 主编辑器容器 */
 .editor-container {
   display: flex;
+  flex-direction: column;
   max-width: 1400px;
   margin: 0 auto;
   gap: 24px;
@@ -842,7 +843,7 @@ watch(
 
 /* 右侧设置面板 */
 .editor-sidebar {
-  width: 320px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 16px;

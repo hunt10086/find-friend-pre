@@ -90,17 +90,14 @@
     <van-divider />
   </div>
   <!-- 固定在右下角的按钮 -->
-  <van-sticky :offset-bottom="20" position="bottom">
-    <van-button
-      icon="plus"
-      type="primary"
-      class="round-button"
-      round
-      style="position: fixed; right: 20px; bottom: 120px; z-index: 999"
-      @click="handleAddBlog"
-    >
-    </van-button>
-  </van-sticky>
+  <van-button
+    icon="plus"
+    type="primary"
+    class="round-button floating-action-button"
+    round
+    @click="handleAddBlog"
+  >
+  </van-button>
 </template>
 
 <script setup lang="ts">

@@ -52,22 +52,8 @@ export default {
 }
 </script>
 <style scoped>
-/* 只为容器页面设置样式 */
-#app.container {
-  margin: 0;
-  padding: 0;
-}
-
 #router {
   padding-bottom: 70px; /* 为底部导航栏预留空间 */
   min-height: calc(100vh - 120px); /* 减去顶部导航栏和底部导航栏的高度 */
-}
-
-/* 确保全屏页面没有任何边距和填充 */
-#app:not(.container) {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
 }
 </style>
