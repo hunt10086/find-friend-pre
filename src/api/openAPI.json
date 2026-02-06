@@ -125,6 +125,38 @@
         }
       }
     },
+    "/user/forgetPassword": {
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "忘记密码",
+        "description": "忘记密码",
+        "operationId": "forgetPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseBoolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/user/delete": {
       "post": {
         "tags": [
@@ -651,6 +683,37 @@
         ],
         "summary": "发送验证码",
         "operationId": "sendCode",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponseLong"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/sendCode/pa": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "summary": "发送找回密码验证码",
+        "operationId": "sendCodePa",
         "parameters": [
           {
             "name": "email",

@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { api } from '@/api/apiClient'
-import { showSuccessToast, showFailToast, showToast } from 'vant'
+import { showSuccessToast, showFailToast } from 'vant'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -181,7 +181,7 @@ const Register = () => {
 }
 
 const showForgotPassword = () => {
-  showToast('该功能暂未开放')
+  router.push('/user/forget-password')
 }
 </script>
 

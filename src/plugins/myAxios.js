@@ -6,7 +6,7 @@ import { showFailToast } from 'vant'
 export const BASE_URL =
   import.meta.env.MODE === 'development'
     ? 'http://localhost:7777/api'
-    : 'http://bc.seestars.top/api'
+    : 'https://bc.seestars.top/api'
 
 const myAxios = axios.create({
   baseURL: BASE_URL,

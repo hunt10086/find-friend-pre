@@ -1,5 +1,5 @@
 import { Api } from './api'
-import myAxios from '@/plugins/myAxios.js'
+import myAxios, { BASE_URL } from '@/plugins/myAxios.js'
 
 /**
  * 自定义 API 客户端类
@@ -8,7 +8,7 @@ import myAxios from '@/plugins/myAxios.js'
 class MyApiClient extends Api<unknown> {
   constructor() {
     super({
-      baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:7777/api',
+      baseURL: import.meta.env.VITE_API_BASE_URL || BASE_URL,
     })
 
     // 使用项目的 axios 实例（已配置拦截器、认证等）

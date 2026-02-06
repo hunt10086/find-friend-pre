@@ -8,6 +8,7 @@ import UserEditPages from '@/pages/user/UserEditPages.vue'
 import SearchResultPages from '@/pages/search/SearchResultPages.vue'
 import UserLogin from '@/pages/auth/UserLogin.vue'
 import UserRegister from '@/pages/auth/UserRegister.vue'
+import ForgetPassword from '@/pages/auth/ForgetPassword.vue'
 import JoinTeam from '@/pages/team/JoinTeam.vue'
 import I from '@/pages/user/I.vue'
 import MyTeam from '@/pages/team/MyTeam.vue'
@@ -71,6 +72,11 @@ const routes = [
   {
     path: '/user/register',
     component: UserRegister,
+    meta: { keepAlive: true, showNavBar: false },
+  },
+  {
+    path: '/user/forget-password',
+    component: ForgetPassword,
     meta: { keepAlive: true, showNavBar: false },
   },
   {

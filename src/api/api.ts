@@ -624,6 +624,23 @@ export class Api<
       }),
 
     /**
+     * @description 忘记密码
+     *
+     * @tags user-controller
+     * @name ForgetPassword
+     * @summary 忘记密码
+     * @request POST:/user/forgetPassword
+     */
+    forgetPassword: (data: UserRegisterRequest, params: RequestParams = {}) =>
+      this.request<BaseResponseBoolean, any>({
+        path: `/user/forgetPassword`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
      * No description
      *
      * @tags user-controller
@@ -656,6 +673,27 @@ export class Api<
     ) =>
       this.request<BaseResponseLong, any>({
         path: `/user/sendCode`,
+        method: "GET",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags user-controller
+     * @name SendCodePa
+     * @summary 发送找回密码验证码
+     * @request GET:/user/sendCode/pa
+     */
+    sendCodePa: (
+      query: {
+        email: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<BaseResponseLong, any>({
+        path: `/user/sendCode/pa`,
         method: "GET",
         query: query,
         ...params,

@@ -19,12 +19,13 @@
 export const API_BASE_URL =
   import.meta.env.MODE === 'development'
     ? 'http://localhost:7777/api'
-    : 'http://bc.seestars.top/api'
+    : 'https://bc.seestars.top/api'
 export const BASE_URL = API_BASE_URL
 
 // 基于 API_BASE_URL 推导 WebSocket 基址
-// 例如: http://localhost:7777/api -> ws://localhost:7777/api
-export const WS_BASE_URL = API_BASE_URL.replace(/^http/, 'ws')
+// http://localhost:7777/api -> ws://localhost:7777/api
+// https://bc.seestars.top/api -> wss://bc.seestars.top/api
+export const WS_BASE_URL = API_BASE_URL.replace(/^https/, 'wss').replace(/^http/, 'ws')
 
 // 构建完整的 WebSocket URL
 export function buildWsUrl(path: string): string {
