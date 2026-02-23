@@ -33,7 +33,7 @@
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/your-repo/findFriend-front-vue.git
+git clone https://github.com/hunt10086/findFriend-front-vue.git
 cd findFriend-front-vue
 ```
 
@@ -49,7 +49,7 @@ npm install
 npm run dev
 ```
 
-访问 http://localhost:9090
+端口在vite.config.ts中可修改，默认localhost:9191
 
 ### 4. 构建生产版本
 
